@@ -34,6 +34,18 @@ out=$("$BIN" --undo-selftest 2>/dev/null) || fail=1
 echo "$out"
 echo "$out" | grep -q "undo-selftest: PASS" || fail=1
 
+# Image and PDF export produce non-empty, well-formed files.
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+"$BIN" "$SAMPLE" --render "$tmp/out.png" >/dev/null 2>&1
+"$BIN" "$SAMPLE" --pdf "$tmp/out.pdf" >/dev/null 2>&1
+if [ -s "$tmp/out.png" ]; then echo "render-png: PASS"; else echo "render-png: FAIL"; fail=1; fi
+if head -c 5 "$tmp/out.pdf" 2>/dev/null | grep -q '%PDF'; then
+    echo "render-pdf: PASS"
+else
+    echo "render-pdf: FAIL"; fail=1
+fi
+
 if [ "$fail" -eq 0 ]; then
     echo "editor: PASS"
 else

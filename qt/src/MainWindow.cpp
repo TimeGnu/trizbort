@@ -57,6 +57,7 @@
 
 #include "ConnectionDialog.h"
 #include "EditCommands.h"
+#include "MapRender.h"
 #include "MapScene.h"
 #include "MapView.h"
 #include "RoomDialog.h"
@@ -107,6 +108,9 @@ void MainWindow::createActions()
         const QString key = fmt.key;
         exportMenu->addAction(fmt.label, this, [this, key] { exportMap(key); });
     }
+    exportMenu->addSeparator();
+    exportMenu->addAction(tr("PDF…"), this, &MainWindow::exportPdf);
+    exportMenu->addAction(tr("PNG image…"), this, &MainWindow::exportImage);
     fileMenu->addSeparator();
     fileMenu->addAction(tr("&Quit"), QKeySequence::Quit, this, &QWidget::close);
 
@@ -260,6 +264,38 @@ void MainWindow::exportMap(const QString &format)
     }
     file.write(text.toUtf8());
     statusBar()->showMessage(tr("Exported %1").arg(QFileInfo(path).fileName()));
+}
+
+void MainWindow::exportImage()
+{
+    const QString suggested =
+        (m_filePath.isEmpty() ? QStringLiteral("map") : QFileInfo(m_filePath).completeBaseName())
+        + QStringLiteral(".png");
+    QString path = QFileDialog::getSaveFileName(this, tr("Export PNG"), suggested,
+                                                tr("PNG image (*.png);;All files (*)"));
+    if (path.isEmpty())
+        return;
+    QString error;
+    if (!renderMapToImage(m_map, path, &error))
+        QMessageBox::warning(this, tr("Export Failed"), error);
+    else
+        statusBar()->showMessage(tr("Exported %1").arg(QFileInfo(path).fileName()));
+}
+
+void MainWindow::exportPdf()
+{
+    const QString suggested =
+        (m_filePath.isEmpty() ? QStringLiteral("map") : QFileInfo(m_filePath).completeBaseName())
+        + QStringLiteral(".pdf");
+    QString path = QFileDialog::getSaveFileName(this, tr("Export PDF"), suggested,
+                                                tr("PDF document (*.pdf);;All files (*)"));
+    if (path.isEmpty())
+        return;
+    QString error;
+    if (!renderMapToPdf(m_map, path, &error))
+        QMessageBox::warning(this, tr("Export Failed"), error);
+    else
+        statusBar()->showMessage(tr("Exported %1").arg(QFileInfo(path).fileName()));
 }
 
 void MainWindow::addRoom()

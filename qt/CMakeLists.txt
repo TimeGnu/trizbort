@@ -24,6 +24,7 @@ add_executable(trizbort-qt
     src/TrizbortWriter.cpp
     src/MapScene.cpp
     src/MapView.cpp
+    src/MapRender.cpp
     src/MainWindow.cpp
     src/RoomItem.cpp
     src/ConnectionItem.cpp

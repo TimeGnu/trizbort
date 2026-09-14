@@ -70,6 +70,8 @@ private slots:
     bool save();
     bool saveAs();
     void exportMap(const QString &format);
+    void exportImage();
+    void exportPdf();
     void addRoom();
     void deleteSelection();
     void toggleConnectMode(bool on);

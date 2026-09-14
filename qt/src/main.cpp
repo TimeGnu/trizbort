@@ -55,6 +55,7 @@
 #include "EditCommands.h"
 #include "MainWindow.h"
 #include "MapDocument.h"
+#include "MapRender.h"
 #include "MapScene.h"
 #include "RoomItem.h"
 #include "SettingsDialog.h"
@@ -63,9 +64,10 @@
 #include "export/CodeExporter.h"
 #include "export/ExporterFactory.h"
 
-// Headless render: load a map and write a PNG, no window. Useful for CI smoke
-// tests and thumbnails. Run with QT_QPA_PLATFORM=offscreen on a headless host.
-static int renderToPng(const QString &mapPath, const QString &pngPath)
+// Headless render: load a map and write a PNG or PDF, no window. Useful for CI
+// smoke tests and thumbnails. Run with QT_QPA_PLATFORM=offscreen on a headless
+// host.
+static int renderToFile(const QString &mapPath, const QString &outPath, bool pdf)
 {
     QTextStream err(stderr);
 
@@ -76,29 +78,14 @@ static int renderToPng(const QString &mapPath, const QString &pngPath)
         return 1;
     }
 
-    trizbort::MapScene scene;
-    scene.setDocument(&map);
-
-    QRectF bounds = scene.itemsBoundingRect().adjusted(-20, -20, 20, 20);
-    if (bounds.isEmpty())
-        bounds = QRectF(0, 0, 200, 200);
-
-    QImage image(bounds.size().toSize(), QImage::Format_ARGB32);
-    image.fill(Qt::white);
-    {
-        QPainter painter(&image);
-        painter.setRenderHint(QPainter::Antialiasing, true);
-        painter.setRenderHint(QPainter::TextAntialiasing, true);
-        scene.render(&painter, QRectF(QPointF(0, 0), bounds.size()), bounds);
-    }
-
-    if (!image.save(pngPath)) {
-        err << "could not write " << pngPath << Qt::endl;
+    const bool ok = pdf ? trizbort::renderMapToPdf(map, outPath, &error)
+                        : trizbort::renderMapToImage(map, outPath, &error);
+    if (!ok) {
+        err << error << Qt::endl;
         return 3;
     }
     QTextStream(stdout) << "rendered " << map.rooms.size() << " rooms, "
-                        << map.connections.size() << " connections -> " << pngPath
-                        << Qt::endl;
+                        << map.connections.size() << " connections -> " << outPath << Qt::endl;
     return 0;
 }
 
@@ -384,6 +371,7 @@ int main(int argc, char *argv[])
 
     QString mapPath;
     QString renderPath;
+    QString pdfPath;
     QString savePath;
     QString exportFmt;
     QString exportOut;
@@ -400,6 +388,10 @@ int main(int argc, char *argv[])
     for (int i = 1; i < args.size(); ++i) {
         if (args.at(i) == QLatin1String("--render") && i + 1 < args.size()) {
             renderPath = args.at(++i);
+            continue;
+        }
+        if (args.at(i) == QLatin1String("--pdf") && i + 1 < args.size()) {
+            pdfPath = args.at(++i);
             continue;
         }
         if (args.at(i) == QLatin1String("--save") && i + 1 < args.size()) {
@@ -436,13 +428,21 @@ int main(int argc, char *argv[])
         return runSave(mapPath, savePath);
     }
 
+    if (!pdfPath.isEmpty()) {
+        if (mapPath.isEmpty()) {
+            QTextStream(stderr) << "usage: trizbort-qt <map.trizbort> --pdf <out.pdf>" << Qt::endl;
+            return 2;
+        }
+        return renderToFile(mapPath, pdfPath, /*pdf=*/true);
+    }
+
     if (!renderPath.isEmpty()) {
         if (mapPath.isEmpty()) {
             QTextStream(stderr) << "usage: trizbort-qt <map.trizbort> --render <out.png>"
                                 << Qt::endl;
             return 2;
         }
-        return renderToPng(mapPath, renderPath);
+        return renderToFile(mapPath, renderPath, /*pdf=*/false);
     }
 
     trizbort::MainWindow window;
