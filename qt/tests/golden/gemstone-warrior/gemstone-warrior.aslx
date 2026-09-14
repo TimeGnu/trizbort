@@ -1,0 +1,1194 @@
+<asl version="550">
+
+  <include ref="English.aslx"/>
+  <include ref="Core.aslx"/>
+  <game name="Gemstone Warrior Trizbort map">
+    <gameid>f0e62cbe-6e17-4126-9e87-4fc51b26e62c</gameid>
+    <version>1.0</version>
+    <firstpublished>2026</firstpublished>
+    <author>Andrew Schultz</author>
+    <description>I set the preferred distance between rooms to 16, and I set regions to </description>
+  </game>
+
+  <object name="Room1">
+    <inherit name="editor_room" />
+    <alias>Room 1</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room4">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room4">
+    <inherit name="editor_room" />
+    <alias>Room 4</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room0">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room5">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Room6">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room1">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room0">
+    <inherit name="editor_room" />
+    <alias>Room 0</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Room4">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Room5">
+    <inherit name="editor_room" />
+    <alias>Room 5</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room4">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room3">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Room6">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room2">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room3">
+    <inherit name="editor_room" />
+    <alias>Room 3</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room5">
+      <inherit name="northdirection" />
+    </exit>
+  </object>
+
+  <object name="Room2">
+    <inherit name="editor_room" />
+    <alias>Room 2</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room5">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room6">
+    <inherit name="editor_room" />
+    <alias>Room 6</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room4">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="Room7">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room5">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room7">
+    <inherit name="editor_room" />
+    <alias>Room 7</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room8">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="west" to="Room6">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room8">
+    <inherit name="editor_room" />
+    <alias>Room 8</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room9">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room7">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Room10">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room10">
+    <inherit name="editor_room" />
+    <alias>Room 10</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room102">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room8">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room9">
+    <inherit name="editor_room" />
+    <alias>Room 9</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room12">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room8">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Room102">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room102">
+    <inherit name="editor_room" />
+    <alias>Room 10</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">6</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room12">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="west" to="Room9">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room12">
+    <inherit name="editor_room" />
+    <alias>Room 12</alias>
+    <attr name="grid_width" type="int">13</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room15">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room102">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Room13">
+    <inherit name="editor_room" />
+    <alias>Room 13</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room12">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="Room14">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room14">
+    <inherit name="editor_room" />
+    <alias>Room 14</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room16">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="west" to="Room13">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room16">
+    <inherit name="editor_room" />
+    <alias>Room 16</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room15">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room14">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Room15">
+    <inherit name="editor_room" />
+    <alias>Room 15</alias>
+    <attr name="grid_width" type="int">6</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Room16">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Room17">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room17">
+    <inherit name="editor_room" />
+    <alias>Room 17</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Room18">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Room20">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room15">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room18">
+    <inherit name="editor_room" />
+    <alias>Room 18</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room17">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room19">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Room19">
+    <inherit name="editor_room" />
+    <alias>Room 19</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room18">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room21">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Room21">
+    <inherit name="editor_room" />
+    <alias>Room 21</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room19">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="Room22">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room22">
+    <inherit name="editor_room" />
+    <alias>Room 22</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room20">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room21">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room20">
+    <inherit name="editor_room" />
+    <alias>Room 20</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">14</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room24">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room17">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room24">
+    <inherit name="editor_room" />
+    <alias>Room 24</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">9</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="Room20">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room25">
+    <inherit name="editor_room" />
+    <alias>Room 25</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room24">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room23">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room23">
+    <inherit name="editor_room" />
+    <alias>Room 23</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Room27">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Room25">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room26">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room26">
+    <inherit name="editor_room" />
+    <alias>Room 26</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">11</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room23">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room27">
+    <inherit name="editor_room" />
+    <alias>Room 27</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room23">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room28">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Room28">
+    <inherit name="editor_room" />
+    <alias>Room 28</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room27">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room29">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Room31">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room29">
+    <inherit name="editor_room" />
+    <alias>Room 29</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room28">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="west" to="Room26">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room31">
+    <inherit name="editor_room" />
+    <alias>Room 31</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Room34">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Room32">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room28">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room32">
+    <inherit name="editor_room" />
+    <alias>Room 32</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">10</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="Room31">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room34">
+    <inherit name="editor_room" />
+    <alias>Room 34</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">5</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room31">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room35">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Room33">
+    <inherit name="editor_room" />
+    <alias>Room 33</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room32">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room38">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room38">
+    <inherit name="editor_room" />
+    <alias>Room 38</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Room39">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Room33">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room35">
+    <inherit name="editor_room" />
+    <alias>Room 35</alias>
+    <attr name="grid_width" type="int">5</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room36">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="Room34">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room36">
+    <inherit name="editor_room" />
+    <alias>Room 36</alias>
+    <attr name="grid_width" type="int">5</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Room35">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="west" to="Room37">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room37">
+    <inherit name="editor_room" />
+    <alias>Room 37</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room36">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room40">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room40">
+    <inherit name="editor_room" />
+    <alias>Room 40</alias>
+    <attr name="grid_width" type="int">5</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Room42">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Room37">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room42">
+    <inherit name="editor_room" />
+    <alias>Room 42</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room40">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room41">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Room43">
+    <inherit name="editor_room" />
+    <alias>Room 43</alias>
+    <attr name="grid_width" type="int">5</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room40">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room41">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Room41">
+    <inherit name="editor_room" />
+    <alias>Room 41</alias>
+    <attr name="grid_width" type="int">5</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room43">
+      <inherit name="northdirection" />
+    </exit>
+  </object>
+
+  <object name="Room69">
+    <inherit name="editor_room" />
+    <alias>Room 69</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+  </object>
+
+  <object name="Room39">
+    <inherit name="editor_room" />
+    <alias>Room 39</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room38">
+      <inherit name="northdirection" />
+    </exit>
+  </object>
+
+  <object name="Room692">
+    <inherit name="editor_room" />
+    <alias>Room 69</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Room68">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Room68">
+    <inherit name="editor_room" />
+    <alias>Room 68</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Room67">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Room67">
+    <inherit name="editor_room" />
+    <alias>Room 67</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room68">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room66">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Room66">
+    <inherit name="editor_room" />
+    <alias>Room 66</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room67">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room65">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Room65">
+    <inherit name="editor_room" />
+    <alias>Room 65</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room66">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="west" to="Room64">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room64">
+    <inherit name="editor_room" />
+    <alias>Room 64</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room64">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room63">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Room65">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room64">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room63">
+    <inherit name="editor_room" />
+    <alias>Room 63</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">5</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room62">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="west" to="Room61">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room56">
+    <inherit name="editor_room" />
+    <alias>Room 56</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room58">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room61">
+    <inherit name="editor_room" />
+    <alias>Room 61</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room58">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="Room63">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room57">
+    <inherit name="editor_room" />
+    <alias>Room 57</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room58">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room58">
+    <inherit name="editor_room" />
+    <alias>Room 58</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">5</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Room61">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Room59">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room57">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room62">
+    <inherit name="editor_room" />
+    <alias>Room 62</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Room63">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Room60">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room59">
+    <inherit name="editor_room" />
+    <alias>Room 59</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room60">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room58">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room60">
+    <inherit name="editor_room" />
+    <alias>Room 60</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">5</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="Room59">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room52">
+    <inherit name="editor_room" />
+    <alias>Room 52</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Room53">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Room54">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room51">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room54">
+    <inherit name="editor_room" />
+    <alias>Room 54</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room562">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room52">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room53">
+    <inherit name="editor_room" />
+    <alias>Room 53</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room52">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="Room55">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Room55">
+    <inherit name="editor_room" />
+    <alias>Room 55</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room572">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room53">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room572">
+    <inherit name="editor_room" />
+    <alias>Room 57</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room582">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room55">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room582">
+    <inherit name="editor_room" />
+    <alias>Room 58</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="Room572">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room562">
+    <inherit name="editor_room" />
+    <alias>Room 56</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">5</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room583">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room54">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room583">
+    <inherit name="editor_room" />
+    <alias>Room 58</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="Room562">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room72">
+    <inherit name="editor_room" />
+    <alias>Room 7</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+  </object>
+
+  <object name="Room44">
+    <inherit name="editor_room" />
+    <alias>Room 44</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">8</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="Room45">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room45">
+    <inherit name="editor_room" />
+    <alias>Room 45</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room44">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room47">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room46">
+    <inherit name="editor_room" />
+    <alias>Room 46</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room44">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room48">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room48">
+    <inherit name="editor_room" />
+    <alias>Room 48</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room46">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room50">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room47">
+    <inherit name="editor_room" />
+    <alias>Room 47</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room45">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room49">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room49">
+    <inherit name="editor_room" />
+    <alias>Room 49</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room47">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room50">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room50">
+    <inherit name="editor_room" />
+    <alias>Room 50</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">5</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room49">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Room51">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room51">
+    <inherit name="editor_room" />
+    <alias>Room 51</alias>
+    <attr name="grid_width" type="int">2</attr>
+    <attr name="grid_length" type="int">14</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Room52">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+
+</asl>
+

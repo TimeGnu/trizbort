@@ -1,0 +1,695 @@
+#include "verblib.g" ! grammar must come first
+
+#include "hugolib.h"
+
+routine init
+{
+	cls
+	verbosity = 2
+	counter = -1
+	STATUSTYPE = 1 !1 = score / turns, 2 = time, 3 = moves: score:
+	player = you
+	Font(BOLD_ON)
+	"space-quest-lost-chapter-spaceship"
+	Font(BOLD_OFF)
+	"by A Trizbort User"
+	location = EngineRoom
+	MovePlayer(location)
+}
+
+property region
+room EngineRoom
+{
+	region Through Way
+
+	s_to Hallway
+
+}
+
+room Hallway
+{
+	region Through Way
+
+	n_to EngineRoom
+	w_to Entry
+
+}
+
+room Entry
+{
+	region Through Way
+
+	n_to WiresLeft
+	e_to Hallway
+	w_to PilotRoom
+
+}
+
+room PilotRoom
+{
+	region Through Way
+
+	s_to Entry
+	sw_to Hall
+
+}
+
+room WiresLeft
+{
+	region Important item
+
+	s_to Entry
+	e_to WiresRight
+
+}
+
+room Elevator2
+{
+	region Elevator
+
+	s_to L2room
+
+}
+
+room L2room
+{
+	region Through Way
+
+	n_to Elevator2
+	e_to FromPod
+
+}
+
+room FromPod
+{
+	region Through Way
+
+	w_to L2room
+
+}
+
+object GETNEWHAIR
+{
+	in FromPod
+}
+
+room L3hall
+{
+	region Through Way
+
+	n_to Elevator3
+	e_to L3hall2
+	w_to Guards9
+
+}
+
+room Elevator3
+{
+	region Elevator
+
+	s_to L3hall
+
+}
+
+room L3hall2
+{
+	region Through Way
+
+	n_to Lookout
+	e_to Guards8
+	w_to L3hall
+
+}
+
+room Lookout
+{
+	region Important item
+
+	s_to L3hall2
+
+}
+
+room Bar
+{
+	region Important item
+
+	e_to BarLISTEN
+
+}
+
+object OrderFrost
+{
+	in Bar
+}
+
+object Tormeenian
+{
+	in Bar
+}
+
+room BarLISTEN
+{
+	region Through Way
+
+	s_to L4Hall
+	e_to Bar2
+	w_to Bar
+
+}
+
+room Bar2
+{
+	region Important item
+
+	w_to BarLISTEN
+
+}
+
+object tradestone
+{
+	in Bar2
+}
+
+object forclearance
+{
+	in Bar2
+}
+
+room L4Hall
+{
+	region Through Way
+
+	n_to BarLISTEN
+	e_to Guards
+	w_to L4Hall2
+
+}
+
+room Guards
+{
+	region Useless
+
+	w_to L4Hall
+
+}
+
+room L4Hall2
+{
+	region Through Way
+
+	n_to Elevator4
+	e_to L4Hall
+	w_to Guards2
+
+}
+
+room Elevator4
+{
+	region Elevator
+
+	s_to L4Hall2
+
+}
+
+room Guards2
+{
+	region Useless
+
+	e_to L4Hall2
+
+}
+
+room Elevator5
+{
+	region Elevator
+
+	s_to L5hall
+
+}
+
+room L5hall
+{
+	region Useless
+
+	n_to Elevator5
+	e_to Guards4
+	w_to Guards3
+
+}
+
+room Guards3
+{
+	region Useless
+
+	e_to L5hall
+
+}
+
+room Guards4
+{
+	region Useless
+
+	w_to L5hall
+
+}
+
+room L6hall
+{
+	region Useless
+
+	n_to ScienceRoom
+	e_to L6hall2
+	w_to Guards6
+
+}
+
+room ScienceRoom
+{
+	region Useless
+
+	s_to L6hall
+
+}
+
+room L6hall2
+{
+	region Useless
+
+	n_to Elevator6
+	e_to L6hall3
+	w_to L6hall
+
+}
+
+room L6hall3
+{
+	region Useless
+
+	n_to Elevator6
+	e_to Guards7
+	w_to L6hall2
+
+}
+
+room Elevator6
+{
+	region Elevator
+
+	s_to L6hall2
+	e_to L6hall3
+
+}
+
+room Science
+{
+	region Useless
+
+	e_to Science2
+
+}
+
+room Science2
+{
+	region Useless
+
+	s_to L7hall
+	w_to Science
+
+}
+
+room L7hall
+{
+	region Useless
+
+	n_to Science2
+	e_to L7hall2
+	w_to Guards10
+
+}
+
+room L7hall2
+{
+	region Useless
+
+	n_to Elevator7
+	e_to Guards11
+	w_to L7hall
+
+}
+
+room Elevator7
+{
+	region Elevator
+
+	s_to L7hall2
+
+}
+
+room Elevator8
+{
+	region Elevator
+
+	s_to HallL10
+
+}
+
+room HallL10
+{
+	region Through Way
+
+	n_to Elevator8
+	e_to HallL102
+
+}
+
+room HallL102
+{
+	region Through Way
+
+	n_to WAITLISTEN
+	e_to Guards12
+	w_to HallL10
+
+}
+
+room WAITLISTEN
+{
+	region Important item
+
+	s_to HallL102
+
+}
+
+room Elevator9
+{
+	region Elevator
+
+	s_to GuardsL8
+
+}
+
+room Elevator10
+{
+	region Elevator
+
+	s_to GuardsL9
+
+}
+
+room Elevator11
+{
+	region Elevator
+
+	s_to HallL11
+
+}
+
+room HallL11
+{
+	region Through Way
+
+	n_to Elevator11
+	e_to HallL112
+
+}
+
+room HallL112
+{
+	region Through Way
+
+	n_to Scienceroom2
+	e_to Guards13
+	w_to HallL11
+
+}
+
+room Scienceroom2
+{
+	region Through Way
+
+	s_to HallL112
+	w_to BombRoom
+
+}
+
+room BombRoom
+{
+	region Important item
+
+	e_to Scienceroom2
+
+}
+
+room DockingBay
+{
+	region Important item
+
+	e_to ControlsL12
+
+}
+
+object LISTEN
+{
+	in DockingBay
+}
+
+room ControlsL12
+{
+	region Through Way
+
+	n_to Elevator12
+	w_to DockingBay
+
+}
+
+room Elevator12
+{
+	region Elevator
+
+	s_to ControlsL12
+
+}
+
+room WiresRight
+{
+	region Important item
+
+	w_to WiresLeft
+
+}
+
+object POD
+{
+	in WiresRight
+}
+
+room Leverroom
+{
+	region Important item
+
+	n_to EngineRoom
+
+}
+
+room Hall
+{
+	region Through Way
+
+	e_to Fight2Aliens
+	nw_to PilotRoom
+
+}
+
+room Fight2Aliens
+{
+	region Lethal
+
+	e_to Hall2
+	w_to Hall
+
+}
+
+room Hall2
+{
+	region Through Way
+
+	s_to Hall3
+	w_to Fight2Aliens
+
+}
+
+room Hall3
+{
+	region Through Way
+
+	n_to Hall2
+	e_to SUITHELMET
+
+}
+
+room SUITHELMET
+{
+	region Important item
+
+	w_to Hall3
+
+}
+
+room GunCompartment
+{
+	region Important item
+
+	n_to PilotRoom
+
+}
+
+object GUN
+{
+	in GunCompartment
+}
+
+room Guards5
+{
+	region Useless
+
+	s_to L1hall
+
+}
+
+room L1hall
+{
+	region Useless
+
+	e_to L1hall2
+	w_to Guards5
+
+}
+
+room L1hall2
+{
+	region Through Way
+
+	n_to Elevator13
+	e_to L1hall3
+	w_to L1hall
+
+}
+
+room Elevator13
+{
+	region Elevator
+
+	s_to L1hall2
+
+}
+
+room L1hall3
+{
+	region Through Way
+
+	n_to Science3
+	w_to L1hall2
+
+}
+
+room Science3
+{
+	region Through Way
+
+	s_to L1hall3
+	w_to Science4
+
+}
+
+room Science4
+{
+	region Important item
+
+	e_to Science3
+
+}
+
+room Guards6
+{
+	region Useless
+
+	e_to L6hall
+
+}
+
+room Guards7
+{
+	region Useless
+
+	w_to L6hall3
+
+}
+
+room Guards8
+{
+	region Useless
+
+	w_to L3hall2
+
+}
+
+room Guards9
+{
+	region Useless
+
+	e_to L3hall
+
+}
+
+room Guards10
+{
+	region Useless
+
+	e_to L7hall
+
+}
+
+room Guards11
+{
+	region Useless
+
+	w_to L7hall2
+
+}
+
+room GuardsL8
+{
+	region Useless
+
+	n_to Elevator9
+
+}
+
+room GuardsL9
+{
+	region Useless
+
+	n_to Elevator10
+
+}
+
+room Guards12
+{
+	region Useless
+
+	w_to HallL102
+
+}
+
+room Guards13
+{
+	region Useless
+
+	w_to HallL112
+
+}
+
+player_character you "you"
+{
+}
+

@@ -1,0 +1,159 @@
+
+start_at = linville_student_library
+
+locations {
+   linville_student_library      : location "" header = "Linville Student Library";
+   library_toilet                : location "" header = "Library Toilet";
+   amongst_the_library_stacks    : location "" header = "Amongst the Library Stack";
+   in_the_library_foyer          : location "" header = "In the Library Foyer";
+   in_the_quadrangle             : location "" header = "In the Quadrangle";
+   on_the_rose_garden_lawn       : location "" header = "On the Rose Garden Lawn";
+   in_the_dormitory_courtyard    : location "" header = "In the Dormitory Courtyar";
+   in_the_gym_entry              : location "" header = "In the Gym Entry";
+   on_the_gym_court_north        : location "" header = "On the Gym Court, North";
+   on_the_gym_court_south        : location "" header = "On the Gym Court, South";
+   in_the_dormitory_entryway     : location "" header = "In the Dormitory Entryway";
+   room_106                      : location "" header = "Room 106";
+   room_101                      : location "" header = "Room 101";
+   halfway_along_the_dorm_hall   : location "" header = "Halfway Along the Dorm Ha";
+   room_105                      : location "" header = "Room 105";
+   room_102                      : location "" header = "Room 102";
+   at_the_dorm_halls_east_end    : location "" header = "At the Dorm Hall's East E";
+   room_104                      : location "" header = "Room 104";
+   room_103                      : location "" header = "Room 103";
+   on_the_school_steps           : location "" header = "On the School Steps";
+   in_the_school_foyer           : location "" header = "In the School Foyer";
+   on_the_trellised_patio        : location "" header = "On the Trellised Patio";
+   by_the_school_fountain        : location "" header = "By the School Fountain";
+   in_the_art_cottage            : location "" header = "In the Art Cottage";
+   in_staff_cottage_b            : location "" header = "In Staff Cottage B";
+   in_the_receptionists_office   : location "" header = "In the Receptionist's Off";
+   in_the_sick_bay               : location "" header = "In the Sick Bay";
+   in_the_marble_stateroom       : location "" header = "In the Marble Stateroom";
+   in_the_south_hall             : location "" header = "In the South Hall";
+   in_the_sitting_room           : location "" header = "In the Sitting Room";
+   in_the_eastern_hallway        : location "" header = "In the Eastern Hallway";
+   in_the_dance_room             : location "" header = "In the Dance Room";
+   in_the_waiting_room           : location "" header = "In the Waiting Room";
+   in_science_lab_1c             : location "" header = "In Science Lab 1C";
+   in_the_grand_hall             : location "" header = "In the Grand Hall";
+   in_the_school_chapel          : location "" header = "In the School Chapel";
+   in_the_staff_library          : location "" header = "In the Staff Library";
+   in_the_leather_study          : location "" header = "In the Leather Study";
+   in_the_strange_gallery        : location "" header = "In the Strange Gallery";
+   on_the_balcony                : location "" header = "On the Balcony";
+   in_a_curtained_hallway        : location "" header = "In a Curtained Hallway";
+   in_a_curtained_hallway_2      : location "" header = "In a Curtained Hallway";
+   at_the_opulent_corner         : location "" header = "At the Opulent Corner";
+   before_the_leadlight_door     : location "" header = "Before the Leadlight Door";
+                                 : location "" header = "???";
+   in_the_founders_room          : location "" header = "In the Founder's Room";
+   in_the_secret_place           : location "" header = "In the Secret Place";
+   in_the_upstairs_changing_room : location "" header = "In the Upstairs Changing ";
+}
+
+
+connections {
+   from, direction, to = [
+      linville_student_library, south_oneway, amongst_the_library_stacks,
+      linville_student_library, east_oneway, in_the_library_foyer,
+      linville_student_library, west_oneway, library_toilet,
+      library_toilet, east_oneway, linville_student_library,
+      amongst_the_library_stacks, north_oneway, linville_student_library,
+      in_the_library_foyer, east_oneway, in_the_quadrangle,
+      in_the_library_foyer, west_oneway, linville_student_library,
+      in_the_quadrangle, north_oneway, on_the_school_steps,
+      in_the_quadrangle, south_oneway, on_the_rose_garden_lawn,
+      in_the_quadrangle, east_oneway, in_the_dormitory_courtyard,
+      in_the_quadrangle, west_oneway, in_the_library_foyer,
+      on_the_rose_garden_lawn, north_oneway, in_the_quadrangle,
+      in_the_dormitory_courtyard, south_oneway, in_the_gym_entry,
+      in_the_dormitory_courtyard, east_oneway, in_the_dormitory_entryway,
+      in_the_dormitory_courtyard, west_oneway, in_the_quadrangle,
+      in_the_gym_entry, north_oneway, in_the_dormitory_courtyard,
+      in_the_gym_entry, south_oneway, on_the_gym_court_north,
+      on_the_gym_court_north, north_oneway, in_the_gym_entry,
+      on_the_gym_court_north, south_oneway, on_the_gym_court_south,
+      on_the_gym_court_north, up_oneway, in_the_upstairs_changing_room,
+      on_the_gym_court_south, north_oneway, on_the_gym_court_north,
+      in_the_dormitory_entryway, north_oneway, room_106,
+      in_the_dormitory_entryway, south_oneway, room_101,
+      in_the_dormitory_entryway, east_oneway, halfway_along_the_dorm_hall,
+      in_the_dormitory_entryway, west_oneway, in_the_dormitory_courtyard,
+      room_106, south_oneway, in_the_dormitory_entryway,
+      room_101, north_oneway, in_the_dormitory_entryway,
+      halfway_along_the_dorm_hall, north_oneway, room_105,
+      halfway_along_the_dorm_hall, south_oneway, room_102,
+      halfway_along_the_dorm_hall, east_oneway, at_the_dorm_halls_east_end,
+      halfway_along_the_dorm_hall, west_oneway, in_the_dormitory_entryway,
+      room_105, south_oneway, halfway_along_the_dorm_hall,
+      room_102, north_oneway, halfway_along_the_dorm_hall,
+      at_the_dorm_halls_east_end, north_oneway, room_104,
+      at_the_dorm_halls_east_end, south_oneway, room_103,
+      at_the_dorm_halls_east_end, west_oneway, halfway_along_the_dorm_hall,
+      room_104, south_oneway, at_the_dorm_halls_east_end,
+      room_103, north_oneway, at_the_dorm_halls_east_end,
+      on_the_school_steps, north_oneway, in_the_school_foyer,
+      on_the_school_steps, south_oneway, in_the_quadrangle,
+      on_the_school_steps, east_oneway, on_the_trellised_patio,
+      on_the_school_steps, west_oneway, by_the_school_fountain,
+      in_the_school_foyer, north_oneway, in_the_marble_stateroom,
+      in_the_school_foyer, south_oneway, on_the_school_steps,
+      in_the_school_foyer, east_oneway, in_the_sick_bay,
+      in_the_school_foyer, west_oneway, in_the_receptionists_office,
+      on_the_trellised_patio, west_oneway, on_the_school_steps,
+      by_the_school_fountain, north_oneway, in_the_art_cottage,
+      by_the_school_fountain, south_oneway, in_staff_cottage_b,
+      by_the_school_fountain, east_oneway, on_the_school_steps,
+      in_the_art_cottage, south_oneway, by_the_school_fountain,
+      in_staff_cottage_b, north_oneway, by_the_school_fountain,
+      in_the_receptionists_office, east_oneway, in_the_school_foyer,
+      in_the_sick_bay, west_oneway, in_the_school_foyer,
+      in_the_marble_stateroom, north_oneway, in_the_south_hall,
+      in_the_marble_stateroom, south_oneway, in_the_school_foyer,
+      in_the_south_hall, north_oneway, in_the_grand_hall,
+      in_the_south_hall, south_oneway, in_the_marble_stateroom,
+      in_the_south_hall, east_oneway, in_the_sitting_room,
+      in_the_sitting_room, north_oneway, in_the_eastern_hallway,
+      in_the_sitting_room, west_oneway, in_the_south_hall,
+      in_the_eastern_hallway, north_oneway, in_the_waiting_room,
+      in_the_eastern_hallway, south_oneway, in_the_sitting_room,
+      in_the_eastern_hallway, east_oneway, in_the_dance_room,
+      in_the_eastern_hallway, west_oneway, in_the_grand_hall,
+      in_the_dance_room, west_oneway, in_the_eastern_hallway,
+      in_the_waiting_room, north_oneway, in_the_staff_library,
+      in_the_waiting_room, south_oneway, in_the_eastern_hallway,
+      in_the_waiting_room, west_oneway, in_science_lab_1c,
+      in_science_lab_1c, south_oneway, in_the_grand_hall,
+      in_science_lab_1c, east_oneway, in_the_waiting_room,
+      in_the_grand_hall, north_oneway, in_science_lab_1c,
+      in_the_grand_hall, south_oneway, in_the_south_hall,
+      in_the_grand_hall, east_oneway, in_the_eastern_hallway,
+      in_the_grand_hall, west_oneway, in_the_school_chapel,
+      in_the_school_chapel, east_oneway, in_the_grand_hall,
+      in_the_staff_library, north_oneway, in_the_leather_study,
+      in_the_staff_library, south_oneway, in_the_waiting_room,
+      in_the_leather_study, south_oneway, in_the_staff_library,
+      in_the_leather_study, east_oneway, in_the_strange_gallery,
+      in_the_leather_study, west_oneway, in_a_curtained_hallway,
+      in_the_leather_study, up_oneway, on_the_balcony,
+      in_the_strange_gallery, west_oneway, in_the_leather_study,
+      on_the_balcony, down_oneway, in_the_leather_study,
+      in_a_curtained_hallway, east_oneway, in_the_leather_study,
+      in_a_curtained_hallway, west_oneway, in_a_curtained_hallway_2,
+      in_a_curtained_hallway_2, east_oneway, in_a_curtained_hallway,
+      in_a_curtained_hallway_2, west_oneway, at_the_opulent_corner,
+      at_the_opulent_corner, north_oneway, before_the_leadlight_door,
+      at_the_opulent_corner, east_oneway, in_a_curtained_hallway_2,
+      before_the_leadlight_door, north_oneway, ,
+      before_the_leadlight_door, south_oneway, at_the_opulent_corner,
+      , north_oneway, in_the_founders_room,
+      , south_oneway, before_the_leadlight_door,
+      in_the_founders_room, south_oneway, ,
+      in_the_founders_room, east_oneway, in_the_secret_place,
+      in_the_secret_place, west_oneway, in_the_founders_room,
+      in_the_upstairs_changing_room, down_oneway, on_the_gym_court_north,
+   ]
+}
+
+

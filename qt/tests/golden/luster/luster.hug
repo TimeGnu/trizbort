@@ -1,0 +1,576 @@
+#include "verblib.g" ! grammar must come first
+
+#include "hugolib.h"
+
+routine init
+{
+	cls
+	verbosity = 2
+	counter = -1
+	STATUSTYPE = 1 !1 = score / turns, 2 = time, 3 = moves: score:
+	player = you
+	Font(BOLD_ON)
+	"luster"
+	Font(BOLD_OFF)
+	"by A Trizbort User"
+	location = Fork
+	MovePlayer(location)
+}
+
+property region
+room Fork
+{
+
+	n_to TrainCrossing
+	s_to MeanderingPath
+	w_to DirtPath
+
+}
+
+object Returnfromplaintohere
+{
+	in Fork
+}
+
+room TrainCrossing
+{
+
+	n_to Field
+	s_to Fork
+
+}
+
+room DirtPath
+{
+
+	s_to SheriffStationEntrance
+	e_to Fork
+	ne_to GatedPath
+	nw_to LakeShore
+
+}
+
+room SheriffStationEntrance
+{
+
+	n_to DirtPath
+	s_to SheriffStation
+	w_to PowerRoom
+	in_to SheriffStation
+
+}
+
+room LakeShore
+{
+
+	s_to LakeShore2
+	se_to DirtPath
+
+}
+
+room LakeShore2
+{
+
+	n_to LakeShore
+	w_to Dock
+
+}
+
+room Dock
+{
+
+	e_to LakeShore2
+	w_to Lakeonraft
+
+}
+
+object Raft
+{
+	in Dock
+}
+
+room Lakeonraft
+{
+
+	e_to Dock
+
+}
+
+object Bluegemfallintolake
+{
+	in Lakeonraft
+}
+
+room TempleEntrance
+{
+	region Water
+
+	w_to StatueRoombecomesplain
+
+}
+
+object Backtodockonceyougetgem
+{
+	in TempleEntrance
+}
+
+room StatueRoombecomesplain
+{
+	region Water
+
+	n_to SpectatorBox
+	s_to Armory
+	e_to TempleEntrance
+	w_to ArenaRoom
+
+}
+
+room ArenaRoom
+{
+	region Water
+
+	e_to StatueRoombecomesplain
+
+}
+
+object Swordsman
+{
+	in ArenaRoom
+}
+
+room SpectatorBox
+{
+	region Water
+
+	s_to StatueRoombecomesplain
+
+}
+
+object Ballpointpen
+{
+	in SpectatorBox
+}
+
+room Armory
+{
+	region Water
+
+	n_to StatueRoombecomesplain
+
+}
+
+room GatedPath
+{
+
+	n_to BlankRoom
+	sw_to DirtPath
+
+}
+
+room BlankRoom
+{
+	region Lever Building
+
+	n_to OceanRoom
+	s_to GatedPath
+	e_to MetallicRoom
+	ne_to SpaceRoom
+	nw_to RainForestRoom
+
+}
+
+object Leverswitchit
+{
+	in BlankRoom
+}
+
+room OceanRoom
+{
+	region Lever Building
+
+	s_to BlankRoom
+
+}
+
+object pedestal1
+{
+	in OceanRoom
+}
+
+object Bluegem
+{
+	in OceanRoom
+}
+
+room RainForestRoom
+{
+	region Lever Building
+
+	se_to BlankRoom
+
+}
+
+object pedestal3
+{
+	in RainForestRoom
+}
+
+object Greengem
+{
+	in RainForestRoom
+}
+
+room SpaceRoom
+{
+	region Lever Building
+
+	sw_to BlankRoom
+
+}
+
+object pedestal2
+{
+	in SpaceRoom
+}
+
+object Midnightgem
+{
+	in SpaceRoom
+}
+
+room MetallicRoom
+{
+	region Lever Building
+
+	w_to BlankRoom
+
+}
+
+object pedestal4
+{
+	in MetallicRoom
+}
+
+object Silvergem
+{
+	in MetallicRoom
+}
+
+room MeanderingPath
+{
+
+	n_to Fork
+	s_to DeadEnd
+	w_to RosarioEntrance
+	se_to RamenBooth
+	nw_to AbandStoreFrontMyersEntrance
+
+}
+
+room AbandStoreFrontMyersEntrance
+{
+
+	w_to AbandonedShop
+	se_to MeanderingPath
+
+}
+
+object Matsteelkey
+{
+	in AbandStoreFrontMyersEntrance
+}
+
+object MyersEntrance
+{
+	in AbandStoreFrontMyersEntrance
+}
+
+room AbandonedShop
+{
+
+	e_to AbandStoreFrontMyersEntrance
+
+}
+
+object CashRegisterDime
+{
+	in AbandonedShop
+}
+
+room RosarioEntrance
+{
+
+	e_to MeanderingPath
+
+}
+
+room DeadEnd
+{
+
+	n_to MeanderingPath
+	s_to TimberPath
+
+}
+
+object Rectangleputmat
+{
+	in DeadEnd
+}
+
+room RamenBooth
+{
+
+	w_to InsideRamenBooth
+	nw_to MeanderingPath
+
+}
+
+room InsideRamenBooth
+{
+
+	e_to RamenBooth
+
+}
+
+object Bulbuntiefromrope
+{
+	in InsideRamenBooth
+}
+
+object Needsteelkey
+{
+	in InsideRamenBooth
+}
+
+room TimberPath
+{
+	region Forest
+
+	n_to DeadEnd
+	s_to ForestMaze
+
+}
+
+object Note
+{
+	in TimberPath
+}
+
+object forestroomnamesarerandom
+{
+	in TimberPath
+}
+
+object Lightgreenindicateswrappingmaze
+{
+	in TimberPath
+}
+
+object Diagonaldirectionsarepossiblebutignored
+{
+	in TimberPath
+}
+
+object Wejustwantawaythrough
+{
+	in TimberPath
+}
+
+room ForestMaze
+{
+	region Forest
+
+	n_to TimberPath
+	s_to ForestMaze2
+
+}
+
+room ForestMaze2
+{
+	region Forest
+
+	n_to ForestMaze
+	s_to ForestCenter
+
+}
+
+room ForestCenter
+{
+	region Forest
+
+	n_to ForestMaze2
+	s_to ForestMaze6
+	e_to ForestMaze8
+	w_to ForestMaze3
+
+}
+
+room ForestMaze3
+{
+	region Forest
+
+	n_to ForestMaze4
+	s_to ForestMaze5
+	e_to ForestCenter
+	w_to ForestMaze4
+
+}
+
+room ForestMaze4
+{
+	region Forest
+
+	s_to ForestMaze9
+	e_to ForestMaze3
+	w_to ForestCenter2
+
+}
+
+room ForestCenter2
+{
+	region Forest
+
+	e_to ForestMaze4
+
+}
+
+room ForestMaze5
+{
+	region Forest
+
+	n_to ForestMaze3
+	s_to ForestMaze7
+
+}
+
+room ForestMaze6
+{
+	region Forest
+
+	n_to ForestCenter
+	e_to Clearing
+
+}
+
+room Clearing
+{
+	region Forest
+
+	w_to ForestMaze6
+
+}
+
+object GreenGem2
+{
+	in Clearing
+}
+
+room ForestMaze7
+{
+	region Forest
+
+	n_to ForestMaze5
+	s_to EndofCave
+
+}
+
+room EndofCave
+{
+	region Forest
+
+	n_to ForestMaze7
+
+}
+
+object MidnightGemneedbulb
+{
+	in EndofCave
+}
+
+room ForestMaze8
+{
+	region Forest
+
+	w_to ForestCenter
+
+}
+
+room SheriffStation
+{
+
+	n_to SheriffStationEntrance
+	w_to CrampedBathroom
+
+}
+
+object Needcopperkeytoexit
+{
+	in SheriffStation
+}
+
+room CrampedBathroom
+{
+
+	e_to SheriffStation
+
+}
+
+object soapwashsoap
+{
+	in CrampedBathroom
+}
+
+room Field
+{
+
+	s_to TrainCrossing
+
+}
+
+object Cubeputcoininslot
+{
+	in Field
+}
+
+object Makessilvergem
+{
+	in Field
+}
+
+room PowerRoom
+{
+
+	e_to SheriffStationEntrance
+
+}
+
+object switchbuttonsRBI
+{
+	in PowerRoom
+}
+
+room ForestMaze9
+{
+	region Forest
+
+	n_to ForestMaze4
+	e_to ForestMaze4
+
+}
+
+room TreeCanopy
+{
+	region Forest
+
+
+}
+
+object Fromtoclearing
+{
+	in TreeCanopy
+}
+
+player_character you "you"
+{
+}
+

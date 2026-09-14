@@ -1,0 +1,680 @@
+#include "verblib.g" ! grammar must come first
+
+#include "hugolib.h"
+
+routine init
+{
+	cls
+	verbosity = 2
+	counter = -1
+	STATUSTYPE = 1 !1 = score / turns, 2 = time, 3 = moves: score:
+	player = you
+	Font(BOLD_ON)
+	"Gemstone Warrior Trizbort map"
+	Font(BOLD_OFF)
+	"I set the preferred distance between rooms to 16, and I set regions to , by Andrew Schultz"
+	location = Room1
+
+    showAbout()
+    {
+    "Not much";
+    }
+	MovePlayer(location)
+}
+
+property region
+room Room1
+{
+	region Beginning
+
+	e_to Room4
+
+}
+
+room Room4
+{
+	region Beginning
+
+	n_to Room0
+	s_to Room5
+	e_to Room6
+	w_to Room1
+
+}
+
+room Room0
+{
+	region Beginning
+
+	s_to Room4
+
+}
+
+room Room5
+{
+	region Beginning
+
+	n_to Room4
+	s_to Room3
+	e_to Room6
+	w_to Room2
+
+}
+
+room Room3
+{
+	region Beginning
+
+	n_to Room5
+
+}
+
+room Room2
+{
+	region Beginning
+
+	e_to Room5
+
+}
+
+room Room6
+{
+	region Beginning
+
+	n_to Room4
+	e_to Room7
+	w_to Room5
+
+}
+
+room Room7
+{
+
+	n_to Room8
+	w_to Room6
+
+}
+
+room Room8
+{
+	region Inward
+
+	n_to Room9
+	s_to Room7
+	e_to Room10
+
+}
+
+room Room10
+{
+	region Inward
+
+	e_to Room102
+	w_to Room8
+
+}
+
+room Room9
+{
+	region Inward
+
+	n_to Room12
+	s_to Room8
+	e_to Room102
+
+}
+
+room Room102
+{
+	region Inward
+
+	n_to Room12
+	w_to Room9
+
+}
+
+room Room12
+{
+	region Inward
+
+	n_to Room15
+	s_to Room102
+
+}
+
+room Room13
+{
+	region Inward
+
+	n_to Room12
+	e_to Room14
+
+}
+
+room Room14
+{
+	region Inward
+
+	n_to Room16
+	w_to Room13
+
+}
+
+room Room16
+{
+	region Inward
+
+	n_to Room15
+	s_to Room14
+
+}
+
+room Room15
+{
+	region Inward
+
+	s_to Room16
+	e_to Room17
+
+}
+
+room Room17
+{
+	region Inward
+
+	s_to Room18
+	e_to Room20
+	w_to Room15
+
+}
+
+room Room18
+{
+	region Inward
+
+	n_to Room17
+	s_to Room19
+
+}
+
+room Room19
+{
+	region Inward
+
+	n_to Room18
+	s_to Room21
+
+}
+
+room Room21
+{
+	region Inward
+
+	n_to Room19
+	e_to Room22
+
+}
+
+room Room22
+{
+	region Inward
+
+	e_to Room20
+	w_to Room21
+
+}
+
+room Room20
+{
+	region Inward
+
+	e_to Room24
+	w_to Room17
+
+}
+
+room Room24
+{
+	region Inward
+
+	w_to Room20
+
+}
+
+room Room25
+{
+	region Inward
+
+	e_to Room24
+	w_to Room23
+
+}
+
+room Room23
+{
+	region Inward
+
+	s_to Room27
+	e_to Room25
+	w_to Room26
+
+}
+
+room Room26
+{
+	region Inward
+
+	e_to Room23
+
+}
+
+room Room27
+{
+	region Inward
+
+	n_to Room23
+	s_to Room28
+
+}
+
+room Room28
+{
+	region Inward
+
+	n_to Room27
+	s_to Room29
+	e_to Room31
+
+}
+
+room Room29
+{
+	region Inward
+
+	n_to Room28
+	w_to Room26
+
+}
+
+room Room31
+{
+	region Inward
+
+	s_to Room34
+	e_to Room32
+	w_to Room28
+
+}
+
+room Room32
+{
+	region Inward
+
+	w_to Room31
+
+}
+
+room Room34
+{
+	region Inward
+
+	n_to Room31
+	s_to Room35
+
+}
+
+room Room33
+{
+	region Inward
+
+	e_to Room32
+	w_to Room38
+
+}
+
+room Room38
+{
+	region Inward
+
+	s_to Room39
+	e_to Room33
+
+}
+
+room Room35
+{
+	region Inward
+
+	n_to Room36
+	e_to Room34
+
+}
+
+room Room36
+{
+	region Inward
+
+	s_to Room35
+	w_to Room37
+
+}
+
+room Room37
+{
+	region Inward
+
+	e_to Room36
+	w_to Room40
+
+}
+
+room Room40
+{
+	region Inward
+
+	s_to Room42
+	e_to Room37
+
+}
+
+room Room42
+{
+	region Inward
+
+	n_to Room40
+	s_to Room41
+
+}
+
+room Room43
+{
+	region Inward
+
+	n_to Room40
+	s_to Room41
+
+}
+
+room Room41
+{
+	region Inward
+
+	n_to Room43
+
+}
+
+room Room69
+{
+
+
+}
+
+room Room39
+{
+	region Inward
+
+	n_to Room38
+
+}
+
+room Room692
+{
+
+	s_to Room68
+
+}
+
+room Room68
+{
+
+	s_to Room67
+
+}
+
+room Room67
+{
+
+	n_to Room68
+	s_to Room66
+
+}
+
+room Room66
+{
+
+	n_to Room67
+	s_to Room65
+
+}
+
+room Room65
+{
+
+	n_to Room66
+	w_to Room64
+
+}
+
+room Room64
+{
+
+	n_to Room64
+	s_to Room63
+	e_to Room65
+	w_to Room64
+
+}
+
+room Room63
+{
+
+	n_to Room62
+	w_to Room61
+
+}
+
+room Room56
+{
+
+	e_to Room58
+
+}
+
+room Room61
+{
+
+	n_to Room58
+	e_to Room63
+
+}
+
+room Room57
+{
+
+	e_to Room58
+
+}
+
+room Room58
+{
+
+	s_to Room61
+	e_to Room59
+	w_to Room57
+
+}
+
+room Room62
+{
+
+	s_to Room63
+	e_to Room60
+
+}
+
+room Room59
+{
+
+	e_to Room60
+	w_to Room58
+
+}
+
+room Room60
+{
+
+	w_to Room59
+
+}
+
+room Room52
+{
+	region Outward
+
+	s_to Room53
+	e_to Room54
+	w_to Room51
+
+}
+
+room Room54
+{
+	region Outward
+
+	e_to Room562
+	w_to Room52
+
+}
+
+room Room53
+{
+	region Outward
+
+	n_to Room52
+	e_to Room55
+
+}
+
+room Room55
+{
+	region Outward
+
+	e_to Room572
+	w_to Room53
+
+}
+
+room Room572
+{
+	region Outward
+
+	e_to Room582
+	w_to Room55
+
+}
+
+room Room582
+{
+	region Outward
+
+	w_to Room572
+
+}
+
+room Room562
+{
+	region Outward
+
+	e_to Room583
+	w_to Room54
+
+}
+
+room Room583
+{
+	region Outward
+
+	w_to Room562
+
+}
+
+room Room72
+{
+
+
+}
+
+room Room44
+{
+	region Outward
+
+	w_to Room45
+
+}
+
+room Room45
+{
+	region Outward
+
+	e_to Room44
+	w_to Room47
+
+}
+
+room Room46
+{
+	region Outward
+
+	e_to Room44
+	w_to Room48
+
+}
+
+room Room48
+{
+	region Outward
+
+	e_to Room46
+	w_to Room50
+
+}
+
+room Room47
+{
+	region Outward
+
+	e_to Room45
+	w_to Room49
+
+}
+
+room Room49
+{
+	region Outward
+
+	e_to Room47
+	w_to Room50
+
+}
+
+room Room50
+{
+	region Outward
+
+	e_to Room49
+	w_to Room51
+
+}
+
+room Room51
+{
+	region Outward
+
+	e_to Room52
+
+}
+
+player_character you "you"
+{
+}
+

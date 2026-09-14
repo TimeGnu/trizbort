@@ -1,0 +1,215 @@
+Constant Story "further";
+Constant Headline "^By A Trizbort User^^^";
+
+Include "Parser";
+Include "VerbLib";
+
+Class Blue;
+Class Green;
+Class Red;
+Class Yellow;
+
+Object  FoggyRoom "Foggy Room"
+  with  description
+            "",
+        n_to Prairie,
+        s_to Cave,
+        e_to Hearth,
+        w_to Sandstorm,
+        ne_to Tundra,
+   has  light;
+
+Object ->  RuddyBell "Ruddy Bell"
+  with  name 'Ruddy' 'Bell',
+        description "Ruddy Bell";
+
+Green  Prairie "Prairie"
+  with  description
+            "",
+        s_to FoggyRoom,
+        nw_to ManicSky,
+   has  light;
+
+Blue  Cave "Cave"
+  with  description
+            "",
+        n_to FoggyRoom,
+        d_to ShiftingGrotto,
+   has  light;
+
+Red  Hearth "Hearth"
+  with  description
+            "",
+        w_to FoggyRoom,
+        d_to LowRoom,
+   has  light;
+
+Yellow  Sandstorm "Sandstorm"
+  with  description
+            "",
+        e_to FoggyRoom,
+        d_to CountlessDunes,
+   has  light;
+
+Object  Tundra "Tundra"
+  with  description
+            "",
+        ne_to InfiniteIceFloes,
+        sw_to FoggyRoom,
+   has  light;
+
+Green  ManicSky "Manic Sky"
+  with  description
+            "",
+        w_to Grassland,
+        se_to Prairie,
+   has  light;
+
+Object ->  Becomes "Becomes"
+  with  name 'Becomes',
+        description "Becomes";
+
+Object ->  PetShop "Pet Shop"
+  with  name 'Pet' 'Shop',
+        description "Pet Shop";
+
+Green  Grassland "Grassland"
+  with  description
+            "",
+        e_to ManicSky,
+   has  light;
+
+Object ->  AshenRobe "Ashen Robe"
+  with  name 'Ashen' 'Robe',
+        description "Ashen Robe";
+
+Object  InfiniteIceFloes "Infinite Ice Floes"
+  with  description
+            "",
+        sw_to Tundra,
+        u_to CementRoom,
+   has  light;
+
+Object ->  BecomesFrozenPond "Becomes Frozen Pond"
+  with  name 'Becomes' 'Frozen' 'Pond',
+        description "Becomes Frozen Pond";
+
+Red  LowRoom "Low Room"
+  with  description
+            "",
+        se_to Alcove,
+        u_to Hearth,
+   has  light;
+
+Object ->  Becomes2 "Becomes"
+  with  name 'Becomes',
+        description "Becomes";
+
+Object ->  YourBasement "Your Basement"
+  with  name 'Your' 'Basement',
+        description "Your Basement";
+
+Red  Alcove "Alcove"
+  with  description
+            "",
+        nw_to LowRoom,
+   has  light;
+
+Object ->  JaundicedPenny "Jaundiced Penny"
+  with  name 'Jaundiced' 'Penny',
+        description "Jaundiced Penny";
+
+Yellow  CountlessDunes "Countless Dunes"
+  with  description
+            "",
+        sw_to Oasis,
+        u_to Sandstorm,
+   has  light;
+
+Object ->  BecomesAlansDen "Becomes Alans Den"
+  with  name 'Becomes' 'Alans' 'Den',
+        description "Becomes Alan's Den";
+
+Yellow  Oasis "Oasis"
+  with  description
+            "",
+        ne_to CountlessDunes,
+   has  light;
+
+Object ->  CobaltRibbon "Cobalt Ribbon"
+  with  name 'Cobalt' 'Ribbon',
+        description "Cobalt Ribbon";
+
+Blue  ShiftingGrotto "Shifting Grotto"
+  with  description
+            "",
+        se_to CrumblingChimney,
+        u_to Cave,
+   has  light;
+
+Object ->  Becomes3 "Becomes"
+  with  name 'Becomes',
+        description "Becomes";
+
+Object ->  LindasRoom "Lindas Room"
+  with  name 'Lindas' 'Room',
+        description "Linda's Room";
+
+Blue  CrumblingChimney "Crumbling Chimney"
+  with  description
+            "",
+        nw_to ShiftingGrotto,
+   has  light;
+
+Object ->  OliveEnvelope "Olive Envelope"
+  with  name 'Olive' 'Envelope',
+        description "Olive Envelope";
+
+Object  CementRoom "Cement Room"
+  with  description
+            "",
+        n_to BrickLinedRoom,
+        d_to InfiniteIceFloes,
+   has  light;
+
+Object  BrickLinedRoom "Brick-Lined Room"
+  with  description
+            "",
+        n_to SandyRoom,
+        s_to CementRoom,
+   has  light;
+
+Object  SandyRoom "Sandy Room"
+  with  description
+            "",
+        n_to WaterRoom,
+        s_to BrickLinedRoom,
+   has  light;
+
+Object  WaterRoom "Water Room"
+  with  description
+            "",
+        n_to WritingRoom,
+        s_to SandyRoom,
+   has  light;
+
+Object  WritingRoom "Writing Room"
+  with  description
+            "",
+        n_to SpinningExpanse,
+        s_to WaterRoom,
+   has  light;
+
+Object  SpinningExpanse "Spinning Expanse"
+  with  description
+            "",
+        s_to WritingRoom,
+   has  light;
+
+[ Initialise;
+    location = FoggyRoom;
+    ! "^^Your opening paragraph here...^^";
+];
+
+Include "Grammar";
+

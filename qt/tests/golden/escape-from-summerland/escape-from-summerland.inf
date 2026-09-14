@@ -1,0 +1,207 @@
+Constant Story "escape-from-summerland";
+Constant Headline "^By A Trizbort User^^^";
+
+Include "Parser";
+Include "VerbLib";
+
+Class Cooperate;
+Class Jacquotte;
+Class Man;
+Class ManandJacquotte;
+Class Manneedstoshow;
+Class Shinobi;
+
+Man  IntheCaravanPark "In the Caravan Park"
+  with  description
+            "",
+        s_to MainTrack,
+        in_to InsidetheCaravan,
+   has  light;
+
+Object ->  Enterthenexamineperson "Enter then examine person"
+  with  name 'Enter' 'then' 'examine' 'person',
+        description "Enter then examine person";
+
+Man  MainTrack "Main Track"
+  with  description
+            "",
+        n_to IntheCaravanPark,
+        e_to BeneaththeHedge,
+   has  light;
+
+Man  BeneaththeHedge "Beneath the Hedge"
+  with  description
+            "",
+        e_to DrizzleCourt,
+        w_to MainTrack,
+   has  light;
+
+Object ->  Jacquottegonegoeastorwest "Jacquotte gone go east or west"
+  with  name 'Jacquotte' 'gone' 'go' 'east' 'or' 'west',
+        description "Jacquotte gone, go east or west";
+
+Man  DrizzleCourt "Drizzle Court"
+  with  description
+            "",
+        e_to OrbisAlius,
+        w_to BeneaththeHedge,
+   has  light;
+
+ManandJacquotte  OrbisAlius "Orbis Alius"
+  with  description
+            "",
+        n_to MirrorMaze,
+        s_to SelkieAquariumAquaticRegion,
+        e_to UpintheStands,
+        w_to DrizzleCourt,
+   has  light;
+
+Object ->  CLIMBorPUSHrobot "CLIMB or PUSH robot"
+  with  name 'CLIMB' 'or' 'PUSH' 'robot',
+        description "CLIMB or PUSH robot";
+
+Object ->  asJacquotte "as Jacquotte"
+  with  name 'as' 'Jacquotte',
+        description "as Jacquotte";
+
+Man  MirrorMaze "Mirror Maze"
+  with  description
+            "",
+        s_to OrbisAlius,
+   has  light;
+
+Man  UpintheStands "Up in the Stands"
+  with  description
+            "",
+        w_to OrbisAlius,
+        d_to BigTopWest,
+   has  light;
+
+Shinobi  BigTopWest "Big Top West"
+  with  description
+            "",
+        e_to BigTopEast,
+        u_to UpintheStands,
+   has  light;
+
+Object ->  Leftunitfallshere "Left unit falls here"
+  with  name 'Left' 'unit' 'falls' 'here',
+        description "Left unit falls here";
+
+Cooperate  BigTopEast "Big Top East"
+  with  description
+            "",
+        n_to AnotherHighPlace,
+        s_to Backways,
+        w_to BigTopWest,
+   has  light;
+
+Cooperate  Backways "Backways"
+  with  description
+            "",
+        n_to BigTopEast,
+        e_to TheDressingRooms,
+        w_to HomePlace,
+   has  light;
+
+Object ->  Jacquotteneedslight "Jacquotte needs light"
+  with  name 'Jacquotte' 'needs' 'light',
+        description "Jacquotte needs light";
+
+Shinobi  TheDressingRooms "The Dressing Rooms"
+  with  description
+            "",
+        w_to Backways,
+        in_to GoingUpThingskippedbyman,
+   has  light;
+
+Object  HomePlace "Home Place"
+  with  description
+            "",
+        e_to Backways,
+   has  light;
+
+Object ->  RightInteraction "Right Interaction"
+  with  name 'Right' 'Interaction',
+        description "Right Interaction";
+
+Object ->  CivilianDiscouragement "Civilian Discouragement"
+  with  name 'Civilian' 'Discouragement',
+        description "Civilian Discouragement";
+
+Man  InsidetheCaravan "Inside the Caravan"
+  with  description
+            "",
+        out_to IntheCaravanPark,
+   has  light;
+
+Object ->  DeadMan "Dead Man"
+  with  name 'Dead' 'Man',
+        description "Dead Man";
+
+Jacquotte  AnotherHighPlace "Another High Place"
+  with  description
+            "",
+        s_to BigTopEast,
+   has  light;
+
+Object ->  ShinyThingLeftunit "Shiny Thing Left unit"
+  with  name 'Shiny' 'Thing' 'Left' 'unit',
+        description "Shiny Thing (Left unit)";
+
+Jacquotte  JacquottesCage "Jacquotte's Cage"
+  with  description
+            "",
+        out_to HomePlace,
+   has  light;
+
+Cooperate  GoingUpThingskippedbyman "Going Up Thing (skipped by man)"
+  with  description
+            "",
+        out_to TheDressingRooms,
+   has  light;
+
+Object ->  Skippedbyman "Skipped by man"
+  with  name 'Skipped' 'by' 'man',
+        description "Skipped by man";
+
+Shinobi  SelkieAquariumAquaticRegion "Selkie Aquarium/Aquatic Region"
+  with  description
+            "",
+        n_to OrbisAlius,
+        e_to ControlBooth,
+   has  light;
+
+Cooperate  ControlBooth "Control Booth"
+  with  description
+            "",
+        e_to ServiceCorridor,
+        w_to SelkieAquariumAquaticRegion,
+   has  light;
+
+Object ->  Crank "Crank"
+  with  name 'Crank',
+        description "Crank";
+
+Shinobi  ServiceCorridor "Service Corridor"
+  with  description
+            "",
+        w_to ControlBooth,
+        in_to GoingUpThingskippedbyman,
+   has  light;
+
+Object ->  searchrubbleforplunger "search rubble for plunger"
+  with  name 'search' 'rubble' 'for' 'plunger',
+        description "search rubble for plunger";
+
+Object ->  installSUCKDOOR "install SUCK DOOR"
+  with  name 'install' 'SUCK' 'DOOR',
+        description "install, SUCK DOOR";
+
+[ Initialise;
+    location = IntheCaravanPark;
+    ! "^^Your opening paragraph here...^^";
+];
+
+Include "Grammar";
+

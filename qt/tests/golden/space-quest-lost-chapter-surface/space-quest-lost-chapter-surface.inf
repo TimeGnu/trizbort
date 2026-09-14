@@ -1,0 +1,840 @@
+Constant Story "space-quest-lost-chapter-surface";
+Constant Headline "^By A Trizbort User^^^";
+
+Include "Parser";
+Include "VerbLib";
+
+Class Importantitem;
+Class Later;
+Class Lethal;
+Class ThroughWay;
+Class Useless;
+
+Later  RockTree "Rock Tree"
+  with  description
+            "",
+        n_to RockWithVines,
+        s_to EndofPath,
+   has  light;
+
+Later  RockWithVines "Rock With Vines"
+  with  description
+            "",
+        s_to RockTree,
+        e_to RockPath,
+   has  light;
+
+Later  RockPath "Rock Path"
+  with  description
+            "",
+        e_to RockBridge,
+        w_to RockWithVines,
+   has  light;
+
+Later  RockBridge "Rock Bridge"
+  with  description
+            "",
+        e_to NWRockPath2,
+        w_to RockPath,
+   has  light;
+
+Later  NWRockPath2 "N/W Rock Path 2"
+  with  description
+            "",
+        e_to NWRockPath,
+        w_to RockBridge,
+   has  light;
+
+Object ->  Becarefulcanfall "Be careful can fall"
+  with  name 'Be' 'careful' 'can' 'fall',
+        description "Be careful, can fall";
+
+Later  NWRockPath "N/W Rock Path"
+  with  description
+            "",
+        s_to Shore,
+        w_to NWRockPath2,
+   has  light;
+
+Later  Shore "Shore"
+  with  description
+            "",
+        n_to NWRockPath,
+        e_to ShipFront,
+        w_to Waterfall,
+   has  light;
+
+Useless  Waterfall "Water fall"
+  with  description
+            "",
+        e_to Shore,
+   has  light;
+
+ThroughWay  ShipFront "Ship Front"
+  with  description
+            "",
+        s_to Monsterchasesyou2,
+        e_to ShipBody,
+        w_to Shore,
+   has  light;
+
+ThroughWay  ShipBody "Ship Body"
+  with  description
+            "",
+        s_to Monsterchasesyou2,
+        e_to ShipTail,
+        w_to ShipFront,
+   has  light;
+
+Importantitem  ShipTail "Ship Tail"
+  with  description
+            "",
+        s_to Monsterchasesyou2,
+        e_to Lake,
+        w_to ShipBody,
+   has  light;
+
+Object ->  NAIL "NAIL"
+  with  name 'NAIL',
+        description "NAIL";
+
+ThroughWay  Lake "Lake"
+  with  description
+            "",
+        e_to LagoonCLIMB,
+        w_to ShipTail,
+   has  light;
+
+ThroughWay  LagoonCLIMB "Lagoon CLIMB"
+  with  description
+            "",
+        n_to Tree,
+        e_to WaterWtolagoon,
+        w_to Lake,
+   has  light;
+
+Object ->  GoSWWtonextlake "Go SWW to next lake"
+  with  name 'Go' 'SWW' 'to' 'next' 'lake',
+        description "Go SW/W to next lake";
+
+ThroughWay  Tree "Tree"
+  with  description
+            "",
+        s_to LagoonCLIMB,
+   has  light;
+
+ThroughWay  Tree2 "Tree"
+  with  description
+            "",
+        e_to FRUIT,
+   has  light;
+
+Importantitem  FRUIT "FRUIT"
+  with  description
+            "",
+        w_to Tree2,
+   has  light;
+
+ThroughWay  WaterWtolagoon "Water W to lagoon"
+  with  description
+            "",
+        s_to Monsterchasesyou,
+        e_to LakeonS,
+        w_to LagoonCLIMB,
+   has  light;
+
+ThroughWay  LakeonS "Lake on S"
+  with  description
+            "",
+        s_to Monsterchasesyou,
+        e_to LakeinSW,
+        w_to WaterWtolagoon,
+   has  light;
+
+ThroughWay  LakeinSW "Lake in SW"
+  with  description
+            "",
+        n_to jungle,
+        s_to DeathinS,
+        e_to GreyRock,
+        w_to LakeonS,
+   has  light;
+
+Lethal  Monsterchasesyou "Monster chases you"
+  with  description
+            "",
+        n_to LakeonS,
+        e_to DeathinS,
+   has  light;
+
+ThroughWay  jungle "jungle"
+  with  description
+            "",
+        s_to LakeinSW,
+        e_to MOULDN,
+        w_to LakeinSW,
+   has  light;
+
+Importantitem  MOULDN "MOULD (N)"
+  with  description
+            "",
+        e_to FlowerN,
+        w_to jungle,
+   has  light;
+
+Importantitem  FlowerN "Flower (N)"
+  with  description
+            "",
+        s_to GreyTree,
+        e_to jungle2,
+        w_to MOULDN,
+   has  light;
+
+Object ->  Mould "Mould"
+  with  name 'Mould',
+        description "Mould";
+
+ThroughWay  jungle2 "jungle"
+  with  description
+            "",
+        s_to jungle3,
+        w_to FlowerN,
+   has  light;
+
+ThroughWay  jungle3 "jungle"
+  with  description
+            "",
+        n_to jungle2,
+        s_to jungle5,
+        e_to YourShip,
+        w_to GreyTree,
+   has  light;
+
+ThroughWay  YourShip "Your Ship"
+  with  description
+            "",
+        s_to jungle3,
+        e_to jungle4,
+   has  light;
+
+Useless  jungle4 "jungle"
+  with  description
+            "",
+        n_to YourShip,
+        w_to jungle5,
+   has  light;
+
+ThroughWay  jungle5 "jungle"
+  with  description
+            "",
+        n_to jungle3,
+        s_to CODECARD,
+        e_to jungle4,
+        w_to BlackTree,
+   has  light;
+
+Useless  BlackTree "Black Tree"
+  with  description
+            "",
+        n_to GreyTree,
+        e_to jungle5,
+   has  light;
+
+Useless  GreyTree "Grey Tree"
+  with  description
+            "",
+        n_to FlowerN,
+        s_to BlackTree,
+        e_to jungle3,
+        w_to GreyRock,
+   has  light;
+
+Useless  GreyRock "Grey Rock"
+  with  description
+            "",
+        e_to GreyTree,
+        w_to LakeinSW,
+   has  light;
+
+Importantitem  CODECARD "CODE CARD"
+  with  description
+            "",
+        n_to jungle5,
+   has  light;
+
+Lethal  DeathinS "Death in S"
+  with  description
+            "",
+        n_to LakeinSW,
+        w_to Monsterchasesyou,
+   has  light;
+
+Later  EndofPath "End of Path"
+  with  description
+            "",
+        n_to RockTree,
+        u_to Mountain,
+   has  light;
+
+Later  Mountain "Mountain"
+  with  description
+            "",
+        n_to Mountain2,
+        d_to EndofPath,
+   has  light;
+
+Later  Mountain2 "Mountain"
+  with  description
+            "",
+        n_to CAVE,
+        s_to Mountain,
+   has  light;
+
+Importantitem  CAVE "CAVE"
+  with  description
+            "",
+        s_to Mountain2,
+   has  light;
+
+Object ->  GETSTONEWITHBONE "GET STONE WITH BONE"
+  with  name 'GET' 'STONE' 'WITH' 'BONE',
+        description "GET STONE WITH BONE";
+
+ThroughWay  Undershipbody "Under ship body"
+  with  description
+            "",
+        s_to BAG,
+        e_to Undershiptail,
+   has  light;
+
+Importantitem  BAG "BAG"
+  with  description
+            "",
+        n_to Undershipbody,
+   has  light;
+
+ThroughWay  Undershiptail "Under ship tail"
+  with  description
+            "",
+        s_to WallWEopen,
+        e_to Scenic,
+        w_to Undershipbody,
+   has  light;
+
+ThroughWay  Scenic "Scenic"
+  with  description
+            "",
+        s_to TreeRootNE,
+        e_to Scenic2,
+        w_to Undershiptail,
+   has  light;
+
+ThroughWay  Scenic2 "Scenic"
+  with  description
+            "",
+        s_to TreeRootNW,
+        e_to Scenic3,
+        w_to Scenic,
+   has  light;
+
+ThroughWay  Scenic3 "Scenic"
+  with  description
+            "",
+        s_to BigVineW,
+        e_to HiddenPsgWest,
+        w_to Scenic2,
+   has  light;
+
+ThroughWay  HiddenPsgWest "Hidden Psg West"
+  with  description
+            "",
+        s_to WallE,
+        e_to HiddenPsgEast,
+        w_to Scenic3,
+   has  light;
+
+ThroughWay  HiddenPsgEast "Hidden Psg East"
+  with  description
+            "",
+        s_to BlackWallWest,
+        e_to Scenic4,
+        w_to HiddenPsgWest,
+   has  light;
+
+ThroughWay  Scenic4 "Scenic"
+  with  description
+            "",
+        s_to SeaWeed,
+        e_to ForkNorth,
+        w_to HiddenPsgEast,
+   has  light;
+
+ThroughWay  ForkNorth "Fork North"
+  with  description
+            "",
+        n_to TENTACLE2,
+        s_to BrownTree,
+        e_to TinyTooth,
+        w_to Scenic4,
+   has  light;
+
+Lethal  TinyTooth "Tiny Tooth"
+  with  description
+            "",
+        s_to GelBlob,
+        e_to Turtle,
+        w_to ForkNorth,
+   has  light;
+
+ThroughWay  Turtle "Turtle"
+  with  description
+            "",
+        e_to JellyFish,
+        w_to TinyTooth,
+   has  light;
+
+ThroughWay  JellyFish "Jelly Fish"
+  with  description
+            "",
+        e_to METALROD,
+        w_to Turtle,
+   has  light;
+
+Importantitem  METALROD "METAL ROD"
+  with  description
+            "",
+        e_to Cavern,
+        w_to JellyFish,
+   has  light;
+
+ThroughWay  Cavern "Cavern"
+  with  description
+            "",
+        e_to Cavern2,
+        w_to METALROD,
+   has  light;
+
+ThroughWay  Cavern2 "Cavern"
+  with  description
+            "",
+        n_to Pool,
+        w_to Cavern,
+   has  light;
+
+ThroughWay  Pool "Pool"
+  with  description
+            "",
+        s_to Cavern2,
+        w_to PuffyFish,
+   has  light;
+
+Importantitem  PuffyFish "Puffy Fish"
+  with  description
+            "",
+        e_to Pool,
+   has  light;
+
+Lethal  GelBlob "Gel Blob"
+  with  description
+            "",
+        n_to TinyTooth,
+        s_to Clams,
+        w_to BrownTree,
+   has  light;
+
+ThroughWay  BrownTree "Brown Tree"
+  with  description
+            "",
+        n_to ForkNorth,
+        s_to Clams,
+        e_to GelBlob,
+        w_to SeaWeed,
+   has  light;
+
+Lethal  Clams "Clams"
+  with  description
+            "",
+        n_to BrownTree,
+        s_to TrunkAlgae,
+        w_to Clams2,
+   has  light;
+
+Lethal  Clams2 "Clams"
+  with  description
+            "",
+        n_to SeaWeed,
+        s_to TREEE,
+        e_to Clams,
+        w_to Clams3,
+   has  light;
+
+Lethal  Clams3 "Clams"
+  with  description
+            "",
+        n_to BlackWallWest,
+        e_to Clams2,
+   has  light;
+
+Useless  BlackWallWest "Black Wall West"
+  with  description
+            "",
+        n_to HiddenPsgEast,
+        s_to Clams3,
+        e_to SeaWeed,
+   has  light;
+
+ThroughWay  SeaWeed "Sea Weed"
+  with  description
+            "",
+        n_to Scenic4,
+        s_to Clams2,
+        e_to BrownTree,
+        w_to BlackWallWest,
+   has  light;
+
+ThroughWay  TREEE "TREE (E)"
+  with  description
+            "",
+        n_to Clams2,
+        s_to Clams5,
+        e_to TrunkAlgae,
+        w_to TREESearch,
+   has  light;
+
+ThroughWay  TrunkAlgae "Trunk/ Algae"
+  with  description
+            "",
+        n_to Clams,
+        s_to Clams5,
+        e_to Structures,
+        w_to TREEE,
+   has  light;
+
+ThroughWay  Structures "Struc tures"
+  with  description
+            "",
+        n_to Clams6,
+        e_to OCTOPUS,
+        w_to TrunkAlgae,
+   has  light;
+
+Importantitem  OCTOPUS "OCTO PUS"
+  with  description
+            "",
+        w_to Structures,
+   has  light;
+
+Object ->  BONE "BONE"
+  with  name 'BONE',
+        description "BONE";
+
+Importantitem  TREESearch "TREE (Search)"
+  with  description
+            "",
+        s_to Clams5,
+        e_to TREEE,
+        w_to WallEAlgae,
+   has  light;
+
+Object ->  SEARCHHOLE "SEARCH HOLE"
+  with  name 'SEARCH' 'HOLE',
+        description "SEARCH HOLE";
+
+ThroughWay  WallEAlgae "Wall E + Algae"
+  with  description
+            "",
+        n_to TreeWWall,
+        s_to Eels,
+        e_to TREESearch,
+        w_to CoralPULL,
+   has  light;
+
+Object ->  Stoalgae "S to algae"
+  with  name 'S' 'to' 'algae',
+        description "S to algae";
+
+ThroughWay  CoralPULL "Coral (PULL)"
+  with  description
+            "",
+        n_to NWtotreasure,
+        s_to Eels,
+        e_to WallEAlgae,
+        w_to VineandTrunk,
+   has  light;
+
+ThroughWay  VineandTrunk "Vine and Trunk"
+  with  description
+            "",
+        n_to TrunkwNEHole,
+        s_to Eels,
+        e_to CoralPULL,
+        w_to VineinEast,
+   has  light;
+
+ThroughWay  VineinEast "Vine in East"
+  with  description
+            "",
+        n_to 2rootedges,
+        s_to Clams4,
+        e_to VineandTrunk,
+        w_to Turtle2,
+   has  light;
+
+ThroughWay  Turtle2 "Turtle"
+  with  description
+            "",
+        n_to WallWETrunk,
+        s_to Clams4,
+        e_to VineinEast,
+   has  light;
+
+Lethal  Clams4 "Clams"
+  with  description
+            "",
+        n_to Turtle2,
+   has  light;
+
+Lethal  Clams5 "Clams"
+  with  description
+            "",
+        n_to TREEE,
+   has  light;
+
+ThroughWay  WallWETrunk "Wall W, E Trunk"
+  with  description
+            "",
+        n_to WallWEopen,
+        s_to Turtle2,
+        e_to 2rootedges,
+   has  light;
+
+ThroughWay  WallWEopen "Wall W, E open"
+  with  description
+            "",
+        n_to Undershiptail,
+        s_to WallWETrunk,
+        e_to TreeRootNE,
+   has  light;
+
+Useless  TreeRootNE "Tree Root NE"
+  with  description
+            "",
+        n_to Scenic,
+        s_to 2rootedges,
+        e_to TreeRootNW,
+        w_to WallWEopen,
+   has  light;
+
+Useless  TreeRootNW "Tree Root NW"
+  with  description
+            "",
+        n_to Scenic2,
+        s_to TrunkwNEHole,
+        e_to BigVineW,
+        w_to TreeRootNE,
+   has  light;
+
+Useless  BigVineW "Big Vine W"
+  with  description
+            "",
+        n_to Scenic3,
+        s_to NWtotreasure,
+        e_to WallE,
+        w_to TreeRootNW,
+   has  light;
+
+Useless  WallE "Wall E"
+  with  description
+            "",
+        n_to HiddenPsgWest,
+        s_to TreeWWall,
+        w_to BigVineW,
+   has  light;
+
+Useless  2rootedges "2 root edges"
+  with  description
+            "",
+        n_to TreeRootNE,
+        s_to VineinEast,
+        e_to TrunkwNEHole,
+        w_to WallWETrunk,
+   has  light;
+
+Useless  TrunkwNEHole "Trunk w/NE Hole"
+  with  description
+            "",
+        n_to TreeRootNW,
+        s_to VineandTrunk,
+        e_to NWtotreasure,
+        w_to 2rootedges,
+   has  light;
+
+ThroughWay  NWtotreasure "NW to treas ure"
+  with  description
+            "",
+        n_to BigVineW,
+        s_to CoralPULL,
+        e_to TreeWWall,
+        w_to TrunkwNEHole,
+   has  light;
+
+ThroughWay  TreeWWall "Tree W + Wall"
+  with  description
+            "",
+        n_to WallE,
+        s_to WallEAlgae,
+        w_to NWtotreasure,
+   has  light;
+
+ThroughWay  WaterCave "Water Cave"
+  with  description
+            "",
+        s_to WaterCave3,
+        e_to WaterCave2,
+   has  light;
+
+ThroughWay  WaterCave2 "Water Cave"
+  with  description
+            "",
+        e_to updownpsgs,
+        w_to WaterCave,
+   has  light;
+
+ThroughWay  WaterCave3 "Water Cave"
+  with  description
+            "",
+        n_to WaterCave,
+        e_to WaterCave4,
+   has  light;
+
+ThroughWay  WaterCave4 "Water Cave"
+  with  description
+            "",
+        e_to Shipwcard,
+        w_to WaterCave3,
+   has  light;
+
+Importantitem  Shipwcard "Ship w/card"
+  with  description
+            "",
+        w_to WaterCave4,
+   has  light;
+
+ThroughWay  updownpsgs "up/down psgs"
+  with  description
+            "",
+        e_to UpperPsg,
+        w_to WaterCave2,
+   has  light;
+
+Lethal  TenTacle "Ten Tacle"
+  with  description
+            "",
+        e_to updownpsgs,
+   has  light;
+
+ThroughWay  HidPsgEast "Hid Psg East"
+  with  description
+            "",
+        e_to Oracle,
+        w_to TenTacle,
+   has  light;
+
+Importantitem  Oracle "Oracle"
+  with  description
+            "",
+        w_to HidPsgEast,
+   has  light;
+
+Object ->  TouchExamine "TouchExamine"
+  with  name 'TouchExamine',
+        description "Touch/Examine";
+
+Lethal  Shark "Shark"
+  with  description
+            "",
+        e_to LowerPsg,
+   has  light;
+
+Object ->  Usefruit "Use fruit"
+  with  name 'Use' 'fruit',
+        description "Use fruit";
+
+Object ->  Getpaper "Get paper"
+  with  name 'Get' 'paper',
+        description "Get paper";
+
+ThroughWay  UpperPsg "Upper Psg"
+  with  description
+            "",
+        e_to UpperPsg2,
+        w_to updownpsgs,
+   has  light;
+
+ThroughWay  UpperPsg2 "Upper Psg"
+  with  description
+            "",
+        e_to UDHole,
+        w_to UpperPsg,
+   has  light;
+
+ThroughWay  UDHole "U/D Hole"
+  with  description
+            "",
+        w_to UpperPsg2,
+   has  light;
+
+Lethal  Monsterchasesyou2 "Monster chases you"
+  with  description
+            "",
+        n_to ShipBody,
+   has  light;
+
+Lethal  TENTACLE2 "TENT ACLE"
+  with  description
+            "",
+        e_to ForkNorth,
+        w_to updownpsgs,
+   has  light;
+
+Importantitem  FromNofCoral "From N of Coral"
+  with  description
+            "",
+   has  light;
+
+Object ->  LineJar "Line Jar"
+  with  name 'Line' 'Jar',
+        description "Line, Jar";
+
+Lethal  Clams6 "Clams"
+  with  description
+            "",
+   has  light;
+
+Lethal  Eels "Eels"
+  with  description
+            "",
+        n_to CoralPULL,
+   has  light;
+
+ThroughWay  LowerPsg "Lower Psg"
+  with  description
+            "",
+        e_to LowerPsg2,
+        w_to Shark,
+   has  light;
+
+ThroughWay  LowerPsg2 "Lower Psg"
+  with  description
+            "",
+        e_to UDHole,
+        w_to LowerPsg,
+   has  light;
+
+[ Initialise;
+    location = RockTree;
+    ! "^^Your opening paragraph here...^^";
+];
+
+Include "Grammar";
+

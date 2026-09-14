@@ -1,0 +1,1065 @@
+#include "verblib.g" ! grammar must come first
+
+#include "hugolib.h"
+
+routine init
+{
+	cls
+	verbosity = 2
+	counter = -1
+	STATUSTYPE = 1 !1 = score / turns, 2 = time, 3 = moves: score:
+	player = you
+	Font(BOLD_ON)
+	"space-quest-lost-chapter-surface"
+	Font(BOLD_OFF)
+	"by A Trizbort User"
+	location = RockTree
+	MovePlayer(location)
+}
+
+property region
+room RockTree
+{
+	region Later
+
+	n_to RockWithVines
+	s_to EndofPath
+
+}
+
+room RockWithVines
+{
+	region Later
+
+	s_to RockTree
+	e_to RockPath
+
+}
+
+room RockPath
+{
+	region Later
+
+	e_to RockBridge
+	w_to RockWithVines
+
+}
+
+room RockBridge
+{
+	region Later
+
+	e_to NWRockPath2
+	w_to RockPath
+
+}
+
+room NWRockPath2
+{
+	region Later
+
+	e_to NWRockPath
+	w_to RockBridge
+
+}
+
+object Becarefulcanfall
+{
+	in NWRockPath2
+}
+
+room NWRockPath
+{
+	region Later
+
+	s_to Shore
+	w_to NWRockPath2
+
+}
+
+room Shore
+{
+	region Later
+
+	n_to NWRockPath
+	e_to ShipFront
+	w_to Waterfall
+
+}
+
+room Waterfall
+{
+	region Useless
+
+	e_to Shore
+
+}
+
+room ShipFront
+{
+	region Through Way
+
+	s_to Monsterchasesyou2
+	e_to ShipBody
+	w_to Shore
+
+}
+
+room ShipBody
+{
+	region Through Way
+
+	s_to Monsterchasesyou2
+	e_to ShipTail
+	w_to ShipFront
+
+}
+
+room ShipTail
+{
+	region Important item
+
+	s_to Monsterchasesyou2
+	e_to Lake
+	w_to ShipBody
+
+}
+
+object NAIL
+{
+	in ShipTail
+}
+
+room Lake
+{
+	region Through Way
+
+	e_to LagoonCLIMB
+	w_to ShipTail
+
+}
+
+room LagoonCLIMB
+{
+	region Through Way
+
+	n_to Tree
+	e_to WaterWtolagoon
+	w_to Lake
+
+}
+
+object GoSWWtonextlake
+{
+	in LagoonCLIMB
+}
+
+room Tree
+{
+	region Through Way
+
+	s_to LagoonCLIMB
+
+}
+
+room Tree2
+{
+	region Through Way
+
+	e_to FRUIT
+
+}
+
+room FRUIT
+{
+	region Important item
+
+	w_to Tree2
+
+}
+
+room WaterWtolagoon
+{
+	region Through Way
+
+	s_to Monsterchasesyou
+	e_to LakeonS
+	w_to LagoonCLIMB
+
+}
+
+room LakeonS
+{
+	region Through Way
+
+	s_to Monsterchasesyou
+	e_to LakeinSW
+	w_to WaterWtolagoon
+
+}
+
+room LakeinSW
+{
+	region Through Way
+
+	n_to jungle
+	s_to DeathinS
+	e_to GreyRock
+	w_to LakeonS
+
+}
+
+room Monsterchasesyou
+{
+	region Lethal
+
+	n_to LakeonS
+	e_to DeathinS
+
+}
+
+room jungle
+{
+	region Through Way
+
+	s_to LakeinSW
+	e_to MOULDN
+	w_to LakeinSW
+
+}
+
+room MOULDN
+{
+	region Important item
+
+	e_to FlowerN
+	w_to jungle
+
+}
+
+room FlowerN
+{
+	region Important item
+
+	s_to GreyTree
+	e_to jungle2
+	w_to MOULDN
+
+}
+
+object Mould
+{
+	in FlowerN
+}
+
+room jungle2
+{
+	region Through Way
+
+	s_to jungle3
+	w_to FlowerN
+
+}
+
+room jungle3
+{
+	region Through Way
+
+	n_to jungle2
+	s_to jungle5
+	e_to YourShip
+	w_to GreyTree
+
+}
+
+room YourShip
+{
+	region Through Way
+
+	s_to jungle3
+	e_to jungle4
+
+}
+
+room jungle4
+{
+	region Useless
+
+	n_to YourShip
+	w_to jungle5
+
+}
+
+room jungle5
+{
+	region Through Way
+
+	n_to jungle3
+	s_to CODECARD
+	e_to jungle4
+	w_to BlackTree
+
+}
+
+room BlackTree
+{
+	region Useless
+
+	n_to GreyTree
+	e_to jungle5
+
+}
+
+room GreyTree
+{
+	region Useless
+
+	n_to FlowerN
+	s_to BlackTree
+	e_to jungle3
+	w_to GreyRock
+
+}
+
+room GreyRock
+{
+	region Useless
+
+	e_to GreyTree
+	w_to LakeinSW
+
+}
+
+room CODECARD
+{
+	region Important item
+
+	n_to jungle5
+
+}
+
+room DeathinS
+{
+	region Lethal
+
+	n_to LakeinSW
+	w_to Monsterchasesyou
+
+}
+
+room EndofPath
+{
+	region Later
+
+	n_to RockTree
+	u_to Mountain
+
+}
+
+room Mountain
+{
+	region Later
+
+	n_to Mountain2
+	d_to EndofPath
+
+}
+
+room Mountain2
+{
+	region Later
+
+	n_to CAVE
+	s_to Mountain
+
+}
+
+room CAVE
+{
+	region Important item
+
+	s_to Mountain2
+
+}
+
+object GETSTONEWITHBONE
+{
+	in CAVE
+}
+
+room Undershipbody
+{
+	region Through Way
+
+	s_to BAG
+	e_to Undershiptail
+
+}
+
+room BAG
+{
+	region Important item
+
+	n_to Undershipbody
+
+}
+
+room Undershiptail
+{
+	region Through Way
+
+	s_to WallWEopen
+	e_to Scenic
+	w_to Undershipbody
+
+}
+
+room Scenic
+{
+	region Through Way
+
+	s_to TreeRootNE
+	e_to Scenic2
+	w_to Undershiptail
+
+}
+
+room Scenic2
+{
+	region Through Way
+
+	s_to TreeRootNW
+	e_to Scenic3
+	w_to Scenic
+
+}
+
+room Scenic3
+{
+	region Through Way
+
+	s_to BigVineW
+	e_to HiddenPsgWest
+	w_to Scenic2
+
+}
+
+room HiddenPsgWest
+{
+	region Through Way
+
+	s_to WallE
+	e_to HiddenPsgEast
+	w_to Scenic3
+
+}
+
+room HiddenPsgEast
+{
+	region Through Way
+
+	s_to BlackWallWest
+	e_to Scenic4
+	w_to HiddenPsgWest
+
+}
+
+room Scenic4
+{
+	region Through Way
+
+	s_to SeaWeed
+	e_to ForkNorth
+	w_to HiddenPsgEast
+
+}
+
+room ForkNorth
+{
+	region Through Way
+
+	n_to TENTACLE2
+	s_to BrownTree
+	e_to TinyTooth
+	w_to Scenic4
+
+}
+
+room TinyTooth
+{
+	region Lethal
+
+	s_to GelBlob
+	e_to Turtle
+	w_to ForkNorth
+
+}
+
+room Turtle
+{
+	region Through Way
+
+	e_to JellyFish
+	w_to TinyTooth
+
+}
+
+room JellyFish
+{
+	region Through Way
+
+	e_to METALROD
+	w_to Turtle
+
+}
+
+room METALROD
+{
+	region Important item
+
+	e_to Cavern
+	w_to JellyFish
+
+}
+
+room Cavern
+{
+	region Through Way
+
+	e_to Cavern2
+	w_to METALROD
+
+}
+
+room Cavern2
+{
+	region Through Way
+
+	n_to Pool
+	w_to Cavern
+
+}
+
+room Pool
+{
+	region Through Way
+
+	s_to Cavern2
+	w_to PuffyFish
+
+}
+
+room PuffyFish
+{
+	region Important item
+
+	e_to Pool
+
+}
+
+room GelBlob
+{
+	region Lethal
+
+	n_to TinyTooth
+	s_to Clams
+	w_to BrownTree
+
+}
+
+room BrownTree
+{
+	region Through Way
+
+	n_to ForkNorth
+	s_to Clams
+	e_to GelBlob
+	w_to SeaWeed
+
+}
+
+room Clams
+{
+	region Lethal
+
+	n_to BrownTree
+	s_to TrunkAlgae
+	w_to Clams2
+
+}
+
+room Clams2
+{
+	region Lethal
+
+	n_to SeaWeed
+	s_to TREEE
+	e_to Clams
+	w_to Clams3
+
+}
+
+room Clams3
+{
+	region Lethal
+
+	n_to BlackWallWest
+	e_to Clams2
+
+}
+
+room BlackWallWest
+{
+	region Useless
+
+	n_to HiddenPsgEast
+	s_to Clams3
+	e_to SeaWeed
+
+}
+
+room SeaWeed
+{
+	region Through Way
+
+	n_to Scenic4
+	s_to Clams2
+	e_to BrownTree
+	w_to BlackWallWest
+
+}
+
+room TREEE
+{
+	region Through Way
+
+	n_to Clams2
+	s_to Clams5
+	e_to TrunkAlgae
+	w_to TREESearch
+
+}
+
+room TrunkAlgae
+{
+	region Through Way
+
+	n_to Clams
+	s_to Clams5
+	e_to Structures
+	w_to TREEE
+
+}
+
+room Structures
+{
+	region Through Way
+
+	n_to Clams6
+	e_to OCTOPUS
+	w_to TrunkAlgae
+
+}
+
+room OCTOPUS
+{
+	region Important item
+
+	w_to Structures
+
+}
+
+object BONE
+{
+	in OCTOPUS
+}
+
+room TREESearch
+{
+	region Important item
+
+	s_to Clams5
+	e_to TREEE
+	w_to WallEAlgae
+
+}
+
+object SEARCHHOLE
+{
+	in TREESearch
+}
+
+room WallEAlgae
+{
+	region Through Way
+
+	n_to TreeWWall
+	s_to Eels
+	e_to TREESearch
+	w_to CoralPULL
+
+}
+
+object Stoalgae
+{
+	in WallEAlgae
+}
+
+room CoralPULL
+{
+	region Through Way
+
+	n_to NWtotreasure
+	s_to Eels
+	e_to WallEAlgae
+	w_to VineandTrunk
+
+}
+
+room VineandTrunk
+{
+	region Through Way
+
+	n_to TrunkwNEHole
+	s_to Eels
+	e_to CoralPULL
+	w_to VineinEast
+
+}
+
+room VineinEast
+{
+	region Through Way
+
+	n_to 2rootedges
+	s_to Clams4
+	e_to VineandTrunk
+	w_to Turtle2
+
+}
+
+room Turtle2
+{
+	region Through Way
+
+	n_to WallWETrunk
+	s_to Clams4
+	e_to VineinEast
+
+}
+
+room Clams4
+{
+	region Lethal
+
+	n_to Turtle2
+
+}
+
+room Clams5
+{
+	region Lethal
+
+	n_to TREEE
+
+}
+
+room WallWETrunk
+{
+	region Through Way
+
+	n_to WallWEopen
+	s_to Turtle2
+	e_to 2rootedges
+
+}
+
+room WallWEopen
+{
+	region Through Way
+
+	n_to Undershiptail
+	s_to WallWETrunk
+	e_to TreeRootNE
+
+}
+
+room TreeRootNE
+{
+	region Useless
+
+	n_to Scenic
+	s_to 2rootedges
+	e_to TreeRootNW
+	w_to WallWEopen
+
+}
+
+room TreeRootNW
+{
+	region Useless
+
+	n_to Scenic2
+	s_to TrunkwNEHole
+	e_to BigVineW
+	w_to TreeRootNE
+
+}
+
+room BigVineW
+{
+	region Useless
+
+	n_to Scenic3
+	s_to NWtotreasure
+	e_to WallE
+	w_to TreeRootNW
+
+}
+
+room WallE
+{
+	region Useless
+
+	n_to HiddenPsgWest
+	s_to TreeWWall
+	w_to BigVineW
+
+}
+
+room 2rootedges
+{
+	region Useless
+
+	n_to TreeRootNE
+	s_to VineinEast
+	e_to TrunkwNEHole
+	w_to WallWETrunk
+
+}
+
+room TrunkwNEHole
+{
+	region Useless
+
+	n_to TreeRootNW
+	s_to VineandTrunk
+	e_to NWtotreasure
+	w_to 2rootedges
+
+}
+
+room NWtotreasure
+{
+	region Through Way
+
+	n_to BigVineW
+	s_to CoralPULL
+	e_to TreeWWall
+	w_to TrunkwNEHole
+
+}
+
+room TreeWWall
+{
+	region Through Way
+
+	n_to WallE
+	s_to WallEAlgae
+	w_to NWtotreasure
+
+}
+
+room WaterCave
+{
+	region Through Way
+
+	s_to WaterCave3
+	e_to WaterCave2
+
+}
+
+room WaterCave2
+{
+	region Through Way
+
+	e_to updownpsgs
+	w_to WaterCave
+
+}
+
+room WaterCave3
+{
+	region Through Way
+
+	n_to WaterCave
+	e_to WaterCave4
+
+}
+
+room WaterCave4
+{
+	region Through Way
+
+	e_to Shipwcard
+	w_to WaterCave3
+
+}
+
+room Shipwcard
+{
+	region Important item
+
+	w_to WaterCave4
+
+}
+
+room updownpsgs
+{
+	region Through Way
+
+	e_to UpperPsg
+	w_to WaterCave2
+
+}
+
+room TenTacle
+{
+	region Lethal
+
+	e_to updownpsgs
+
+}
+
+room HidPsgEast
+{
+	region Through Way
+
+	e_to Oracle
+	w_to TenTacle
+
+}
+
+room Oracle
+{
+	region Important item
+
+	w_to HidPsgEast
+
+}
+
+object TouchExamine
+{
+	in Oracle
+}
+
+room Shark
+{
+	region Lethal
+
+	e_to LowerPsg
+
+}
+
+object Usefruit
+{
+	in Shark
+}
+
+object Getpaper
+{
+	in Shark
+}
+
+room UpperPsg
+{
+	region Through Way
+
+	e_to UpperPsg2
+	w_to updownpsgs
+
+}
+
+room UpperPsg2
+{
+	region Through Way
+
+	e_to UDHole
+	w_to UpperPsg
+
+}
+
+room UDHole
+{
+	region Through Way
+
+	w_to UpperPsg2
+
+}
+
+room Monsterchasesyou2
+{
+	region Lethal
+
+	n_to ShipBody
+
+}
+
+room TENTACLE2
+{
+	region Lethal
+
+	e_to ForkNorth
+	w_to updownpsgs
+
+}
+
+room FromNofCoral
+{
+	region Important item
+
+
+}
+
+object LineJar
+{
+	in FromNofCoral
+}
+
+room Clams6
+{
+	region Lethal
+
+
+}
+
+room Eels
+{
+	region Lethal
+
+	n_to CoralPULL
+
+}
+
+room LowerPsg
+{
+	region Through Way
+
+	e_to LowerPsg2
+	w_to Shark
+
+}
+
+room LowerPsg2
+{
+	region Through Way
+
+	e_to UDHole
+	w_to LowerPsg
+
+}
+
+player_character you "you"
+{
+}
+

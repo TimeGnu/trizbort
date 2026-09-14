@@ -1,0 +1,74 @@
+
+start_at = foggy_room
+
+locations {
+   foggy_room         : location "" header = "Foggy Room";
+   prairie            : location "" header = "Prairie";
+   cave               : location "" header = "Cave";
+   hearth             : location "" header = "Hearth";
+   sandstorm          : location "" header = "Sandstorm";
+   tundra             : location "" header = "Tundra";
+   manic_sky          : location "" header = "Manic Sky";
+   grassland          : location "" header = "Grassland";
+   infinite_ice_floes : location "" header = "Infinite Ice Floes";
+   low_room           : location "" header = "Low Room";
+   alcove             : location "" header = "Alcove";
+   countless_dunes    : location "" header = "Countless Dunes";
+   oasis              : location "" header = "Oasis";
+   shifting_grotto    : location "" header = "Shifting Grotto";
+   crumbling_chimney  : location "" header = "Crumbling Chimney";
+   cement_room        : location "" header = "Cement Room";
+   bricklined_room    : location "" header = "Brick-Lined Room";
+   sandy_room         : location "" header = "Sandy Room";
+   water_room         : location "" header = "Water Room";
+   writing_room       : location "" header = "Writing Room";
+   spinning_expanse   : location "" header = "Spinning Expanse";
+}
+
+
+connections {
+   from, direction, to = [
+      foggy_room, north_oneway, prairie,
+      foggy_room, south_oneway, cave,
+      foggy_room, east_oneway, hearth,
+      foggy_room, west_oneway, sandstorm,
+      foggy_room, northeast_oneway, tundra,
+      prairie, south_oneway, foggy_room,
+      prairie, northwest_oneway, manic_sky,
+      cave, north_oneway, foggy_room,
+      cave, down_oneway, shifting_grotto,
+      hearth, west_oneway, foggy_room,
+      hearth, down_oneway, low_room,
+      sandstorm, east_oneway, foggy_room,
+      sandstorm, down_oneway, countless_dunes,
+      tundra, northeast_oneway, infinite_ice_floes,
+      tundra, southwest_oneway, foggy_room,
+      manic_sky, west_oneway, grassland,
+      manic_sky, southeast_oneway, prairie,
+      grassland, east_oneway, manic_sky,
+      infinite_ice_floes, southwest_oneway, tundra,
+      infinite_ice_floes, up_oneway, cement_room,
+      low_room, southeast_oneway, alcove,
+      low_room, up_oneway, hearth,
+      alcove, northwest_oneway, low_room,
+      countless_dunes, southwest_oneway, oasis,
+      countless_dunes, up_oneway, sandstorm,
+      oasis, northeast_oneway, countless_dunes,
+      shifting_grotto, southeast_oneway, crumbling_chimney,
+      shifting_grotto, up_oneway, cave,
+      crumbling_chimney, northwest_oneway, shifting_grotto,
+      cement_room, north_oneway, bricklined_room,
+      cement_room, down_oneway, infinite_ice_floes,
+      bricklined_room, north_oneway, sandy_room,
+      bricklined_room, south_oneway, cement_room,
+      sandy_room, north_oneway, water_room,
+      sandy_room, south_oneway, bricklined_room,
+      water_room, north_oneway, writing_room,
+      water_room, south_oneway, sandy_room,
+      writing_room, north_oneway, spinning_expanse,
+      writing_room, south_oneway, water_room,
+      spinning_expanse, south_oneway, writing_room,
+   ]
+}
+
+

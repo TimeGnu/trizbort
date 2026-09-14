@@ -1,0 +1,351 @@
+#include "verblib.g" ! grammar must come first
+
+#include "hugolib.h"
+
+routine init
+{
+	cls
+	verbosity = 2
+	counter = -1
+	STATUSTYPE = 1 !1 = score / turns, 2 = time, 3 = moves: score:
+	player = you
+	Font(BOLD_ON)
+	"spiral"
+	Font(BOLD_OFF)
+	"by J. Lautzenheiser"
+	location = Mountainside
+	MovePlayer(location)
+}
+
+property region
+room Mountainside
+{
+	region Helen
+
+	s_to FootoftheMountainS
+
+}
+
+room FootoftheMountainS
+{
+	region Helen
+
+	n_to Mountainside
+	e_to FootoftheMountainE
+	w_to FootoftheMountainW
+	se_to ChurchIsle
+
+}
+
+object Pole
+{
+	in FootoftheMountainS
+}
+
+room FootoftheMountainW
+{
+	region Helen
+
+	e_to FootoftheMountainS
+	w_to Coast
+
+}
+
+room FootoftheMountainE
+{
+	region Helen
+	long_desc
+	"
+		fsdfds
+	"
+
+	w_to FootoftheMountainS
+	in_to OntheCloud
+
+}
+
+room OntheCloud
+{
+	region Helen
+
+	out_to FootoftheMountainE
+
+}
+
+room Platform
+{
+	region Ross
+
+	e_to MachineRoomWest
+
+}
+
+room MachineRoomWest
+{
+	region Ross
+
+	n_to OvertheGap
+	e_to MachineRoomCentral
+	w_to Platform
+	u_to BeneaththePipe
+
+}
+
+object putpoleinrecess
+{
+	in MachineRoomWest
+}
+
+room FalltoCarriage
+{
+
+
+}
+
+room FalltoCarriage2
+{
+
+
+}
+
+room FalltoCarriage3
+{
+
+
+}
+
+room MachineRoomCentral
+{
+	region Ross
+
+	e_to MachineRoomEast
+	w_to MachineRoomWest
+
+}
+
+object Crystal
+{
+	in MachineRoomCentral
+}
+
+room MachineRoomEast
+{
+	region Ross
+
+	w_to MachineRoomCentral
+	d_to HospitalRoom
+
+}
+
+room BeneaththePipe
+{
+	region Ross
+
+	u_to FalltoCarriage4
+	d_to MachineRoomWest
+
+}
+
+object Crystal2
+{
+	in BeneaththePipe
+}
+
+room ChurchIsle
+{
+	region Helen
+
+	nw_to FootoftheMountainS
+
+}
+
+object Page
+{
+	in ChurchIsle
+}
+
+room FalltoCarriage4
+{
+
+	d_to BeneaththePipe
+
+}
+
+room OvertheGap
+{
+	region Ross
+
+	n_to ScrapRoom
+	s_to MachineRoomWest
+
+}
+
+object Crystal3
+{
+	in OvertheGap
+}
+
+room ScrapRoom
+{
+	region Ross
+
+	s_to OvertheGap
+	e_to RethsDen
+
+}
+
+object Phonecrystal
+{
+	in ScrapRoom
+}
+
+room Coast
+{
+	region Helen
+
+	e_to FootoftheMountainW
+	u_to Cave
+
+}
+
+object Page2
+{
+	in Coast
+}
+
+room Cave
+{
+	region Helen
+
+	s_to Attic
+	w_to Tomb
+	d_to Coast
+
+}
+
+room Attic
+{
+	region Helen
+
+	n_to Cave
+
+}
+
+object Stuffpage
+{
+	in Attic
+}
+
+object Laptop
+{
+	in Attic
+}
+
+room Tomb
+{
+	region Helen
+
+	e_to Cave
+
+}
+
+object Coffinpage
+{
+	in Tomb
+}
+
+room Carriage
+{
+	region Both
+
+	ne_to Mountainside
+	se_to MachineRoomWest
+
+}
+
+room UndergroundLine
+{
+	region Helen
+	long_desc
+	"
+		Made in Twine, Men Don't Play With Dolls is an intimate and painful look into the beginnings of a lifelong struggle with addiction. Memories like these are not easily escaped.
+	"
+
+	s_to Tomb
+
+}
+
+object Hat
+{
+	in UndergroundLine
+}
+
+object Cat
+{
+	in UndergroundLine
+}
+
+room HospitalRoom
+{
+	region Ross
+
+	s_to MachineRoomEast
+
+}
+
+room RethsDen
+{
+	region Ross
+
+	w_to ScrapRoom
+
+}
+
+object BoxSoul
+{
+	in RethsDen
+}
+
+room UndergroundLine2
+{
+	region Both
+
+	s_to RethsDen
+	e_to Vat
+	w_to Summit
+	in_to TrainWreck
+
+}
+
+room Summit
+{
+	region Both
+
+	d_to UndergroundLine2
+
+}
+
+room Vat
+{
+	region Both
+
+
+}
+
+object Syringe
+{
+	in Vat
+}
+
+room TrainWreck
+{
+	region Ross
+
+	out_to UndergroundLine2
+
+}
+
+player_character you "you"
+{
+}
+

@@ -1,0 +1,145 @@
+
+start_at = fork
+
+locations {
+   fork                             : location "" header = "Fork";
+   train_crossing                   : location "" header = "Train Crossing";
+   dirt_path                        : location "" header = "Dirt Path";
+   sheriff_station_entrance         : location "" header = "Sheriff Station Entrance";
+   lake_shore                       : location "" header = "Lake Shore";
+   lake_shore_2                     : location "" header = "Lake Shore";
+   dock                             : location "" header = "Dock";
+   lake_on_raft                     : location "" header = "Lake (on raft)";
+   temple_entrance                  : location "" header = "Temple Entrance";
+   statue_room_becomes_plain        : location "" header = "Statue Room (becomes plai";
+   arena_room                       : location "" header = "Arena Room";
+   spectator_box                    : location "" header = "Spectator Box";
+   armory                           : location "" header = "Armory";
+   gated_path                       : location "" header = "Gated Path";
+   blank_room                       : location "" header = "Blank Room";
+   ocean_room                       : location "" header = "Ocean Room";
+   rainforest_room                  : location "" header = "Rain-Forest Room";
+   space_room                       : location "" header = "Space Room";
+   metallic_room                    : location "" header = "Metallic Room";
+   meandering_path                  : location "" header = "Meandering Path";
+   aband_store_front_myers_entrance : location "" header = "Aband. Store Front Myers ";
+   abandoned_shop                   : location "" header = "Abandoned Shop";
+   rosario_entrance                 : location "" header = "Rosario Entrance";
+   dead_end                         : location "" header = "Dead End";
+   ramen_booth                      : location "" header = "Ramen Booth";
+   inside_ramen_booth               : location "" header = "Inside Ramen Booth";
+   timber_path                      : location "" header = "Timber Path";
+   forest_maze                      : location "" header = "Forest Maze";
+   forest_maze_2                    : location "" header = "Forest Maze";
+   forest_center                    : location "" header = "Forest Center";
+   forest_maze_3                    : location "" header = "Forest Maze";
+   forest_maze_4                    : location "" header = "Forest Maze";
+   forest_center                    : location "" header = "(Forest Center)";
+   forest_maze_5                    : location "" header = "Forest Maze";
+   forest_maze_6                    : location "" header = "Forest Maze";
+   clearing                         : location "" header = "Clearing";
+   forest_maze_7                    : location "" header = "Forest Maze";
+   end_of_cave                      : location "" header = "End of Cave";
+   forest_maze                      : location "" header = "(Forest Maze)";
+   sheriff_station                  : location "" header = "Sheriff Station";
+   cramped_bathroom                 : location "" header = "Cramped Bathroom";
+   field                            : location "" header = "Field";
+   power_room                       : location "" header = "Power Room";
+   forest_maze_8                    : location "" header = "Forest Maze";
+   tree_canopy                      : location "" header = "Tree Canopy";
+}
+
+
+connections {
+   from, direction, to = [
+      fork, north_oneway, train_crossing,
+      fork, south_oneway, meandering_path,
+      fork, west_oneway, dirt_path,
+      train_crossing, north_oneway, field,
+      train_crossing, south_oneway, fork,
+      dirt_path, south_oneway, sheriff_station_entrance,
+      dirt_path, east_oneway, fork,
+      dirt_path, northeast_oneway, gated_path,
+      dirt_path, northwest_oneway, lake_shore,
+      sheriff_station_entrance, north_oneway, dirt_path,
+      sheriff_station_entrance, south_oneway, sheriff_station,
+      sheriff_station_entrance, west_oneway, power_room,
+      sheriff_station_entrance, enter_oneway, sheriff_station,
+      lake_shore, south_oneway, lake_shore_2,
+      lake_shore, southeast_oneway, dirt_path,
+      lake_shore_2, north_oneway, lake_shore,
+      lake_shore_2, west_oneway, dock,
+      dock, east_oneway, lake_shore_2,
+      dock, west_oneway, lake_on_raft,
+      lake_on_raft, east_oneway, dock,
+      temple_entrance, west_oneway, statue_room_becomes_plain,
+      statue_room_becomes_plain, north_oneway, spectator_box,
+      statue_room_becomes_plain, south_oneway, armory,
+      statue_room_becomes_plain, east_oneway, temple_entrance,
+      statue_room_becomes_plain, west_oneway, arena_room,
+      arena_room, east_oneway, statue_room_becomes_plain,
+      spectator_box, south_oneway, statue_room_becomes_plain,
+      armory, north_oneway, statue_room_becomes_plain,
+      gated_path, north_oneway, blank_room,
+      gated_path, southwest_oneway, dirt_path,
+      blank_room, north_oneway, ocean_room,
+      blank_room, south_oneway, gated_path,
+      blank_room, east_oneway, metallic_room,
+      blank_room, northeast_oneway, space_room,
+      blank_room, northwest_oneway, rainforest_room,
+      ocean_room, south_oneway, blank_room,
+      rainforest_room, southeast_oneway, blank_room,
+      space_room, southwest_oneway, blank_room,
+      metallic_room, west_oneway, blank_room,
+      meandering_path, north_oneway, fork,
+      meandering_path, south_oneway, dead_end,
+      meandering_path, west_oneway, rosario_entrance,
+      meandering_path, southeast_oneway, ramen_booth,
+      meandering_path, northwest_oneway, aband_store_front_myers_entrance,
+      aband_store_front_myers_entrance, west_oneway, abandoned_shop,
+      aband_store_front_myers_entrance, southeast_oneway, meandering_path,
+      abandoned_shop, east_oneway, aband_store_front_myers_entrance,
+      rosario_entrance, east_oneway, meandering_path,
+      dead_end, north_oneway, meandering_path,
+      dead_end, south_oneway, timber_path,
+      ramen_booth, west_oneway, inside_ramen_booth,
+      ramen_booth, northwest_oneway, meandering_path,
+      inside_ramen_booth, east_oneway, ramen_booth,
+      timber_path, north_oneway, dead_end,
+      timber_path, south_oneway, forest_maze,
+      forest_maze, north_oneway, timber_path,
+      forest_maze, south_oneway, forest_maze_2,
+      forest_maze_2, north_oneway, forest_maze,
+      forest_maze_2, south_oneway, forest_center,
+      forest_center, north_oneway, forest_maze_2,
+      forest_center, south_oneway, forest_maze_6,
+      forest_center, east_oneway, forest_maze,
+      forest_center, west_oneway, forest_maze_3,
+      forest_maze_3, north_oneway, forest_maze_4,
+      forest_maze_3, south_oneway, forest_maze_5,
+      forest_maze_3, east_oneway, forest_center,
+      forest_maze_3, west_oneway, forest_maze_4,
+      forest_maze_4, south_oneway, forest_maze_8,
+      forest_maze_4, east_oneway, forest_maze_3,
+      forest_maze_4, west_oneway, forest_center,
+      forest_center, east_oneway, forest_maze_4,
+      forest_maze_5, north_oneway, forest_maze_3,
+      forest_maze_5, south_oneway, forest_maze_7,
+      forest_maze_6, north_oneway, forest_center,
+      forest_maze_6, east_oneway, clearing,
+      clearing, west_oneway, forest_maze_6,
+      forest_maze_7, north_oneway, forest_maze_5,
+      forest_maze_7, south_oneway, end_of_cave,
+      end_of_cave, north_oneway, forest_maze_7,
+      forest_maze, west_oneway, forest_center,
+      sheriff_station, north_oneway, sheriff_station_entrance,
+      sheriff_station, west_oneway, cramped_bathroom,
+      cramped_bathroom, east_oneway, sheriff_station,
+      field, south_oneway, train_crossing,
+      power_room, east_oneway, sheriff_station_entrance,
+      forest_maze_8, north_oneway, forest_maze_4,
+      forest_maze_8, east_oneway, forest_maze_4,
+   ]
+}
+
+

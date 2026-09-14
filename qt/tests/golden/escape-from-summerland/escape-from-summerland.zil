@@ -1,0 +1,293 @@
+"escape-from-summerland main file"
+
+<VERSION ZIP>
+<CONSTANT RELEASEID 1>
+
+"Main Loop"
+
+<CONSTANT GAME-BANNER "escape-from-summerland|An interactive fiction by A Trizbort User">
+
+<ROUTINE GO ()
+    <CRLF> <CRLF>
+    <TELL "" CR CR>
+    <V-VERSION> <CRLF>
+    <SETG HERE ,IN-THE-CARAVAN-PARK>
+    <MOVE ,PLAYER ,HERE>
+    <V-LOOK>
+    <REPEAT ()
+        <COND (<PARSER>
+               <PERFORM ,PRSA ,PRSO ,PRSI>
+               <COND (<NOT <GAME-VERB?>>
+                      <APPLY <GETP ,HERE ,P?ACTION> ,M-END>
+                      <CLOCKER>)>)>
+        <SETG HERE <LOC ,WINNER>>>>
+
+<INSERT-FILE "parser">
+
+"Objects"
+
+<ROOM IN-THE-CARAVAN-PARK
+    (DESC "In the Caravan Park")
+    (IN ROOMS)
+    (SOUTH TO MAIN-TRACK)
+    (IN TO INSIDE-THE-CARAVAN)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT ENTER-THEN-EXAMINE-PERSON
+    (IN IN-THE-CARAVAN-PARK)
+    (DESC "Enter then examine person")
+    (SYNONYM PERSON)
+    (ADJECTIVE ENTER THEN EXAMINE)
+    (FLAGS TAKEBIT VOWELBIT)>
+
+
+<ROOM MAIN-TRACK
+    (DESC "Main Track")
+    (IN ROOMS)
+    (NORTH TO IN-THE-CARAVAN-PARK)
+    (EAST TO BENEATH-THE-HEDGE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM BENEATH-THE-HEDGE
+    (DESC "Beneath the Hedge")
+    (IN ROOMS)
+    (EAST TO DRIZZLE-COURT)
+    (WEST TO MAIN-TRACK)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT JACQUOTTE-GONE-GO-EAST-OR-WEST
+    (IN BENEATH-THE-HEDGE)
+    (DESC "Jacquotte gone, go east or west")
+    (SYNONYM WEST)
+    (ADJECTIVE JACQUOTTE GONE GO EAST OR)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM DRIZZLE-COURT
+    (DESC "Drizzle Court")
+    (IN ROOMS)
+    (EAST TO ORBIS-ALIUS)
+    (WEST TO BENEATH-THE-HEDGE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ORBIS-ALIUS
+    (DESC "Orbis Alius")
+    (IN ROOMS)
+    (NORTH TO MIRROR-MAZE)
+    (SOUTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (EAST PER TRIZBORT-CONDITIONAL-EXIT)
+    (WEST TO DRIZZLE-COURT)
+    (FLAGS LIGHTBIT)>
+
+
+<ROUTINE TRIZBORT-CONDITIONAL-EXIT ()
+    <TELL "An export nymph appears on your keyboard. She says, 'You can't go that way, as that exit was marked as conditional, you know, a dotted line, in Trizbort. Obviously in your game you'll have a better rationale for this than, er, me.' She looks embarrassed. 'Bye!'" CR>
+    <RFALSE>>
+
+
+<OBJECT CLIMB-OR-PUSH-ROBOT
+    (IN ORBIS-ALIUS)
+    (DESC "CLIMB or PUSH robot")
+    (SYNONYM ROBOT)
+    (ADJECTIVE CLIMB OR PUSH)
+    (FLAGS TAKEBIT)>
+
+
+<OBJECT AS-JACQUOTTE
+    (IN ORBIS-ALIUS)
+    (DESC "as Jacquotte")
+    (SYNONYM JACQUOTTE)
+    (ADJECTIVE AS)
+    (FLAGS TAKEBIT VOWELBIT)>
+
+
+<ROOM MIRROR-MAZE
+    (DESC "Mirror Maze")
+    (IN ROOMS)
+    (SOUTH TO ORBIS-ALIUS)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM UP-IN-THE-STANDS
+    (DESC "Up in the Stands")
+    (IN ROOMS)
+    (WEST PER TRIZBORT-CONDITIONAL-EXIT)
+    (DOWN TO BIG-TOP-WEST)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM BIG-TOP-WEST
+    (DESC "Big Top West")
+    (IN ROOMS)
+    (EAST TO BIG-TOP-EAST)
+    (UP TO UP-IN-THE-STANDS)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT LEFT-UNIT-FALLS-HERE
+    (IN BIG-TOP-WEST)
+    (DESC "Left unit falls here")
+    (SYNONYM HERE)
+    (ADJECTIVE LEFT UNIT FALLS)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM BIG-TOP-EAST
+    (DESC "Big Top East")
+    (IN ROOMS)
+    (NORTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (SOUTH TO BACKWAYS)
+    (WEST TO BIG-TOP-WEST)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM BACKWAYS
+    (DESC "Backways")
+    (IN ROOMS)
+    (NORTH TO BIG-TOP-EAST)
+    (EAST TO THE-DRESSING-ROOMS)
+    (WEST TO HOME-PLACE)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT JACQUOTTE-NEEDS-LIGHT
+    (IN BACKWAYS)
+    (DESC "Jacquotte needs light")
+    (SYNONYM LIGHT)
+    (ADJECTIVE JACQUOTTE NEEDS)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM THE-DRESSING-ROOMS
+    (DESC "The Dressing Rooms")
+    (IN ROOMS)
+    (WEST TO BACKWAYS)
+    (IN TO GOING-UP-THING-SKIPPED-BY-MAN)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM HOME-PLACE
+    (DESC "Home Place")
+    (IN ROOMS)
+    (EAST TO BACKWAYS)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT RIGHT-INTERACTION
+    (IN HOME-PLACE)
+    (DESC "Right Interaction")
+    (SYNONYM INTERACTION)
+    (ADJECTIVE RIGHT)
+    (FLAGS TAKEBIT)>
+
+
+<OBJECT CIVILIAN-DISCOURAGEMENT
+    (IN HOME-PLACE)
+    (DESC "Civilian Discouragement")
+    (SYNONYM DISCOURAGEMENT)
+    (ADJECTIVE CIVILIAN)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM INSIDE-THE-CARAVAN
+    (DESC "Inside the Caravan")
+    (IN ROOMS)
+    (OUT TO IN-THE-CARAVAN-PARK)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT DEAD-MAN
+    (IN INSIDE-THE-CARAVAN)
+    (DESC "Dead Man")
+    (SYNONYM MAN)
+    (ADJECTIVE DEAD)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM ANOTHER-HIGH-PLACE
+    (DESC "Another High Place")
+    (IN ROOMS)
+    (SOUTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT SHINY-THING-LEFT-UNIT
+    (IN ANOTHER-HIGH-PLACE)
+    (DESC "Shiny Thing (Left unit)")
+    (SYNONYM UNIT)
+    (ADJECTIVE SHINY THING LEFT)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM JACQUOTTES-CAGE
+    (DESC "Jacquotte's Cage")
+    (IN ROOMS)
+    (OUT TO HOME-PLACE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GOING-UP-THING-SKIPPED-BY-MAN
+    (DESC "Going Up Thing (skipped by man)")
+    (IN ROOMS)
+    (OUT TO THE-DRESSING-ROOMS)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT SKIPPED-BY-MAN
+    (IN GOING-UP-THING-SKIPPED-BY-MAN)
+    (DESC "Skipped by man")
+    (SYNONYM MAN)
+    (ADJECTIVE SKIPPED BY)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM SELKIE-AQUARIUMAQUATIC-REGION
+    (DESC "Selkie Aquarium/Aquatic Region")
+    (IN ROOMS)
+    (NORTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (EAST TO CONTROL-BOOTH)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM CONTROL-BOOTH
+    (DESC "Control Booth")
+    (IN ROOMS)
+    (EAST PER TRIZBORT-CONDITIONAL-EXIT)
+    (WEST TO SELKIE-AQUARIUMAQUATIC-REGION)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT CRANK
+    (IN CONTROL-BOOTH)
+    (DESC "Crank")
+    (SYNONYM CRANK)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM SERVICE-CORRIDOR
+    (DESC "Service Corridor")
+    (IN ROOMS)
+    (WEST PER TRIZBORT-CONDITIONAL-EXIT)
+    (IN TO GOING-UP-THING-SKIPPED-BY-MAN)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT SEARCH-RUBBLE-FOR-PLUNGER
+    (IN SERVICE-CORRIDOR)
+    (DESC "search rubble for plunger")
+    (SYNONYM PLUNGER)
+    (ADJECTIVE SEARCH RUBBLE FOR)
+    (FLAGS TAKEBIT)>
+
+
+<OBJECT INSTALL-SUCK-DOOR
+    (IN SERVICE-CORRIDOR)
+    (DESC "install, SUCK DOOR")
+    (SYNONYM DOOR)
+    (ADJECTIVE INSTALL SUCK)
+    (FLAGS TAKEBIT VOWELBIT)>
+

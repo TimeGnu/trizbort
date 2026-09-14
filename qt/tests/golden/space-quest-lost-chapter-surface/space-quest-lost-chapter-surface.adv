@@ -1,0 +1,370 @@
+
+start_at = rock_tree
+
+locations {
+   rock_tree            : location "" header = "Rock Tree";
+   rock_with_vines      : location "" header = "Rock With Vines";
+   rock_path            : location "" header = "Rock Path";
+   rock_bridge          : location "" header = "Rock Bridge";
+   nw_rock_path_2       : location "" header = "N/W Rock Path 2";
+   nw_rock_path         : location "" header = "N/W Rock Path";
+   shore                : location "" header = "Shore";
+   water_fall           : location "" header = "Water fall";
+   ship_front           : location "" header = "Ship Front";
+   ship_body            : location "" header = "Ship Body";
+   ship_tail            : location "" header = "Ship Tail";
+   lake                 : location "" header = "Lake";
+   lagoon_climb         : location "" header = "Lagoon CLIMB";
+   tree                 : location "" header = "Tree";
+   tree_2               : location "" header = "Tree";
+   fruit                : location "" header = "FRUIT";
+   water_w_to_lagoon    : location "" header = "Water W to lagoon";
+   lake_on_s            : location "" header = "Lake on S";
+   lake_in_sw           : location "" header = "Lake in SW";
+   monster_chases_you   : location "" header = "Monster chases you";
+   jungle               : location "" header = "jungle";
+   mould_n              : location "" header = "MOULD (N)";
+   flower_n             : location "" header = "Flower (N)";
+   jungle_2             : location "" header = "jungle";
+   jungle_3             : location "" header = "jungle";
+   your_ship            : location "" header = "Your Ship";
+   jungle_4             : location "" header = "jungle";
+   jungle_5             : location "" header = "jungle";
+   black_tree           : location "" header = "Black Tree";
+   grey_tree            : location "" header = "Grey Tree";
+   grey_rock            : location "" header = "Grey Rock";
+   code_card            : location "" header = "CODE CARD";
+   death_in_s           : location "" header = "Death in S";
+   end_of_path          : location "" header = "End of Path";
+   mountain             : location "" header = "Mountain";
+   mountain_2           : location "" header = "Mountain";
+   cave                 : location "" header = "CAVE";
+   under_ship_body      : location "" header = "Under ship body";
+   bag                  : location "" header = "BAG";
+   under_ship_tail      : location "" header = "Under ship tail";
+   scenic               : location "" header = "Scenic";
+   scenic_2             : location "" header = "Scenic";
+   scenic_3             : location "" header = "Scenic";
+   hidden_psg_west      : location "" header = "Hidden Psg West";
+   hidden_psg_east      : location "" header = "Hidden Psg East";
+   scenic_4             : location "" header = "Scenic";
+   fork_north           : location "" header = "Fork North";
+   tiny_tooth           : location "" header = "Tiny Tooth";
+   turtle               : location "" header = "Turtle";
+   jelly_fish           : location "" header = "Jelly Fish";
+   metal_rod            : location "" header = "METAL ROD";
+   cavern               : location "" header = "Cavern";
+   cavern_2             : location "" header = "Cavern";
+   pool                 : location "" header = "Pool";
+   puffy_fish           : location "" header = "Puffy Fish";
+   gel_blob             : location "" header = "Gel Blob";
+   brown_tree           : location "" header = "Brown Tree";
+   clams                : location "" header = "Clams";
+   clams_2              : location "" header = "Clams";
+   clams_3              : location "" header = "Clams";
+   black_wall_west      : location "" header = "Black Wall West";
+   sea_weed             : location "" header = "Sea Weed";
+   tree_e               : location "" header = "TREE (E)";
+   trunk_algae          : location "" header = "Trunk/ Algae";
+   struc_tures          : location "" header = "Struc tures";
+   octo_pus             : location "" header = "OCTO PUS";
+   tree_search          : location "" header = "TREE (Search)";
+   wall_e_algae         : location "" header = "Wall E + Algae";
+   coral_pull           : location "" header = "Coral (PULL)";
+   vine_and_trunk       : location "" header = "Vine and Trunk";
+   vine_in_east         : location "" header = "Vine in East";
+   turtle_2             : location "" header = "Turtle";
+   clams_4              : location "" header = "Clams";
+   clams_5              : location "" header = "Clams";
+   wall_w_e_trunk       : location "" header = "Wall W, E Trunk";
+   wall_w_e_open        : location "" header = "Wall W, E open";
+   tree_root_ne         : location "" header = "Tree Root NE";
+   tree_root_nw         : location "" header = "Tree Root NW";
+   big_vine_w           : location "" header = "Big Vine W";
+   wall_e               : location "" header = "Wall E";
+   2_root_edges         : location "" header = "2 root edges";
+   trunk_wne_hole       : location "" header = "Trunk w/NE Hole";
+   nw_to_treas_ure      : location "" header = "NW to treas ure";
+   tree_w_wall          : location "" header = "Tree W + Wall";
+   water_cave           : location "" header = "Water Cave";
+   water_cave_2         : location "" header = "Water Cave";
+   water_cave_3         : location "" header = "Water Cave";
+   water_cave_4         : location "" header = "Water Cave";
+   ship_wcard           : location "" header = "Ship w/card";
+   updown_psgs          : location "" header = "up/down psgs";
+   ten_tacle            : location "" header = "Ten Tacle";
+   hid_psg_east         : location "" header = "Hid Psg East";
+   oracle               : location "" header = "Oracle";
+   shark                : location "" header = "Shark";
+   upper_psg            : location "" header = "Upper Psg";
+   upper_psg_2          : location "" header = "Upper Psg";
+   ud_hole              : location "" header = "U/D Hole";
+   monster_chases_you_2 : location "" header = "Monster chases you";
+   tent_acle            : location "" header = "TENT ACLE";
+   from_n_of_coral      : location "" header = "From N of Coral";
+   clams_6              : location "" header = "Clams";
+   eels                 : location "" header = "Eels";
+   lower_psg            : location "" header = "Lower Psg";
+   lower_psg_2          : location "" header = "Lower Psg";
+}
+
+
+connections {
+   from, direction, to = [
+      rock_tree, north_oneway, rock_with_vines,
+      rock_tree, south_oneway, end_of_path,
+      rock_with_vines, south_oneway, rock_tree,
+      rock_with_vines, east_oneway, rock_path,
+      rock_path, east_oneway, rock_bridge,
+      rock_path, west_oneway, rock_with_vines,
+      rock_bridge, east_oneway, nw_rock_path_2,
+      rock_bridge, west_oneway, rock_path,
+      nw_rock_path_2, east_oneway, nw_rock_path,
+      nw_rock_path_2, west_oneway, rock_bridge,
+      nw_rock_path, south_oneway, shore,
+      nw_rock_path, west_oneway, nw_rock_path_2,
+      shore, north_oneway, nw_rock_path,
+      shore, east_oneway, ship_front,
+      shore, west_oneway, water_fall,
+      water_fall, east_oneway, shore,
+      ship_front, south_oneway, monster_chases_you_2,
+      ship_front, east_oneway, ship_body,
+      ship_front, west_oneway, shore,
+      ship_body, south_oneway, monster_chases_you_2,
+      ship_body, east_oneway, ship_tail,
+      ship_body, west_oneway, ship_front,
+      ship_tail, south_oneway, monster_chases_you_2,
+      ship_tail, east_oneway, lake,
+      ship_tail, west_oneway, ship_body,
+      lake, east_oneway, lagoon_climb,
+      lake, west_oneway, ship_tail,
+      lagoon_climb, north_oneway, tree,
+      lagoon_climb, east_oneway, water_w_to_lagoon,
+      lagoon_climb, west_oneway, lake,
+      tree, south_oneway, lagoon_climb,
+      tree_2, east_oneway, fruit,
+      fruit, west_oneway, tree_2,
+      water_w_to_lagoon, south_oneway, monster_chases_you,
+      water_w_to_lagoon, east_oneway, lake_on_s,
+      water_w_to_lagoon, west_oneway, lagoon_climb,
+      lake_on_s, south_oneway, monster_chases_you,
+      lake_on_s, east_oneway, lake_in_sw,
+      lake_on_s, west_oneway, water_w_to_lagoon,
+      lake_in_sw, north_oneway, jungle,
+      lake_in_sw, south_oneway, death_in_s,
+      lake_in_sw, east_oneway, grey_rock,
+      lake_in_sw, west_oneway, lake_on_s,
+      monster_chases_you, north_oneway, lake_on_s,
+      monster_chases_you, east_oneway, death_in_s,
+      jungle, south_oneway, lake_in_sw,
+      jungle, east_oneway, mould_n,
+      jungle, west_oneway, lake_in_sw,
+      mould_n, east_oneway, flower_n,
+      mould_n, west_oneway, jungle,
+      flower_n, south_oneway, grey_tree,
+      flower_n, east_oneway, jungle_2,
+      flower_n, west_oneway, mould_n,
+      jungle_2, south_oneway, jungle_3,
+      jungle_2, west_oneway, flower_n,
+      jungle_3, north_oneway, jungle_2,
+      jungle_3, south_oneway, jungle_5,
+      jungle_3, east_oneway, your_ship,
+      jungle_3, west_oneway, grey_tree,
+      your_ship, south_oneway, jungle_3,
+      your_ship, east_oneway, jungle_4,
+      jungle_4, north_oneway, your_ship,
+      jungle_4, west_oneway, jungle_5,
+      jungle_5, north_oneway, jungle_3,
+      jungle_5, south_oneway, code_card,
+      jungle_5, east_oneway, jungle_4,
+      jungle_5, west_oneway, black_tree,
+      black_tree, north_oneway, grey_tree,
+      black_tree, east_oneway, jungle_5,
+      grey_tree, north_oneway, flower_n,
+      grey_tree, south_oneway, black_tree,
+      grey_tree, east_oneway, jungle_3,
+      grey_tree, west_oneway, grey_rock,
+      grey_rock, east_oneway, grey_tree,
+      grey_rock, west_oneway, lake_in_sw,
+      code_card, north_oneway, jungle_5,
+      death_in_s, north_oneway, lake_in_sw,
+      death_in_s, west_oneway, monster_chases_you,
+      end_of_path, north_oneway, rock_tree,
+      end_of_path, up_oneway, mountain,
+      mountain, north_oneway, mountain_2,
+      mountain, down_oneway, end_of_path,
+      mountain_2, north_oneway, cave,
+      mountain_2, south_oneway, mountain,
+      cave, south_oneway, mountain_2,
+      under_ship_body, south_oneway, bag,
+      under_ship_body, east_oneway, under_ship_tail,
+      bag, north_oneway, under_ship_body,
+      under_ship_tail, south_oneway, wall_w_e_open,
+      under_ship_tail, east_oneway, scenic,
+      under_ship_tail, west_oneway, under_ship_body,
+      scenic, south_oneway, tree_root_ne,
+      scenic, east_oneway, scenic_2,
+      scenic, west_oneway, under_ship_tail,
+      scenic_2, south_oneway, tree_root_nw,
+      scenic_2, east_oneway, scenic_3,
+      scenic_2, west_oneway, scenic,
+      scenic_3, south_oneway, big_vine_w,
+      scenic_3, east_oneway, hidden_psg_west,
+      scenic_3, west_oneway, scenic_2,
+      hidden_psg_west, south_oneway, wall_e,
+      hidden_psg_west, east_oneway, hidden_psg_east,
+      hidden_psg_west, west_oneway, scenic_3,
+      hidden_psg_east, south_oneway, black_wall_west,
+      hidden_psg_east, east_oneway, scenic_4,
+      hidden_psg_east, west_oneway, hidden_psg_west,
+      scenic_4, south_oneway, sea_weed,
+      scenic_4, east_oneway, fork_north,
+      scenic_4, west_oneway, hidden_psg_east,
+      fork_north, north_oneway, tent_acle,
+      fork_north, south_oneway, brown_tree,
+      fork_north, east_oneway, tiny_tooth,
+      fork_north, west_oneway, scenic_4,
+      tiny_tooth, south_oneway, gel_blob,
+      tiny_tooth, east_oneway, turtle,
+      tiny_tooth, west_oneway, fork_north,
+      turtle, east_oneway, jelly_fish,
+      turtle, west_oneway, tiny_tooth,
+      jelly_fish, east_oneway, metal_rod,
+      jelly_fish, west_oneway, turtle,
+      metal_rod, east_oneway, cavern,
+      metal_rod, west_oneway, jelly_fish,
+      cavern, east_oneway, cavern_2,
+      cavern, west_oneway, metal_rod,
+      cavern_2, north_oneway, pool,
+      cavern_2, west_oneway, cavern,
+      pool, south_oneway, cavern_2,
+      pool, west_oneway, puffy_fish,
+      puffy_fish, east_oneway, pool,
+      gel_blob, north_oneway, tiny_tooth,
+      gel_blob, south_oneway, clams,
+      gel_blob, west_oneway, brown_tree,
+      brown_tree, north_oneway, fork_north,
+      brown_tree, south_oneway, clams,
+      brown_tree, east_oneway, gel_blob,
+      brown_tree, west_oneway, sea_weed,
+      clams, north_oneway, brown_tree,
+      clams, south_oneway, trunk_algae,
+      clams, west_oneway, clams_2,
+      clams_2, north_oneway, sea_weed,
+      clams_2, south_oneway, tree_e,
+      clams_2, east_oneway, clams,
+      clams_2, west_oneway, clams_3,
+      clams_3, north_oneway, black_wall_west,
+      clams_3, east_oneway, clams_2,
+      black_wall_west, north_oneway, hidden_psg_east,
+      black_wall_west, south_oneway, clams_3,
+      black_wall_west, east_oneway, sea_weed,
+      sea_weed, north_oneway, scenic_4,
+      sea_weed, south_oneway, clams_2,
+      sea_weed, east_oneway, brown_tree,
+      sea_weed, west_oneway, black_wall_west,
+      tree_e, north_oneway, clams_2,
+      tree_e, south_oneway, clams_5,
+      tree_e, east_oneway, trunk_algae,
+      tree_e, west_oneway, tree_search,
+      trunk_algae, north_oneway, clams,
+      trunk_algae, south_oneway, clams_5,
+      trunk_algae, east_oneway, struc_tures,
+      trunk_algae, west_oneway, tree_e,
+      struc_tures, north_oneway, clams_6,
+      struc_tures, east_oneway, octo_pus,
+      struc_tures, west_oneway, trunk_algae,
+      octo_pus, west_oneway, struc_tures,
+      tree_search, south_oneway, clams_5,
+      tree_search, east_oneway, tree_e,
+      tree_search, west_oneway, wall_e_algae,
+      wall_e_algae, north_oneway, tree_w_wall,
+      wall_e_algae, south_oneway, eels,
+      wall_e_algae, east_oneway, tree_search,
+      wall_e_algae, west_oneway, coral_pull,
+      coral_pull, north_oneway, nw_to_treas_ure,
+      coral_pull, south_oneway, eels,
+      coral_pull, east_oneway, wall_e_algae,
+      coral_pull, west_oneway, vine_and_trunk,
+      vine_and_trunk, north_oneway, trunk_wne_hole,
+      vine_and_trunk, south_oneway, eels,
+      vine_and_trunk, east_oneway, coral_pull,
+      vine_and_trunk, west_oneway, vine_in_east,
+      vine_in_east, north_oneway, 2_root_edges,
+      vine_in_east, south_oneway, clams_4,
+      vine_in_east, east_oneway, vine_and_trunk,
+      vine_in_east, west_oneway, turtle_2,
+      turtle_2, north_oneway, wall_w_e_trunk,
+      turtle_2, south_oneway, clams_4,
+      turtle_2, east_oneway, vine_in_east,
+      clams_4, north_oneway, turtle_2,
+      clams_5, north_oneway, tree_e,
+      wall_w_e_trunk, north_oneway, wall_w_e_open,
+      wall_w_e_trunk, south_oneway, turtle_2,
+      wall_w_e_trunk, east_oneway, 2_root_edges,
+      wall_w_e_open, north_oneway, under_ship_tail,
+      wall_w_e_open, south_oneway, wall_w_e_trunk,
+      wall_w_e_open, east_oneway, tree_root_ne,
+      tree_root_ne, north_oneway, scenic,
+      tree_root_ne, south_oneway, 2_root_edges,
+      tree_root_ne, east_oneway, tree_root_nw,
+      tree_root_ne, west_oneway, wall_w_e_open,
+      tree_root_nw, north_oneway, scenic_2,
+      tree_root_nw, south_oneway, trunk_wne_hole,
+      tree_root_nw, east_oneway, big_vine_w,
+      tree_root_nw, west_oneway, tree_root_ne,
+      big_vine_w, north_oneway, scenic_3,
+      big_vine_w, south_oneway, nw_to_treas_ure,
+      big_vine_w, east_oneway, wall_e,
+      big_vine_w, west_oneway, tree_root_nw,
+      wall_e, north_oneway, hidden_psg_west,
+      wall_e, south_oneway, tree_w_wall,
+      wall_e, west_oneway, big_vine_w,
+      2_root_edges, north_oneway, tree_root_ne,
+      2_root_edges, south_oneway, vine_in_east,
+      2_root_edges, east_oneway, trunk_wne_hole,
+      2_root_edges, west_oneway, wall_w_e_trunk,
+      trunk_wne_hole, north_oneway, tree_root_nw,
+      trunk_wne_hole, south_oneway, vine_and_trunk,
+      trunk_wne_hole, east_oneway, nw_to_treas_ure,
+      trunk_wne_hole, west_oneway, 2_root_edges,
+      nw_to_treas_ure, north_oneway, big_vine_w,
+      nw_to_treas_ure, south_oneway, coral_pull,
+      nw_to_treas_ure, east_oneway, tree_w_wall,
+      nw_to_treas_ure, west_oneway, trunk_wne_hole,
+      tree_w_wall, north_oneway, wall_e,
+      tree_w_wall, south_oneway, wall_e_algae,
+      tree_w_wall, west_oneway, nw_to_treas_ure,
+      water_cave, south_oneway, water_cave_3,
+      water_cave, east_oneway, water_cave_2,
+      water_cave_2, east_oneway, updown_psgs,
+      water_cave_2, west_oneway, water_cave,
+      water_cave_3, north_oneway, water_cave,
+      water_cave_3, east_oneway, water_cave_4,
+      water_cave_4, east_oneway, ship_wcard,
+      water_cave_4, west_oneway, water_cave_3,
+      ship_wcard, west_oneway, water_cave_4,
+      updown_psgs, east_oneway, upper_psg,
+      updown_psgs, west_oneway, water_cave_2,
+      ten_tacle, east_oneway, updown_psgs,
+      hid_psg_east, east_oneway, oracle,
+      hid_psg_east, west_oneway, ten_tacle,
+      oracle, west_oneway, hid_psg_east,
+      shark, east_oneway, lower_psg,
+      upper_psg, east_oneway, upper_psg_2,
+      upper_psg, west_oneway, updown_psgs,
+      upper_psg_2, east_oneway, ud_hole,
+      upper_psg_2, west_oneway, upper_psg,
+      ud_hole, west_oneway, upper_psg_2,
+      monster_chases_you_2, north_oneway, ship_body,
+      tent_acle, east_oneway, fork_north,
+      tent_acle, west_oneway, updown_psgs,
+      eels, north_oneway, coral_pull,
+      lower_psg, east_oneway, lower_psg_2,
+      lower_psg, west_oneway, shark,
+      lower_psg_2, east_oneway, ud_hole,
+      lower_psg_2, west_oneway, lower_psg,
+   ]
+}
+
+

@@ -1,0 +1,883 @@
+<asl version="550">
+
+  <include ref="English.aslx"/>
+  <include ref="Core.aslx"/>
+  <game name="Leadlight Gamma Map">
+    <gameid>4cfa8c81-88c0-4630-b319-e301d19d0410</gameid>
+    <version>1.0</version>
+    <firstpublished>2026</firstpublished>
+    <author>Andrew Schultz</author>
+    <description>Map of Wade Clarke's 2010 game Leadlight (and its Inform port Leadlight Gamma). Orange=dorm grey=library purple=indoor yellow=inner sanctum red=inner inner sanctum</description>
+  </game>
+
+  <object name="LinvilleStudentLibrary">
+    <inherit name="editor_room" />
+    <alias>Linville Student Library</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="AmongsttheLibraryStacks">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="IntheLibraryFoyer">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="LibraryToilet">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="CharlotteJeffs">
+      <inherit name="editor_object" />
+      <alias>Charlotte Jeffs</alias>
+    </object>
+  </object>
+
+  <object name="LibraryToilet">
+    <inherit name="editor_room" />
+    <alias>Library Toilet</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="LinvilleStudentLibrary">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="AmongsttheLibraryStacks">
+    <inherit name="editor_room" />
+    <alias>Amongst the Library Stacks</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="LinvilleStudentLibrary">
+      <inherit name="northdirection" />
+    </exit>
+  </object>
+
+  <object name="IntheLibraryFoyer">
+    <inherit name="editor_room" />
+    <alias>In the Library Foyer</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="IntheQuadrangle">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="LinvilleStudentLibrary">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="NarelleParker">
+      <inherit name="editor_object" />
+      <alias>Narelle Parker</alias>
+    </object>
+  </object>
+
+  <object name="IntheQuadrangle">
+    <inherit name="editor_room" />
+    <alias>In the Quadrangle</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="OntheSchoolSteps">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="OntheRoseGardenLawn">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="IntheDormitoryCourtyard">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="IntheLibraryFoyer">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="OntheRoseGardenLawn">
+    <inherit name="editor_room" />
+    <alias>On the Rose Garden Lawn</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="IntheQuadrangle">
+      <inherit name="northdirection" />
+    </exit>
+    <object name="AlexisKarpa">
+      <inherit name="editor_object" />
+      <alias>Alexis Karpa</alias>
+    </object>
+  </object>
+
+  <object name="IntheDormitoryCourtyard">
+    <inherit name="editor_room" />
+    <alias>In the Dormitory Courtyard</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="IntheGymEntry">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="IntheDormitoryEntryway">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="IntheQuadrangle">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="IntheGymEntry">
+    <inherit name="editor_room" />
+    <alias>In the Gym Entry</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="IntheDormitoryCourtyard">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="OntheGymCourtNorth">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="OntheGymCourtNorth">
+    <inherit name="editor_room" />
+    <alias>On the Gym Court, North</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="IntheGymEntry">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="OntheGymCourtSouth">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="up" to="IntheUpstairsChangingRoom">
+      <inherit name="updirection" />
+    </exit>
+  </object>
+
+  <object name="OntheGymCourtSouth">
+    <inherit name="editor_room" />
+    <alias>On the Gym Court, South</alias>
+    <dark />
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="OntheGymCourtNorth">
+      <inherit name="northdirection" />
+    </exit>
+  </object>
+
+  <object name="IntheDormitoryEntryway">
+    <inherit name="editor_room" />
+    <alias>In the Dormitory Entryway</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room106">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room101">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="HalfwayAlongtheDormHall">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="IntheDormitoryCourtyard">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="MsPalmerDianeFallon">
+      <inherit name="editor_object" />
+      <alias>Ms Palmer/Diane Fallon</alias>
+    </object>
+  </object>
+
+  <object name="Room106">
+    <inherit name="editor_room" />
+    <alias>Room 106</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="IntheDormitoryEntryway">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Room101">
+    <inherit name="editor_room" />
+    <alias>Room 101</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="IntheDormitoryEntryway">
+      <inherit name="northdirection" />
+    </exit>
+    <object name="SherylBourke">
+      <inherit name="editor_object" />
+      <alias>Sheryl Bourke</alias>
+    </object>
+  </object>
+
+  <object name="HalfwayAlongtheDormHall">
+    <inherit name="editor_room" />
+    <alias>Halfway Along the Dorm Hall</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room105">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room102">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="AttheDormHallsEastEnd">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="IntheDormitoryEntryway">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room105">
+    <inherit name="editor_room" />
+    <alias>Room 105</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="HalfwayAlongtheDormHall">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Room102">
+    <inherit name="editor_room" />
+    <alias>Room 102</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="HalfwayAlongtheDormHall">
+      <inherit name="northdirection" />
+    </exit>
+    <object name="Louise">
+      <inherit name="editor_object" />
+      <alias>Louise</alias>
+    </object>
+  </object>
+
+  <object name="AttheDormHallsEastEnd">
+    <inherit name="editor_room" />
+    <alias>At the Dorm Hall's East End</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Room104">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Room103">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="west" to="HalfwayAlongtheDormHall">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Room104">
+    <inherit name="editor_room" />
+    <alias>Room 104</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="AttheDormHallsEastEnd">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Room103">
+    <inherit name="editor_room" />
+    <alias>Room 103</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="AttheDormHallsEastEnd">
+      <inherit name="northdirection" />
+    </exit>
+  </object>
+
+  <object name="OntheSchoolSteps">
+    <inherit name="editor_room" />
+    <alias>On the School Steps</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="IntheSchoolFoyer">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="IntheQuadrangle">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="OntheTrellisedPatio">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="BytheSchoolFountain">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="IntheSchoolFoyer">
+    <inherit name="editor_room" />
+    <alias>In the School Foyer</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="IntheMarbleStateroom">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="OntheSchoolSteps">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="IntheSickBay">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="IntheReceptionistsOffice">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="OntheTrellisedPatio">
+    <inherit name="editor_room" />
+    <alias>On the Trellised Patio</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="OntheSchoolSteps">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="Gardener">
+      <inherit name="editor_object" />
+      <alias>Gardener</alias>
+    </object>
+  </object>
+
+  <object name="BytheSchoolFountain">
+    <inherit name="editor_room" />
+    <alias>By the School Fountain</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="IntheArtCottage">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="InStaffCottageB">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="OntheSchoolSteps">
+      <inherit name="eastdirection" />
+    </exit>
+    <object name="MysteryGirl">
+      <inherit name="editor_object" />
+      <alias>Mystery Girl</alias>
+    </object>
+  </object>
+
+  <object name="IntheArtCottage">
+    <inherit name="editor_room" />
+    <alias>In the Art Cottage</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="BytheSchoolFountain">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="MrRhodes">
+      <inherit name="editor_object" />
+      <alias>Mr Rhodes</alias>
+    </object>
+  </object>
+
+  <object name="InStaffCottageB">
+    <inherit name="editor_room" />
+    <alias>In Staff Cottage B</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="BytheSchoolFountain">
+      <inherit name="northdirection" />
+    </exit>
+    <object name="FileMissArden">
+      <inherit name="editor_object" />
+      <alias>File (Miss Arden)</alias>
+    </object>
+  </object>
+
+  <object name="IntheReceptionistsOffice">
+    <inherit name="editor_room" />
+    <alias>In the Receptionist's Office</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="IntheSchoolFoyer">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="IntheSickBay">
+    <inherit name="editor_room" />
+    <alias>In the Sick Bay</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="IntheSchoolFoyer">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="UnnamedGirl">
+      <inherit name="editor_object" />
+      <alias>Unnamed Girl</alias>
+    </object>
+  </object>
+
+  <object name="IntheMarbleStateroom">
+    <inherit name="editor_room" />
+    <alias>In the Marble Stateroom</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="IntheSouthHall">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="IntheSchoolFoyer">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="MaureenSallis">
+      <inherit name="editor_object" />
+      <alias>Maureen Sallis</alias>
+    </object>
+  </object>
+
+  <object name="IntheSouthHall">
+    <inherit name="editor_room" />
+    <alias>In the South Hall</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="IntheGrandHall">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="IntheMarbleStateroom">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="IntheSittingRoom">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="IntheSittingRoom">
+    <inherit name="editor_room" />
+    <alias>In the Sitting Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="IntheEasternHallway">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="west" to="IntheSouthHall">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="LucindaParker">
+      <inherit name="editor_object" />
+      <alias>Lucinda Parker</alias>
+    </object>
+  </object>
+
+  <object name="IntheEasternHallway">
+    <inherit name="editor_room" />
+    <alias>In the Eastern Hallway</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="IntheWaitingRoom">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="IntheSittingRoom">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="IntheDanceRoom">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="IntheGrandHall">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="MiaFellini">
+      <inherit name="editor_object" />
+      <alias>Mia Fellini</alias>
+    </object>
+  </object>
+
+  <object name="IntheDanceRoom">
+    <inherit name="editor_room" />
+    <alias>In the Dance Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="IntheEasternHallway">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="TheDancer">
+      <inherit name="editor_object" />
+      <alias>The Dancer</alias>
+    </object>
+  </object>
+
+  <object name="IntheWaitingRoom">
+    <inherit name="editor_room" />
+    <alias>In the Waiting Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="IntheStaffLibrary">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="IntheEasternHallway">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="west" to="InScienceLab1C">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="InScienceLab1C">
+    <inherit name="editor_room" />
+    <alias>In Science Lab 1C</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="IntheGrandHall">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="IntheWaitingRoom">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="IntheGrandHall">
+    <inherit name="editor_room" />
+    <alias>In the Grand Hall</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="InScienceLab1C">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="IntheSouthHall">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="IntheEasternHallway">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="IntheSchoolChapel">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="MadisonJones">
+      <inherit name="editor_object" />
+      <alias>Madison Jones</alias>
+    </object>
+    <object name="KateSeung">
+      <inherit name="editor_object" />
+      <alias>Kate, Seung</alias>
+    </object>
+  </object>
+
+  <object name="IntheSchoolChapel">
+    <inherit name="editor_room" />
+    <alias>In the School Chapel</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="IntheGrandHall">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="IntheStaffLibrary">
+    <inherit name="editor_room" />
+    <alias>In the Staff Library</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="IntheLeatherStudy">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="IntheWaitingRoom">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="IntheLeatherStudy">
+    <inherit name="editor_room" />
+    <alias>In the Leather Study</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="IntheStaffLibrary">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="IntheStrangeGallery">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="InaCurtainedHallway">
+      <inherit name="westdirection" />
+    </exit>
+    <exit alias="up" to="OntheBalcony">
+      <inherit name="updirection" />
+    </exit>
+  </object>
+
+  <object name="IntheStrangeGallery">
+    <inherit name="editor_room" />
+    <alias>In the Strange Gallery</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="IntheLeatherStudy">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="OntheBalcony">
+    <inherit name="editor_room" />
+    <alias>On the Balcony</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="down" to="IntheLeatherStudy">
+      <inherit name="downdirection" />
+    </exit>
+    <object name="Witch">
+      <inherit name="editor_object" />
+      <alias>Witch</alias>
+    </object>
+  </object>
+
+  <object name="InaCurtainedHallway">
+    <inherit name="editor_room" />
+    <alias>In a Curtained Hallway</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="IntheLeatherStudy">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="InaCurtainedHallway2">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="InaCurtainedHallway2">
+    <inherit name="editor_room" />
+    <alias>In a Curtained Hallway</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="InaCurtainedHallway">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="AttheOpulentCorner">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="AttheOpulentCorner">
+    <inherit name="editor_room" />
+    <alias>At the Opulent Corner</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="BeforetheLeadlightDoor">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="InaCurtainedHallway2">
+      <inherit name="eastdirection" />
+    </exit>
+    <object name="EveJoshi">
+      <inherit name="editor_object" />
+      <alias>Eve Joshi</alias>
+    </object>
+  </object>
+
+  <object name="BeforetheLeadlightDoor">
+    <inherit name="editor_room" />
+    <alias>Before the Leadlight Door</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="item">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="AttheOpulentCorner">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="item">
+    <inherit name="editor_room" />
+    <alias>???</alias>
+    <dark />
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="IntheFoundersRoom">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="BeforetheLeadlightDoor">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="IntheFoundersRoom">
+    <inherit name="editor_room" />
+    <alias>In the Founder's Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="item">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="IntheSecretPlace">
+      <inherit name="eastdirection" />
+    </exit>
+    <object name="Founder">
+      <inherit name="editor_object" />
+      <alias>Founder</alias>
+    </object>
+  </object>
+
+  <object name="IntheSecretPlace">
+    <inherit name="editor_room" />
+    <alias>In the Secret Place</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="IntheFoundersRoom">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="Shadow">
+      <inherit name="editor_object" />
+      <alias>Shadow</alias>
+    </object>
+    <object name="Founder2">
+      <inherit name="editor_object" />
+      <alias>Founder</alias>
+    </object>
+  </object>
+
+  <object name="IntheUpstairsChangingRoom">
+    <inherit name="editor_room" />
+    <alias>In the Upstairs Changing Room</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="down" to="OntheGymCourtNorth">
+      <inherit name="downdirection" />
+    </exit>
+    <object name="IsabelleGreen">
+      <inherit name="editor_object" />
+      <alias>Isabelle Green</alias>
+    </object>
+  </object>
+
+
+</asl>
+

@@ -1,0 +1,262 @@
+#include "verblib.g" ! grammar must come first
+
+#include "hugolib.h"
+
+routine init
+{
+	cls
+	verbosity = 2
+	counter = -1
+	STATUSTYPE = 1 !1 = score / turns, 2 = time, 3 = moves: score:
+	player = you
+	Font(BOLD_ON)
+	"escape-from-summerland"
+	Font(BOLD_OFF)
+	"by A Trizbort User"
+	location = IntheCaravanPark
+	MovePlayer(location)
+}
+
+property region
+room IntheCaravanPark
+{
+	region Man
+
+	s_to MainTrack
+	in_to InsidetheCaravan
+
+}
+
+object Enterthenexamineperson
+{
+	in IntheCaravanPark
+}
+
+room MainTrack
+{
+	region Man
+
+	n_to IntheCaravanPark
+	e_to BeneaththeHedge
+
+}
+
+room BeneaththeHedge
+{
+	region Man
+
+	e_to DrizzleCourt
+	w_to MainTrack
+
+}
+
+object Jacquottegonegoeastorwest
+{
+	in BeneaththeHedge
+}
+
+room DrizzleCourt
+{
+	region Man
+
+	e_to OrbisAlius
+	w_to BeneaththeHedge
+
+}
+
+room OrbisAlius
+{
+	region Man and Jacquotte
+
+	n_to MirrorMaze
+	s_to SelkieAquariumAquaticRegion
+	e_to UpintheStands
+	w_to DrizzleCourt
+
+}
+
+object CLIMBorPUSHrobot
+{
+	in OrbisAlius
+}
+
+object asJacquotte
+{
+	in OrbisAlius
+}
+
+room MirrorMaze
+{
+	region Man
+
+	s_to OrbisAlius
+
+}
+
+room UpintheStands
+{
+	region Man
+
+	w_to OrbisAlius
+	d_to BigTopWest
+
+}
+
+room BigTopWest
+{
+	region Shinobi
+
+	e_to BigTopEast
+	u_to UpintheStands
+
+}
+
+object Leftunitfallshere
+{
+	in BigTopWest
+}
+
+room BigTopEast
+{
+	region Cooperate
+
+	n_to AnotherHighPlace
+	s_to Backways
+	w_to BigTopWest
+
+}
+
+room Backways
+{
+	region Cooperate
+
+	n_to BigTopEast
+	e_to TheDressingRooms
+	w_to HomePlace
+
+}
+
+object Jacquotteneedslight
+{
+	in Backways
+}
+
+room TheDressingRooms
+{
+	region Shinobi
+
+	w_to Backways
+	in_to GoingUpThingskippedbyman
+
+}
+
+room HomePlace
+{
+
+	e_to Backways
+
+}
+
+object RightInteraction
+{
+	in HomePlace
+}
+
+object CivilianDiscouragement
+{
+	in HomePlace
+}
+
+room InsidetheCaravan
+{
+	region Man
+
+	out_to IntheCaravanPark
+
+}
+
+object DeadMan
+{
+	in InsidetheCaravan
+}
+
+room AnotherHighPlace
+{
+	region Jacquotte
+
+	s_to BigTopEast
+
+}
+
+object ShinyThingLeftunit
+{
+	in AnotherHighPlace
+}
+
+room JacquottesCage
+{
+	region Jacquotte
+
+	out_to HomePlace
+
+}
+
+room GoingUpThingskippedbyman
+{
+	region Cooperate
+
+	out_to TheDressingRooms
+
+}
+
+object Skippedbyman
+{
+	in GoingUpThingskippedbyman
+}
+
+room SelkieAquariumAquaticRegion
+{
+	region Shinobi
+
+	n_to OrbisAlius
+	e_to ControlBooth
+
+}
+
+room ControlBooth
+{
+	region Cooperate
+
+	e_to ServiceCorridor
+	w_to SelkieAquariumAquaticRegion
+
+}
+
+object Crank
+{
+	in ControlBooth
+}
+
+room ServiceCorridor
+{
+	region Shinobi
+
+	w_to ControlBooth
+	in_to GoingUpThingskippedbyman
+
+}
+
+object searchrubbleforplunger
+{
+	in ServiceCorridor
+}
+
+object installSUCKDOOR
+{
+	in ServiceCorridor
+}
+
+player_character you "you"
+{
+}
+

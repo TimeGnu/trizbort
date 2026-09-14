@@ -1,0 +1,625 @@
+"Gemstone Warrior Trizbort map main file"
+
+<VERSION ZIP>
+<CONSTANT RELEASEID 1>
+
+"Main Loop"
+
+<CONSTANT GAME-BANNER "Gemstone Warrior Trizbort map|An interactive fiction by Andrew Schultz">
+
+<ROUTINE GO ()
+    <CRLF> <CRLF>
+    <TELL "I set the preferred distance between rooms to 16, and I set regions to " CR CR>
+    <V-VERSION> <CRLF>
+    <SETG HERE ,ROOM-1>
+    <MOVE ,PLAYER ,HERE>
+    <V-LOOK>
+    <REPEAT ()
+        <COND (<PARSER>
+               <PERFORM ,PRSA ,PRSO ,PRSI>
+               <COND (<NOT <GAME-VERB?>>
+                      <APPLY <GETP ,HERE ,P?ACTION> ,M-END>
+                      <CLOCKER>)>)>
+        <SETG HERE <LOC ,WINNER>>>>
+
+<INSERT-FILE "parser">
+
+<SYNTAX ABOUT = V-ABOUT>
+
+<ROUTINE V-ABOUT ()
+    <TELL "Not much" CR>>
+
+"Objects"
+
+<ROOM ROOM-1
+    (DESC "Room 1")
+    (IN ROOMS)
+    (EAST TO ROOM-4)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-4
+    (DESC "Room 4")
+    (IN ROOMS)
+    (NORTH TO ROOM-0)
+    (SOUTH TO ROOM-5)
+    (EAST TO ROOM-6)
+    (WEST TO ROOM-1)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-0
+    (DESC "Room 0")
+    (IN ROOMS)
+    (SOUTH TO ROOM-4)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-5
+    (DESC "Room 5")
+    (IN ROOMS)
+    (NORTH TO ROOM-4)
+    (SOUTH TO ROOM-3)
+    (EAST TO ROOM-6)
+    (WEST TO ROOM-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-3
+    (DESC "Room 3")
+    (IN ROOMS)
+    (NORTH TO ROOM-5)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-2
+    (DESC "Room 2")
+    (IN ROOMS)
+    (EAST TO ROOM-5)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-6
+    (DESC "Room 6")
+    (IN ROOMS)
+    (NORTH TO ROOM-4)
+    (EAST TO ROOM-7)
+    (WEST TO ROOM-5)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-7
+    (DESC "Room 7")
+    (IN ROOMS)
+    (NORTH TO ROOM-8)
+    (WEST TO ROOM-6)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-8
+    (DESC "Room 8")
+    (IN ROOMS)
+    (NORTH TO ROOM-9)
+    (SOUTH TO ROOM-7)
+    (EAST TO ROOM-10)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-10
+    (DESC "Room 10")
+    (IN ROOMS)
+    (EAST TO ROOM-10-2)
+    (WEST TO ROOM-8)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-9
+    (DESC "Room 9")
+    (IN ROOMS)
+    (NORTH TO ROOM-12)
+    (SOUTH TO ROOM-8)
+    (EAST TO ROOM-10-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-10-2
+    (DESC "Room 10")
+    (IN ROOMS)
+    (NORTH TO ROOM-12)
+    (WEST TO ROOM-9)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-12
+    (DESC "Room 12")
+    (IN ROOMS)
+    (NORTH TO ROOM-15)
+    (SOUTH TO ROOM-10-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-13
+    (DESC "Room 13")
+    (IN ROOMS)
+    (NORTH TO ROOM-12)
+    (EAST TO ROOM-14)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-14
+    (DESC "Room 14")
+    (IN ROOMS)
+    (NORTH TO ROOM-16)
+    (WEST TO ROOM-13)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-16
+    (DESC "Room 16")
+    (IN ROOMS)
+    (NORTH TO ROOM-15)
+    (SOUTH TO ROOM-14)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-15
+    (DESC "Room 15")
+    (IN ROOMS)
+    (SOUTH TO ROOM-16)
+    (EAST TO ROOM-17)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-17
+    (DESC "Room 17")
+    (IN ROOMS)
+    (SOUTH TO ROOM-18)
+    (EAST TO ROOM-20)
+    (WEST TO ROOM-15)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-18
+    (DESC "Room 18")
+    (IN ROOMS)
+    (NORTH TO ROOM-17)
+    (SOUTH TO ROOM-19)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-19
+    (DESC "Room 19")
+    (IN ROOMS)
+    (NORTH TO ROOM-18)
+    (SOUTH TO ROOM-21)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-21
+    (DESC "Room 21")
+    (IN ROOMS)
+    (NORTH TO ROOM-19)
+    (EAST TO ROOM-22)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-22
+    (DESC "Room 22")
+    (IN ROOMS)
+    (EAST TO ROOM-20)
+    (WEST TO ROOM-21)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-20
+    (DESC "Room 20")
+    (IN ROOMS)
+    (EAST TO ROOM-24)
+    (WEST TO ROOM-17)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-24
+    (DESC "Room 24")
+    (IN ROOMS)
+    (WEST TO ROOM-20)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-25
+    (DESC "Room 25")
+    (IN ROOMS)
+    (EAST TO ROOM-24)
+    (WEST TO ROOM-23)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-23
+    (DESC "Room 23")
+    (IN ROOMS)
+    (SOUTH TO ROOM-27)
+    (EAST TO ROOM-25)
+    (WEST TO ROOM-26)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-26
+    (DESC "Room 26")
+    (IN ROOMS)
+    (EAST TO ROOM-23)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-27
+    (DESC "Room 27")
+    (IN ROOMS)
+    (NORTH TO ROOM-23)
+    (SOUTH TO ROOM-28)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-28
+    (DESC "Room 28")
+    (IN ROOMS)
+    (NORTH TO ROOM-27)
+    (SOUTH TO ROOM-29)
+    (EAST TO ROOM-31)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-29
+    (DESC "Room 29")
+    (IN ROOMS)
+    (NORTH TO ROOM-28)
+    (WEST TO ROOM-26)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-31
+    (DESC "Room 31")
+    (IN ROOMS)
+    (SOUTH TO ROOM-34)
+    (EAST TO ROOM-32)
+    (WEST TO ROOM-28)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-32
+    (DESC "Room 32")
+    (IN ROOMS)
+    (WEST TO ROOM-31)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-34
+    (DESC "Room 34")
+    (IN ROOMS)
+    (NORTH TO ROOM-31)
+    (SOUTH TO ROOM-35)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-33
+    (DESC "Room 33")
+    (IN ROOMS)
+    (EAST TO ROOM-32)
+    (WEST TO ROOM-38)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-38
+    (DESC "Room 38")
+    (IN ROOMS)
+    (SOUTH TO ROOM-39)
+    (EAST TO ROOM-33)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-35
+    (DESC "Room 35")
+    (IN ROOMS)
+    (NORTH TO ROOM-36)
+    (EAST TO ROOM-34)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-36
+    (DESC "Room 36")
+    (IN ROOMS)
+    (SOUTH TO ROOM-35)
+    (WEST TO ROOM-37)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-37
+    (DESC "Room 37")
+    (IN ROOMS)
+    (EAST TO ROOM-36)
+    (WEST TO ROOM-40)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-40
+    (DESC "Room 40")
+    (IN ROOMS)
+    (SOUTH TO ROOM-42)
+    (EAST TO ROOM-37)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-42
+    (DESC "Room 42")
+    (IN ROOMS)
+    (NORTH TO ROOM-40)
+    (SOUTH TO ROOM-41)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-43
+    (DESC "Room 43")
+    (IN ROOMS)
+    (NORTH TO ROOM-40)
+    (SOUTH TO ROOM-41)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-41
+    (DESC "Room 41")
+    (IN ROOMS)
+    (NORTH TO ROOM-43)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-69
+    (DESC "Room 69")
+    (IN ROOMS)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-39
+    (DESC "Room 39")
+    (IN ROOMS)
+    (NORTH TO ROOM-38)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-69-2
+    (DESC "Room 69")
+    (IN ROOMS)
+    (SOUTH TO ROOM-68)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-68
+    (DESC "Room 68")
+    (IN ROOMS)
+    (SOUTH TO ROOM-67)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-67
+    (DESC "Room 67")
+    (IN ROOMS)
+    (NORTH TO ROOM-68)
+    (SOUTH TO ROOM-66)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-66
+    (DESC "Room 66")
+    (IN ROOMS)
+    (NORTH TO ROOM-67)
+    (SOUTH TO ROOM-65)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-65
+    (DESC "Room 65")
+    (IN ROOMS)
+    (NORTH TO ROOM-66)
+    (WEST TO ROOM-64)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-64
+    (DESC "Room 64")
+    (IN ROOMS)
+    (NORTH TO ROOM-64)
+    (SOUTH TO ROOM-63)
+    (EAST TO ROOM-65)
+    (WEST TO ROOM-64)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-63
+    (DESC "Room 63")
+    (IN ROOMS)
+    (NORTH TO ROOM-62)
+    (WEST TO ROOM-61)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-56
+    (DESC "Room 56")
+    (IN ROOMS)
+    (EAST TO ROOM-58)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-61
+    (DESC "Room 61")
+    (IN ROOMS)
+    (NORTH TO ROOM-58)
+    (EAST TO ROOM-63)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-57
+    (DESC "Room 57")
+    (IN ROOMS)
+    (EAST TO ROOM-58)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-58
+    (DESC "Room 58")
+    (IN ROOMS)
+    (SOUTH TO ROOM-61)
+    (EAST TO ROOM-59)
+    (WEST TO ROOM-57)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-62
+    (DESC "Room 62")
+    (IN ROOMS)
+    (SOUTH TO ROOM-63)
+    (EAST TO ROOM-60)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-59
+    (DESC "Room 59")
+    (IN ROOMS)
+    (EAST TO ROOM-60)
+    (WEST TO ROOM-58)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-60
+    (DESC "Room 60")
+    (IN ROOMS)
+    (WEST TO ROOM-59)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-52
+    (DESC "Room 52")
+    (IN ROOMS)
+    (SOUTH TO ROOM-53)
+    (EAST TO ROOM-54)
+    (WEST TO ROOM-51)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-54
+    (DESC "Room 54")
+    (IN ROOMS)
+    (EAST TO ROOM-56-2)
+    (WEST TO ROOM-52)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-53
+    (DESC "Room 53")
+    (IN ROOMS)
+    (NORTH TO ROOM-52)
+    (EAST TO ROOM-55)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-55
+    (DESC "Room 55")
+    (IN ROOMS)
+    (EAST TO ROOM-57-2)
+    (WEST TO ROOM-53)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-57-2
+    (DESC "Room 57")
+    (IN ROOMS)
+    (EAST TO ROOM-58-2)
+    (WEST TO ROOM-55)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-58-2
+    (DESC "Room 58")
+    (IN ROOMS)
+    (WEST TO ROOM-57-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-56-2
+    (DESC "Room 56")
+    (IN ROOMS)
+    (EAST TO ROOM-58-3)
+    (WEST TO ROOM-54)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-58-3
+    (DESC "Room 58")
+    (IN ROOMS)
+    (WEST TO ROOM-56-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-7-2
+    (DESC "Room 7")
+    (IN ROOMS)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-44
+    (DESC "Room 44")
+    (IN ROOMS)
+    (WEST TO ROOM-45)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-45
+    (DESC "Room 45")
+    (IN ROOMS)
+    (EAST TO ROOM-44)
+    (WEST TO ROOM-47)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-46
+    (DESC "Room 46")
+    (IN ROOMS)
+    (EAST TO ROOM-44)
+    (WEST TO ROOM-48)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-48
+    (DESC "Room 48")
+    (IN ROOMS)
+    (EAST TO ROOM-46)
+    (WEST TO ROOM-50)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-47
+    (DESC "Room 47")
+    (IN ROOMS)
+    (EAST TO ROOM-45)
+    (WEST TO ROOM-49)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-49
+    (DESC "Room 49")
+    (IN ROOMS)
+    (EAST TO ROOM-47)
+    (WEST TO ROOM-50)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-50
+    (DESC "Room 50")
+    (IN ROOMS)
+    (EAST TO ROOM-49)
+    (WEST TO ROOM-51)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROOM-51
+    (DESC "Room 51")
+    (IN ROOMS)
+    (EAST TO ROOM-52)
+    (FLAGS LIGHTBIT)>
+

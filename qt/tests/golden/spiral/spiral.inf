@@ -1,0 +1,267 @@
+Constant Story "spiral";
+Constant Headline "^By J. Lautzenheiser^^^";
+
+Include "Parser";
+Include "VerbLib";
+
+Class Both;
+Class Helen;
+Class Ross;
+
+Helen  Mountainside "Mountainside"
+  with  description
+            "",
+        s_to FootoftheMountainS,
+   has  light;
+
+Helen  FootoftheMountainS "Foot of the Mountain S"
+  with  description
+            "",
+        n_to Mountainside,
+        e_to FootoftheMountainE,
+        w_to FootoftheMountainW,
+        se_to ChurchIsle,
+   has  light;
+
+Object ->  Pole "Pole"
+  with  name 'Pole',
+        description "Pole";
+
+Helen  FootoftheMountainW "Foot of the Mountain W"
+  with  description
+            "",
+        e_to FootoftheMountainS,
+        w_to Coast,
+   has  light;
+
+Helen  FootoftheMountainE "Foot of the Mountain E"
+  with  description
+            "fsdfds",
+        w_to FootoftheMountainS,
+        in_to OntheCloud,
+   has  light;
+
+Helen  OntheCloud "On the Cloud"
+  with  description
+            "",
+        out_to FootoftheMountainE,
+   has  light;
+
+Ross  Platform "Platform"
+  with  description
+            "",
+        e_to MachineRoomWest,
+   has  light;
+
+Ross  MachineRoomWest "Machine Room: West"
+  with  description
+            "",
+        n_to OvertheGap,
+        e_to MachineRoomCentral,
+        w_to Platform,
+        u_to BeneaththePipe,
+   has  light;
+
+Object ->  putpoleinrecess "put pole in recess"
+  with  name 'put' 'pole' 'in' 'recess',
+        description "(put pole in recess)";
+
+Object  FalltoCarriage "Fall to Carriage"
+  with  description
+            "",
+   has  light;
+
+Object  FalltoCarriage2 "Fall to Carriage"
+  with  description
+            "",
+   has  light;
+
+Object  FalltoCarriage3 "Fall to Carriage"
+  with  description
+            "",
+   has  light;
+
+Ross  MachineRoomCentral "Machine Room: Central"
+  with  description
+            "",
+        e_to MachineRoomEast,
+        w_to MachineRoomWest,
+   has  light;
+
+Object ->  Crystal "Crystal"
+  with  name 'Crystal',
+        description "Crystal";
+
+Ross  MachineRoomEast "Machine Room: East"
+  with  description
+            "",
+        w_to MachineRoomCentral,
+        d_to HospitalRoom,
+   has  light;
+
+Ross  BeneaththePipe "Beneath the Pipe"
+  with  description
+            "",
+        u_to FalltoCarriage4,
+        d_to MachineRoomWest,
+   has  light;
+
+Object ->  Crystal2 "Crystal"
+  with  name 'Crystal',
+        description "Crystal";
+
+Helen  ChurchIsle "Church Isle"
+  with  description
+            "",
+        nw_to FootoftheMountainS,
+   has  light;
+
+Object ->  Page "Page"
+  with  name 'Page',
+        description "Page";
+
+Object  FalltoCarriage4 "Fall to Carriage"
+  with  description
+            "",
+        d_to BeneaththePipe,
+   has  light;
+
+Ross  OvertheGap "Over the Gap"
+  with  description
+            "",
+        n_to ScrapRoom,
+        s_to MachineRoomWest,
+   has  light;
+
+Object ->  Crystal3 "Crystal"
+  with  name 'Crystal',
+        description "Crystal";
+
+Ross  ScrapRoom "Scrap Room"
+  with  description
+            "",
+        s_to OvertheGap,
+        e_to RethsDen,
+   has  light;
+
+Object ->  Phonecrystal "Phonecrystal"
+  with  name 'Phonecrystal',
+        description "Phone/crystal";
+
+Helen  Coast "Coast"
+  with  description
+            "",
+        e_to FootoftheMountainW,
+        u_to Cave,
+   has  light;
+
+Object ->  Page2 "Page"
+  with  name 'Page',
+        description "Page";
+
+Helen  Cave "Cave"
+  with  description
+            "",
+        s_to Attic,
+        w_to Tomb,
+        d_to Coast,
+   has  light;
+
+Helen  Attic "Attic"
+  with  description
+            "",
+        n_to Cave,
+   has  light;
+
+Object ->  Stuffpage "Stuff page"
+  with  name 'Stuff' 'page',
+        description "Stuff (page)";
+
+Object ->  Laptop "Laptop"
+  with  name 'Laptop',
+        description "Laptop";
+
+Helen  Tomb "Tomb"
+  with  description
+            "",
+        e_to Cave,
+   has  light;
+
+Object ->  Coffinpage "Coffin page"
+  with  name 'Coffin' 'page',
+        description "Coffin (page)";
+
+Both  Carriage "Carriage"
+  with  description
+            "",
+        ne_to Mountainside,
+        se_to MachineRoomWest,
+   has  light;
+
+Helen  UndergroundLine "Underground Line"
+  with  description
+            "Made in Twine, Men Don't Play With Dolls is an intimate and painful look into the beginnings of a lifelong struggle with addiction. Memories like these are not easily escaped.",
+        s_to Tomb,
+   has  light;
+
+Object ->  Hat "Hat"
+  with  name 'Hat',
+        description "Hat";
+
+Object ->  Cat "Cat"
+  with  name 'Cat',
+        description "Cat";
+
+Ross  HospitalRoom "Hospital Room"
+  with  description
+            "",
+        s_to MachineRoomEast,
+   has  light;
+
+Ross  RethsDen "Reth's Den"
+  with  description
+            "",
+        w_to ScrapRoom,
+   has  light;
+
+Object ->  BoxSoul "Box Soul"
+  with  name 'Box' 'Soul',
+        description "Box (Soul)";
+
+Both  UndergroundLine2 "Underground Line"
+  with  description
+            "",
+        s_to RethsDen,
+        e_to Vat,
+        w_to Summit,
+        in_to TrainWreck,
+   has  light;
+
+Both  Summit "Summit"
+  with  description
+            "",
+        d_to UndergroundLine2,
+   has  light;
+
+Both  Vat "Vat"
+  with  description
+            "",
+   has  light;
+
+Object ->  Syringe "Syringe"
+  with  name 'Syringe',
+        description "Syringe";
+
+Ross  TrainWreck "Train Wreck"
+  with  description
+            "",
+        out_to UndergroundLine2,
+   has  light;
+
+[ Initialise;
+    location = Mountainside;
+    ! "^^Your opening paragraph here...^^";
+];
+
+Include "Grammar";
+

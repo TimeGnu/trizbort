@@ -1,0 +1,467 @@
+Constant Story "luster";
+Constant Headline "^By A Trizbort User^^^";
+
+Include "Parser";
+Include "VerbLib";
+
+Class Forest;
+Class LeverBuilding;
+Class MainArea;
+Class Water;
+
+Object  Fork "Fork"
+  with  description
+            "",
+        n_to TrainCrossing,
+        s_to MeanderingPath,
+        w_to DirtPath,
+   has  light;
+
+Object ->  Returnfromplaintohere "Return from plain to here"
+  with  name 'Return' 'from' 'plain' 'to' 'here',
+        description "Return from plain to here";
+
+Object  TrainCrossing "Train Crossing"
+  with  description
+            "",
+        n_to Field,
+        s_to Fork,
+   has  light;
+
+Object  DirtPath "Dirt Path"
+  with  description
+            "",
+        s_to SheriffStationEntrance,
+        e_to Fork,
+        ne_to GatedPath,
+        nw_to LakeShore,
+   has  light;
+
+Object  SheriffStationEntrance "Sheriff Station Entrance"
+  with  description
+            "",
+        n_to DirtPath,
+        s_to SheriffStation,
+        w_to PowerRoom,
+        in_to SheriffStation,
+   has  light;
+
+Object  LakeShore "Lake Shore"
+  with  description
+            "",
+        s_to LakeShore2,
+        se_to DirtPath,
+   has  light;
+
+Object  LakeShore2 "Lake Shore"
+  with  description
+            "",
+        n_to LakeShore,
+        w_to Dock,
+   has  light;
+
+Object  Dock "Dock"
+  with  description
+            "",
+        e_to LakeShore2,
+        w_to Lakeonraft,
+   has  light;
+
+Object ->  Raft "Raft"
+  with  name 'Raft',
+        description "Raft";
+
+Object  Lakeonraft "Lake (on raft)"
+  with  description
+            "",
+        e_to Dock,
+   has  light;
+
+Object ->  Bluegemfallintolake "Blue gem fall into lake"
+  with  name 'Blue' 'gem' 'fall' 'into' 'lake',
+        description "Blue gem (fall into lake)";
+
+Water  TempleEntrance "Temple Entrance"
+  with  description
+            "",
+        w_to StatueRoombecomesplain,
+   has  light;
+
+Object ->  Backtodockonceyougetgem "Back to dock once you get gem"
+  with  name 'Back' 'to' 'dock' 'once' 'you' 'get' 'gem',
+        description "(Back to dock once you get gem)";
+
+Water  StatueRoombecomesplain "Statue Room (becomes plain)"
+  with  description
+            "",
+        n_to SpectatorBox,
+        s_to Armory,
+        e_to TempleEntrance,
+        w_to ArenaRoom,
+   has  light;
+
+Water  ArenaRoom "Arena Room"
+  with  description
+            "",
+        e_to StatueRoombecomesplain,
+   has  light;
+
+Object ->  Swordsman "Swordsman"
+  with  name 'Swordsman',
+        description "Swordsman";
+
+Water  SpectatorBox "Spectator Box"
+  with  description
+            "",
+        s_to StatueRoombecomesplain,
+   has  light;
+
+Object ->  Ballpointpen "Ballpoint pen"
+  with  name 'Ballpoint' 'pen',
+        description "Ballpoint pen";
+
+Water  Armory "Armory"
+  with  description
+            "",
+        n_to StatueRoombecomesplain,
+   has  light;
+
+Object  GatedPath "Gated Path"
+  with  description
+            "",
+        n_to BlankRoom,
+        sw_to DirtPath,
+   has  light;
+
+LeverBuilding  BlankRoom "Blank Room"
+  with  description
+            "",
+        n_to OceanRoom,
+        s_to GatedPath,
+        e_to MetallicRoom,
+        ne_to SpaceRoom,
+        nw_to RainForestRoom,
+   has  light;
+
+Object ->  Leverswitchit "Lever switch it"
+  with  name 'Lever' 'switch' 'it',
+        description "Lever (switch it)";
+
+LeverBuilding  OceanRoom "Ocean Room"
+  with  description
+            "",
+        s_to BlankRoom,
+   has  light;
+
+Object ->  pedestal1 "pedestal1"
+  with  name 'pedestal1',
+        description "pedestal1";
+
+Object ->  Bluegem "Blue gem"
+  with  name 'Blue' 'gem',
+        description "(Blue gem)";
+
+LeverBuilding  RainForestRoom "Rain-Forest Room"
+  with  description
+            "",
+        se_to BlankRoom,
+   has  light;
+
+Object ->  pedestal3 "pedestal3"
+  with  name 'pedestal3',
+        description "pedestal3";
+
+Object ->  Greengem "Green gem"
+  with  name 'Green' 'gem',
+        description "(Green gem)";
+
+LeverBuilding  SpaceRoom "Space Room"
+  with  description
+            "",
+        sw_to BlankRoom,
+   has  light;
+
+Object ->  pedestal2 "pedestal2"
+  with  name 'pedestal2',
+        description "pedestal2";
+
+Object ->  Midnightgem "Midnight gem"
+  with  name 'Midnight' 'gem',
+        description "(Midnight gem)";
+
+LeverBuilding  MetallicRoom "Metallic Room"
+  with  description
+            "",
+        w_to BlankRoom,
+   has  light;
+
+Object ->  pedestal4 "pedestal4"
+  with  name 'pedestal4',
+        description "pedestal4";
+
+Object ->  Silvergem "Silver gem"
+  with  name 'Silver' 'gem',
+        description "(Silver gem)";
+
+Object  MeanderingPath "Meandering Path"
+  with  description
+            "",
+        n_to Fork,
+        s_to DeadEnd,
+        w_to RosarioEntrance,
+        se_to RamenBooth,
+        nw_to AbandStoreFrontMyersEntrance,
+   has  light;
+
+Object  AbandStoreFrontMyersEntrance "Aband. Store Front Myers Entrance"
+  with  description
+            "",
+        w_to AbandonedShop,
+        se_to MeanderingPath,
+   has  light;
+
+Object ->  Matsteelkey "Mat steel key"
+  with  name 'Mat' 'steel' 'key',
+        description "Mat (steel key)";
+
+Object ->  MyersEntrance "Myers Entrance"
+  with  name 'Myers' 'Entrance',
+        description "Myers Entrance";
+
+Object  AbandonedShop "Abandoned Shop"
+  with  description
+            "",
+        e_to AbandStoreFrontMyersEntrance,
+   has  light;
+
+Object ->  CashRegisterDime "Cash RegisterDime"
+  with  name 'Cash' 'RegisterDime',
+        description "Cash Register/Dime";
+
+Object  RosarioEntrance "Rosario Entrance"
+  with  description
+            "",
+        e_to MeanderingPath,
+   has  light;
+
+Object  DeadEnd "Dead End"
+  with  description
+            "",
+        n_to MeanderingPath,
+        s_to TimberPath,
+   has  light;
+
+Object ->  Rectangleputmat "Rectangle put mat"
+  with  name 'Rectangle' 'put' 'mat',
+        description "Rectangle (put mat)";
+
+Object  RamenBooth "Ramen Booth"
+  with  description
+            "",
+        w_to InsideRamenBooth,
+        nw_to MeanderingPath,
+   has  light;
+
+Object  InsideRamenBooth "Inside Ramen Booth"
+  with  description
+            "",
+        e_to RamenBooth,
+   has  light;
+
+Object ->  Bulbuntiefromrope "Bulb untie from rope"
+  with  name 'Bulb' 'untie' 'from' 'rope',
+        description "Bulb (untie from rope)";
+
+Object ->  Needsteelkey "Need steel key"
+  with  name 'Need' 'steel' 'key',
+        description "Need steel key";
+
+Forest  TimberPath "Timber Path"
+  with  description
+            "",
+        n_to DeadEnd,
+        s_to ForestMaze,
+   has  light;
+
+Object ->  Note "Note"
+  with  name 'Note',
+        description "Note:";
+
+Object ->  forestroomnamesarerandom "forest room names are random"
+  with  name 'forest' 'room' 'names' 'are' 'random',
+        description "* forest room names are random.";
+
+Object ->  Lightgreenindicateswrappingmaze "Light green indicates wrapping maze"
+  with  name 'Light' 'green' 'indicates' 'wrapping' 'maze',
+        description "* Light green indicates wrapping maze.";
+
+Object ->  Diagonaldirectionsarepossiblebutignored "Diagonal directions are possible but ignored"
+  with  name 'Diagonal' 'directions' 'are' 'possible' 'but' 'ignored',
+        description "* Diagonal directions are possible but ignored."
+  has open container;
+
+Object -> ->  Wejustwantawaythrough "We just want a way through"
+  with  name 'We' 'just' 'want' 'a' 'way' 'through',
+        description "We just want a way through.";
+
+Forest  ForestMaze "Forest Maze"
+  with  description
+            "",
+        n_to TimberPath,
+        s_to ForestMaze2,
+   has  light;
+
+Forest  ForestMaze2 "Forest Maze"
+  with  description
+            "",
+        n_to ForestMaze,
+        s_to ForestCenter,
+   has  light;
+
+Forest  ForestCenter "Forest Center"
+  with  description
+            "",
+        n_to ForestMaze2,
+        s_to ForestMaze6,
+        e_to ForestMaze8,
+        w_to ForestMaze3,
+   has  light;
+
+Forest  ForestMaze3 "Forest Maze"
+  with  description
+            "",
+        n_to ForestMaze4,
+        s_to ForestMaze5,
+        e_to ForestCenter,
+        w_to ForestMaze4,
+   has  light;
+
+Forest  ForestMaze4 "Forest Maze"
+  with  description
+            "",
+        s_to ForestMaze9,
+        e_to ForestMaze3,
+        w_to ForestCenter2,
+   has  light;
+
+Forest  ForestCenter2 "(Forest Center)"
+  with  description
+            "",
+        e_to ForestMaze4,
+   has  light;
+
+Forest  ForestMaze5 "Forest Maze"
+  with  description
+            "",
+        n_to ForestMaze3,
+        s_to ForestMaze7,
+   has  light;
+
+Forest  ForestMaze6 "Forest Maze"
+  with  description
+            "",
+        n_to ForestCenter,
+        e_to Clearing,
+   has  light;
+
+Forest  Clearing "Clearing"
+  with  description
+            "",
+        w_to ForestMaze6,
+   has  light;
+
+Object ->  GreenGem2 "Green Gem"
+  with  name 'Green' 'Gem',
+        description "Green Gem";
+
+Forest  ForestMaze7 "Forest Maze"
+  with  description
+            "",
+        n_to ForestMaze5,
+        s_to EndofCave,
+   has  light;
+
+Forest  EndofCave "End of Cave"
+  with  description
+            "",
+        n_to ForestMaze7,
+   has  light;
+
+Object ->  MidnightGemneedbulb "Midnight Gem need bulb"
+  with  name 'Midnight' 'Gem' 'need' 'bulb',
+        description "Midnight Gem (need bulb)";
+
+Forest  ForestMaze8 "(Forest Maze)"
+  with  description
+            "",
+        w_to ForestCenter,
+   has  light;
+
+Object  SheriffStation "Sheriff Station"
+  with  description
+            "",
+        n_to SheriffStationEntrance,
+        w_to CrampedBathroom,
+   has  light;
+
+Object ->  Needcopperkeytoexit "Need copper key to exit"
+  with  name 'Need' 'copper' 'key' 'to' 'exit',
+        description "Need copper key to exit";
+
+Object  CrampedBathroom "Cramped Bathroom"
+  with  description
+            "",
+        e_to SheriffStation,
+   has  light;
+
+Object ->  soapwashsoap "soap wash soap"
+  with  name 'soap' 'wash' 'soap',
+        description "soap (wash soap)";
+
+Object  Field "Field"
+  with  description
+            "",
+        s_to TrainCrossing,
+   has  light;
+
+Object ->  Cubeputcoininslot "Cube put coin in slot"
+  with  name 'Cube' 'put' 'coin' 'in' 'slot',
+        description "Cube (put coin in slot)";
+
+Object ->  Makessilvergem "Makes silver gem"
+  with  name 'Makes' 'silver' 'gem',
+        description "Makes silver gem";
+
+Object  PowerRoom "Power Room"
+  with  description
+            "",
+        e_to SheriffStationEntrance,
+   has  light;
+
+Object ->  switchbuttonsRBI "switch buttons RBI"
+  with  name 'switch' 'buttons' 'RBI',
+        description "(switch buttons RBI)";
+
+Forest  ForestMaze9 "Forest Maze"
+  with  description
+            "",
+        n_to ForestMaze4,
+        e_to ForestMaze4,
+   has  light;
+
+Forest  TreeCanopy "Tree Canopy"
+  with  description
+            "",
+   has  light;
+
+Object ->  Fromtoclearing "Fromto clearing"
+  with  name 'Fromto' 'clearing',
+        description "From/to clearing";
+
+[ Initialise;
+    location = Fork;
+    ! "^^Your opening paragraph here...^^";
+];
+
+Include "Grammar";
+

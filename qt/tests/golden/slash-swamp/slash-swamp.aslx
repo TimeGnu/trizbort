@@ -1,0 +1,1382 @@
+<asl version="550">
+
+  <include ref="English.aslx"/>
+  <include ref="Core.aslx"/>
+  <game name="Slasher Swamp map">
+    <gameid>ff9dd851-e65e-484e-9888-231dcbac099f</gameid>
+    <version>1.0</version>
+    <firstpublished>2026</firstpublished>
+    <author>Andrew Schultz</author>
+    <description>This is a map for Slasher Swamp, an IFComp 2014 entry. The dotted lines indicate places you need to search, and in what order.</description>
+  </game>
+
+  <object name="Road">
+    <inherit name="editor_room" />
+    <alias>Road</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="MuddySwamp">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="TRUCK1">
+      <inherit name="editor_object" />
+      <alias>TRUCK (1)</alias>
+    </object>
+  </object>
+
+  <object name="Pond">
+    <inherit name="editor_room" />
+    <alias>Pond</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="SwampForest">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="MuddySwamp">
+    <inherit name="editor_room" />
+    <alias>Muddy Swamp</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Road">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="RottingWoodenWalkway">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="ConcreteBuilding">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="MangroveForest">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="EmptyFloridaHighway">
+    <inherit name="editor_room" />
+    <alias>Empty Florida Highway</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="SwampForest">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="ConcreteBuilding">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="GravelRoad">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="BlacktopHighway">
+    <inherit name="editor_room" />
+    <alias>Blacktop Highway</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="MangroveForest">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="west" to="CreepyHighway">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="BambooForest">
+    <inherit name="editor_room" />
+    <alias>Bamboo Forest</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="DarkGrove">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="west" to="DryEverglades">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="SwampForest">
+    <inherit name="editor_room" />
+    <alias>Swamp Forest</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="PineForest">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="EmptyFloridaHighway">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="OakSwamp">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Pond">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="BRIARPATCH5">
+      <inherit name="editor_object" />
+      <alias>BRIAR PATCH (5)</alias>
+    </object>
+  </object>
+
+  <object name="DryEverglades">
+    <inherit name="editor_room" />
+    <alias>Dry Everglades*</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="FrontPorch">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="CreepyHighway">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="BambooForest">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="PalmettoFlat">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="DarkGrove">
+    <inherit name="editor_room" />
+    <alias>Dark Grove*</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="SouthBankofaBayou">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="BambooForest">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="Etoswampforest">
+      <inherit name="editor_object" />
+      <alias>E to swamp forest</alias>
+    </object>
+  </object>
+
+  <object name="CreepyHighway">
+    <inherit name="editor_room" />
+    <alias>Creepy Highway</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="DryEverglades">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="ScrubForest">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="BlacktopHighway">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="DesolateHighway">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="MangroveForest">
+    <inherit name="editor_room" />
+    <alias>Mangrove Forest</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="BlacktopHighway">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="MuddySwamp">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="ScrubForest">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="DesolateHighway">
+    <inherit name="editor_room" />
+    <alias>Desolate Highway</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="PalmettoFlat">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="PineFlatwood">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="CreepyHighway">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="ScrubForest">
+    <inherit name="editor_room" />
+    <alias>Scrub Forest</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="CreepyHighway">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="MangroveForest">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="PineFlatwood">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="PineFlatwood">
+    <inherit name="editor_room" />
+    <alias>Pine Flatwood*</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="DesolateHighway">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="ScrubForest">
+      <inherit name="eastdirection" />
+    </exit>
+    <object name="WStoswamp">
+      <inherit name="editor_object" />
+      <alias>W/S to swamp</alias>
+    </object>
+  </object>
+
+  <object name="RottingWoodenWalkway">
+    <inherit name="editor_room" />
+    <alias>Rotting Wooden Walkway</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="MuddySwamp">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="SandyGrass">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="ConcreteBuilding">
+    <inherit name="editor_room" />
+    <alias>Concrete Building</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="EmptyFloridaHighway">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="DarkConcreteBuilding">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="ConcreteSlab">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="MuddySwamp">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="SandyGrass">
+    <inherit name="editor_room" />
+    <alias>Sandy Grass</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="RottingWoodenWalkway">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="DustyClearing">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="DustyClearing">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Gazebo">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="KingofSpades">
+      <inherit name="editor_object" />
+      <alias>King of Spades</alias>
+    </object>
+  </object>
+
+  <object name="Gazebo">
+    <inherit name="editor_room" />
+    <alias>Gazebo</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="SandyGrass">
+      <inherit name="eastdirection" />
+    </exit>
+    <object name="QueenofClubs">
+      <inherit name="editor_object" />
+      <alias>Queen of Clubs</alias>
+    </object>
+  </object>
+
+  <object name="DustyClearing">
+    <inherit name="editor_room" />
+    <alias>Dusty Clearing</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="SandyGrass">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="Gate">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Gate">
+    <inherit name="editor_room" />
+    <alias>Gate</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Garden">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="DustyClearing">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Garden">
+    <inherit name="editor_room" />
+    <alias>Garden</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Garden2">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="ConcreteRuins">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Gate">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="ConcreteRuins">
+    <inherit name="editor_room" />
+    <alias>Concrete Ruins</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="RoseBush">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="west" to="Garden">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="JackofSpades">
+      <inherit name="editor_object" />
+      <alias>Jack of Spades</alias>
+    </object>
+  </object>
+
+  <object name="RoseBush">
+    <inherit name="editor_room" />
+    <alias>Rose Bush</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="ConcreteRuins">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="west" to="Garden2">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Garden2">
+    <inherit name="editor_room" />
+    <alias>Garden</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Garden">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="RoseBush">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="DarkConcreteBuilding">
+    <inherit name="editor_room" />
+    <alias>Dark Concrete Building</alias>
+    <dark />
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="ConcreteBuilding">
+      <inherit name="northdirection" />
+    </exit>
+    <object name="Deerdollhead">
+      <inherit name="editor_object" />
+      <alias>Deer (doll head)</alias>
+    </object>
+  </object>
+
+  <object name="ConcreteSlab">
+    <inherit name="editor_room" />
+    <alias>Concrete Slab</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="GravelRoad">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Graveyard">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="BushThicket">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="ConcreteBuilding">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="GravelRoad">
+    <inherit name="editor_room" />
+    <alias>Gravel Road</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="OakSwamp">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="BushThicket">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="GasStationParkingLot">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="EmptyFloridaHighway">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="BushThicket">
+    <inherit name="editor_room" />
+    <alias>Bush Thicket</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="GravelRoad">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="Meadow">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="ConcreteSlab">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="StoSwampForest">
+      <inherit name="editor_object" />
+      <alias>S to Swamp Forest</alias>
+    </object>
+  </object>
+
+  <object name="OakSwamp">
+    <inherit name="editor_room" />
+    <alias>Oak Swamp</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="SwampClearingEtograssfield">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="GravelRoad">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="west" to="SwampForest">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="EtoSwampForest2">
+      <inherit name="editor_object" />
+      <alias>E to Swamp Forest</alias>
+    </object>
+  </object>
+
+  <object name="PalmettoFlat">
+    <inherit name="editor_room" />
+    <alias>Palmetto Flat</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="DustyHill">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="DesolateHighway">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="DryEverglades">
+      <inherit name="eastdirection" />
+    </exit>
+    <object name="WtoSwampForest">
+      <inherit name="editor_object" />
+      <alias>W to Swamp Forest</alias>
+    </object>
+  </object>
+
+  <object name="DustyHill">
+    <inherit name="editor_room" />
+    <alias>Dusty Hill*</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="SouthBankofaBayou">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="PalmettoFlat">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="FrontPorch">
+    <inherit name="editor_room" />
+    <alias>Front Porch</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="LivingRoom">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="DryEverglades">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="LivingRoom">
+    <inherit name="editor_room" />
+    <alias>Living Room</alias>
+    <dark />
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Kitchen">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="FrontPorch">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Kitchen">
+    <inherit name="editor_room" />
+    <alias>Kitchen</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="SouthBankofaBayou">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="LivingRoom">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="SINK2">
+      <inherit name="editor_object" />
+      <alias>SINK (2)</alias>
+    </object>
+  </object>
+
+  <object name="SouthBankofaBayou">
+    <inherit name="editor_room" />
+    <alias>South Bank of a Bayou*</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Kitchen">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="DarkGrove">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="DustyHill">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Meadow">
+    <inherit name="editor_room" />
+    <alias>Meadow*</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="GravelRoad">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="PalmettoClearing">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="SwampClearingEtograssfield">
+    <inherit name="editor_room" />
+    <alias>Swamp Clearing (E to grass field)</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="OakSwamp">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="NWtoSwampForest">
+      <inherit name="editor_object" />
+      <alias>N/W to Swamp Forest</alias>
+    </object>
+  </object>
+
+  <object name="PalmettoClearing">
+    <inherit name="editor_room" />
+    <alias>Palmetto Clearing</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Meadow">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="PalmettoField">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="WEtoSwampForest">
+      <inherit name="editor_object" />
+      <alias>W/E to Swamp Forest</alias>
+    </object>
+  </object>
+
+  <object name="PalmettoField">
+    <inherit name="editor_room" />
+    <alias>Palmetto Field</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="PalmettoClearing">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="InFrontofaStrawHut">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="WEtoSwampForest2">
+      <inherit name="editor_object" />
+      <alias>W/E to Swamp Forest</alias>
+    </object>
+  </object>
+
+  <object name="InFrontofaStrawHut">
+    <inherit name="editor_room" />
+    <alias>In Front of a Straw Hut</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="PalmettoField">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="StrawHut">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="StrawHut">
+    <inherit name="editor_room" />
+    <alias>Straw Hut</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="InFrontofaStrawHut">
+      <inherit name="northdirection" />
+    </exit>
+    <object name="SHACK11">
+      <inherit name="editor_object" />
+      <alias>SHACK(11)</alias>
+    </object>
+    <object name="Needseveredheadandrevolvernotmanwrevolver">
+      <inherit name="editor_object" />
+      <alias>Need severed head and revolver (not man w/revolver)</alias>
+    </object>
+  </object>
+
+  <object name="PineForest">
+    <inherit name="editor_room" />
+    <alias>Pine Forest</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="PineForest2">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="SwampForest">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="PineForest6">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="PineForest2">
+    <inherit name="editor_room" />
+    <alias>Pine Forest</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="PineForest3">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="PineForest">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="PineForest5">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="PineForest3">
+    <inherit name="editor_room" />
+    <alias>Pine Forest</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="PineForest2">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="PineForest4">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="PineForest4">
+    <inherit name="editor_room" />
+    <alias>Pine Forest</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="PineForest5">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="PineForest9">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="PineForest3">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="PineForest5">
+    <inherit name="editor_room" />
+    <alias>Pine Forest</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="PineForest4">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="PineForest6">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="PineForest8">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="PineForest2">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="PineForest6">
+    <inherit name="editor_room" />
+    <alias>Pine Forest</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="PineForest5">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="PineForest7">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="PineForest">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="PineForest7">
+    <inherit name="editor_room" />
+    <alias>Pine Forest</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="PineForest8">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="west" to="PineForest6">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="PineForest8">
+    <inherit name="editor_room" />
+    <alias>Pine Forest</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="PineForest9">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="PineForest7">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="west" to="PineForest5">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="PineForest9">
+    <inherit name="editor_room" />
+    <alias>Pine Forest</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="PineForest8">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="InFrontofShack">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="PineForest4">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="InFrontofShack">
+    <inherit name="editor_room" />
+    <alias>In Front of Shack</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="InShack">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="west" to="PineForest9">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="InShack">
+    <inherit name="editor_room" />
+    <alias>In Shack</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Altar">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="InFrontofShack">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Altar">
+    <inherit name="editor_room" />
+    <alias>Altar</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="InShack">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="west" to="Shrine">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="ALTAR6BODY7">
+      <inherit name="editor_object" />
+      <alias>ALTAR (6), BODY (7)</alias>
+    </object>
+  </object>
+
+  <object name="Graveyard">
+    <inherit name="editor_room" />
+    <alias>Graveyard</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="ConcreteSlab">
+      <inherit name="northdirection" />
+    </exit>
+    <object name="GRAVE9needshovel">
+      <inherit name="editor_object" />
+      <alias>GRAVE (9) (need shovel)</alias>
+    </object>
+    <object name="COFFINwironkeyMAN10">
+      <inherit name="editor_object" />
+      <alias>COFFIN w/iron key, MAN(10)</alias>
+    </object>
+  </object>
+
+  <object name="GasStationParkingLot">
+    <inherit name="editor_room" />
+    <alias>Gas Station Parking Lot</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="AlleyNorthofGasStation">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="SouthoftheGasStation">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="InsideGasStation">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="GravelRoad">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="AlleyNorthofGasStation">
+    <inherit name="editor_room" />
+    <alias>Alley North of Gas Station</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="GasStationDumpster">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="GasStationParkingLot">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="SouthoftheGasStation">
+    <inherit name="editor_room" />
+    <alias>South of the Gas Station</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="GasStationDumpster">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="GasStationParkingLot">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="GasStationDumpster">
+    <inherit name="editor_room" />
+    <alias>Gas Station Dumpster</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="AlleyNorthofGasStation">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="SouthoftheGasStation">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="DUMPSTER3">
+      <inherit name="editor_object" />
+      <alias>DUMPSTER (3)</alias>
+    </object>
+    <object name="ESwampForest">
+      <inherit name="editor_object" />
+      <alias>E: Swamp Forest</alias>
+    </object>
+  </object>
+
+  <object name="InsideGasStation">
+    <inherit name="editor_room" />
+    <alias>Inside Gas Station</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="GasStationOffice">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="west" to="GasStationParkingLot">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="GARBAGE">
+      <inherit name="editor_object" />
+      <alias>GARBAGE</alias>
+    </object>
+  </object>
+
+  <object name="GasStationOffice">
+    <inherit name="editor_room" />
+    <alias>Gas Station Office</alias>
+    <dark />
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="InsideGasStation">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="BLANKET4">
+      <inherit name="editor_object" />
+      <alias>BLANKET (4)</alias>
+    </object>
+  </object>
+
+  <object name="Shrine">
+    <inherit name="editor_room" />
+    <alias>Shrine</alias>
+    <dark />
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Altar">
+      <inherit name="eastdirection" />
+    </exit>
+    <object name="Headneededtowin">
+      <inherit name="editor_object" />
+      <alias>Head (needed to win)</alias>
+    </object>
+  </object>
+
+  <object name="GrassField">
+    <inherit name="editor_room" />
+    <alias>Grass Field</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="CloverField">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="SunflowerField">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="west" to="FlowerField">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="Wtoflower">
+      <inherit name="editor_object" />
+      <alias>(W to flower)</alias>
+    </object>
+  </object>
+
+  <object name="CloverField">
+    <inherit name="editor_room" />
+    <alias>Clover Field</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="MuckField">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="FlowerField">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="GrassField">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="NtoSwamp">
+      <inherit name="editor_object" />
+      <alias>N to Swamp</alias>
+    </object>
+  </object>
+
+  <object name="MuckField">
+    <inherit name="editor_room" />
+    <alias>Muck Field</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="InFrontofanOuthouse">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="FlowerField">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="MuckField">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="CloverField">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="Etograss">
+      <inherit name="editor_object" />
+      <alias>(E to grass)</alias>
+    </object>
+  </object>
+
+  <object name="SunflowerField">
+    <inherit name="editor_room" />
+    <alias>Sunflower Field</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="GrassField">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="FlowerField">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="FlowerField">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="SunflowerField">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="FlowerField">
+    <inherit name="editor_room" />
+    <alias>Flower Field</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="CloverField">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="MuckField">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="SunflowerField">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="Wtograss">
+      <inherit name="editor_object" />
+      <alias>(W to grass)</alias>
+    </object>
+  </object>
+
+  <object name="InFrontofanOuthouse">
+    <inherit name="editor_room" />
+    <alias>In Front of an Outhouse</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Outhouse">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="MuckField">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Outhouse">
+    <inherit name="editor_room" />
+    <alias>Outhouse</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="InFrontofanOuthouse">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="HOLE8">
+      <inherit name="editor_object" />
+      <alias>HOLE (8)</alias>
+    </object>
+  </object>
+
+  <object name="Swamp1fromvariouslocations">
+    <inherit name="editor_room" />
+    <alias>Swamp-1 (from various locations)</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Swamp2fromvariouslocations">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="Northto">
+      <inherit name="editor_object" />
+      <alias>North to</alias>
+    </object>
+    <object name="DesolateHighway2">
+      <inherit name="editor_object" />
+      <alias>Desolate Highway</alias>
+    </object>
+  </object>
+
+  <object name="Swamp2fromvariouslocations">
+    <inherit name="editor_room" />
+    <alias>Swamp-2 (from various locations)</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Swamp3">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="Alwaysto">
+      <inherit name="editor_object" />
+      <alias>Always to</alias>
+    </object>
+    <object name="Swamp32">
+      <inherit name="editor_object" />
+      <alias>Swamp-3</alias>
+    </object>
+  </object>
+
+  <object name="Swamp3">
+    <inherit name="editor_room" />
+    <alias>Swamp-3</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Pond">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="SouthtoPondOtherwisetoSwamp2">
+      <inherit name="editor_object" />
+      <alias>South to Pond, Otherwise to Swamp-2</alias>
+    </object>
+  </object>
+
+
+</asl>
+

@@ -1,0 +1,267 @@
+#include "verblib.g" ! grammar must come first
+
+#include "hugolib.h"
+
+routine init
+{
+	cls
+	verbosity = 2
+	counter = -1
+	STATUSTYPE = 1 !1 = score / turns, 2 = time, 3 = moves: score:
+	player = you
+	Font(BOLD_ON)
+	"further"
+	Font(BOLD_OFF)
+	"by A Trizbort User"
+	location = FoggyRoom
+	MovePlayer(location)
+}
+
+property region
+room FoggyRoom
+{
+
+	n_to Prairie
+	s_to Cave
+	e_to Hearth
+	w_to Sandstorm
+	ne_to Tundra
+
+}
+
+object RuddyBell
+{
+	in FoggyRoom
+}
+
+room Prairie
+{
+	region Green
+
+	s_to FoggyRoom
+	nw_to ManicSky
+
+}
+
+room Cave
+{
+	region Blue
+
+	n_to FoggyRoom
+	d_to ShiftingGrotto
+
+}
+
+room Hearth
+{
+	region Red
+
+	w_to FoggyRoom
+	d_to LowRoom
+
+}
+
+room Sandstorm
+{
+	region Yellow
+
+	e_to FoggyRoom
+	d_to CountlessDunes
+
+}
+
+room Tundra
+{
+
+	ne_to InfiniteIceFloes
+	sw_to FoggyRoom
+
+}
+
+room ManicSky
+{
+	region Green
+
+	w_to Grassland
+	se_to Prairie
+
+}
+
+object Becomes
+{
+	in ManicSky
+}
+
+object PetShop
+{
+	in ManicSky
+}
+
+room Grassland
+{
+	region Green
+
+	e_to ManicSky
+
+}
+
+object AshenRobe
+{
+	in Grassland
+}
+
+room InfiniteIceFloes
+{
+
+	sw_to Tundra
+	u_to CementRoom
+
+}
+
+object BecomesFrozenPond
+{
+	in InfiniteIceFloes
+}
+
+room LowRoom
+{
+	region Red
+
+	se_to Alcove
+	u_to Hearth
+
+}
+
+object Becomes2
+{
+	in LowRoom
+}
+
+object YourBasement
+{
+	in LowRoom
+}
+
+room Alcove
+{
+	region Red
+
+	nw_to LowRoom
+
+}
+
+object JaundicedPenny
+{
+	in Alcove
+}
+
+room CountlessDunes
+{
+	region Yellow
+
+	sw_to Oasis
+	u_to Sandstorm
+
+}
+
+object BecomesAlansDen
+{
+	in CountlessDunes
+}
+
+room Oasis
+{
+	region Yellow
+
+	ne_to CountlessDunes
+
+}
+
+object CobaltRibbon
+{
+	in Oasis
+}
+
+room ShiftingGrotto
+{
+	region Blue
+
+	se_to CrumblingChimney
+	u_to Cave
+
+}
+
+object Becomes3
+{
+	in ShiftingGrotto
+}
+
+object LindasRoom
+{
+	in ShiftingGrotto
+}
+
+room CrumblingChimney
+{
+	region Blue
+
+	nw_to ShiftingGrotto
+
+}
+
+object OliveEnvelope
+{
+	in CrumblingChimney
+}
+
+room CementRoom
+{
+
+	n_to BrickLinedRoom
+	d_to InfiniteIceFloes
+
+}
+
+room BrickLinedRoom
+{
+
+	n_to SandyRoom
+	s_to CementRoom
+
+}
+
+room SandyRoom
+{
+
+	n_to WaterRoom
+	s_to BrickLinedRoom
+
+}
+
+room WaterRoom
+{
+
+	n_to WritingRoom
+	s_to SandyRoom
+
+}
+
+room WritingRoom
+{
+
+	n_to SpinningExpanse
+	s_to WaterRoom
+
+}
+
+room SpinningExpanse
+{
+
+	s_to WritingRoom
+
+}
+
+player_character you "you"
+{
+}
+

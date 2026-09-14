@@ -1,0 +1,369 @@
+<asl version="550">
+
+  <include ref="English.aslx"/>
+  <include ref="Core.aslx"/>
+  <game name="escape-from-summerland">
+    <gameid>375356eb-e541-49c8-bb92-f72d8c094737</gameid>
+    <version>1.0</version>
+    <firstpublished>2026</firstpublished>
+    <author>A Trizbort User</author>
+    <description></description>
+  </game>
+
+  <object name="IntheCaravanPark">
+    <inherit name="editor_room" />
+    <alias>In the Caravan Park</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="MainTrack">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="in" to="InsidetheCaravan">
+      <inherit name="indirection" />
+    </exit>
+    <object name="Enterthenexamineperson">
+      <inherit name="editor_object" />
+      <alias>Enter then examine person</alias>
+    </object>
+  </object>
+
+  <object name="MainTrack">
+    <inherit name="editor_room" />
+    <alias>Main Track</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="IntheCaravanPark">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="BeneaththeHedge">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="BeneaththeHedge">
+    <inherit name="editor_room" />
+    <alias>Beneath the Hedge</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="DrizzleCourt">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="MainTrack">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="Jacquottegonegoeastorwest">
+      <inherit name="editor_object" />
+      <alias>Jacquotte gone, go east or west</alias>
+    </object>
+  </object>
+
+  <object name="DrizzleCourt">
+    <inherit name="editor_room" />
+    <alias>Drizzle Court</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="OrbisAlius">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="BeneaththeHedge">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="OrbisAlius">
+    <inherit name="editor_room" />
+    <alias>Orbis Alius</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="MirrorMaze">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="SelkieAquariumAquaticRegion">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="UpintheStands">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="DrizzleCourt">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="CLIMBorPUSHrobot">
+      <inherit name="editor_object" />
+      <alias>CLIMB or PUSH robot</alias>
+    </object>
+    <object name="asJacquotte">
+      <inherit name="editor_object" />
+      <alias>as Jacquotte</alias>
+    </object>
+  </object>
+
+  <object name="MirrorMaze">
+    <inherit name="editor_room" />
+    <alias>Mirror Maze</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="OrbisAlius">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="UpintheStands">
+    <inherit name="editor_room" />
+    <alias>Up in the Stands</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="OrbisAlius">
+      <inherit name="westdirection" />
+    </exit>
+    <exit alias="down" to="BigTopWest">
+      <inherit name="downdirection" />
+    </exit>
+  </object>
+
+  <object name="BigTopWest">
+    <inherit name="editor_room" />
+    <alias>Big Top West</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="BigTopEast">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="up" to="UpintheStands">
+      <inherit name="updirection" />
+    </exit>
+    <object name="Leftunitfallshere">
+      <inherit name="editor_object" />
+      <alias>Left unit falls here</alias>
+    </object>
+  </object>
+
+  <object name="BigTopEast">
+    <inherit name="editor_room" />
+    <alias>Big Top East</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="AnotherHighPlace">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Backways">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="west" to="BigTopWest">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Backways">
+    <inherit name="editor_room" />
+    <alias>Backways</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="BigTopEast">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="TheDressingRooms">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="HomePlace">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="Jacquotteneedslight">
+      <inherit name="editor_object" />
+      <alias>Jacquotte needs light</alias>
+    </object>
+  </object>
+
+  <object name="TheDressingRooms">
+    <inherit name="editor_room" />
+    <alias>The Dressing Rooms</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="Backways">
+      <inherit name="westdirection" />
+    </exit>
+    <exit alias="in" to="GoingUpThingskippedbyman">
+      <inherit name="indirection" />
+    </exit>
+  </object>
+
+  <object name="HomePlace">
+    <inherit name="editor_room" />
+    <alias>Home Place</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Backways">
+      <inherit name="eastdirection" />
+    </exit>
+    <object name="RightInteraction">
+      <inherit name="editor_object" />
+      <alias>Right Interaction</alias>
+    </object>
+    <object name="CivilianDiscouragement">
+      <inherit name="editor_object" />
+      <alias>Civilian Discouragement</alias>
+    </object>
+  </object>
+
+  <object name="InsidetheCaravan">
+    <inherit name="editor_room" />
+    <alias>Inside the Caravan</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="out" to="IntheCaravanPark">
+      <inherit name="outdirection" />
+    </exit>
+    <object name="DeadMan">
+      <inherit name="editor_object" />
+      <alias>Dead Man</alias>
+    </object>
+  </object>
+
+  <object name="AnotherHighPlace">
+    <inherit name="editor_room" />
+    <alias>Another High Place</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="BigTopEast">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="ShinyThingLeftunit">
+      <inherit name="editor_object" />
+      <alias>Shiny Thing (Left unit)</alias>
+    </object>
+  </object>
+
+  <object name="JacquottesCage">
+    <inherit name="editor_room" />
+    <alias>Jacquotte's Cage</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="out" to="HomePlace">
+      <inherit name="outdirection" />
+    </exit>
+  </object>
+
+  <object name="GoingUpThingskippedbyman">
+    <inherit name="editor_room" />
+    <alias>Going Up Thing (skipped by man)</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">19</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="out" to="TheDressingRooms">
+      <inherit name="outdirection" />
+    </exit>
+    <object name="Skippedbyman">
+      <inherit name="editor_object" />
+      <alias>Skipped by man</alias>
+    </object>
+  </object>
+
+  <object name="SelkieAquariumAquaticRegion">
+    <inherit name="editor_room" />
+    <alias>Selkie Aquarium/Aquatic Region</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="OrbisAlius">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="ControlBooth">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="ControlBooth">
+    <inherit name="editor_room" />
+    <alias>Control Booth</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="ServiceCorridor">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="SelkieAquariumAquaticRegion">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="Crank">
+      <inherit name="editor_object" />
+      <alias>Crank</alias>
+    </object>
+  </object>
+
+  <object name="ServiceCorridor">
+    <inherit name="editor_room" />
+    <alias>Service Corridor</alias>
+    <attr name="grid_width" type="int">4</attr>
+    <attr name="grid_length" type="int">3</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="ControlBooth">
+      <inherit name="westdirection" />
+    </exit>
+    <exit alias="in" to="GoingUpThingskippedbyman">
+      <inherit name="indirection" />
+    </exit>
+    <object name="searchrubbleforplunger">
+      <inherit name="editor_object" />
+      <alias>search rubble for plunger</alias>
+    </object>
+    <object name="installSUCKDOOR">
+      <inherit name="editor_object" />
+      <alias>install, SUCK DOOR</alias>
+    </object>
+  </object>
+
+
+</asl>
+

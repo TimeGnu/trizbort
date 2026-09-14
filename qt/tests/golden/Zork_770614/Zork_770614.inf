@@ -1,0 +1,641 @@
+Constant Story "Zork_770614";
+Constant Headline "^By A Trizbort User^^^";
+
+Include "Parser";
+Include "VerbLib";
+
+item  WestofHouse "West of House"
+  with  description
+            "",
+        n_to NorthofHouse,
+        s_to SouthofHouse,
+        w_to Forest2,
+   has  light;
+
+item  SouthofHouse "South of House"
+  with  description
+            "",
+        s_to Forest1,
+        e_to BehindHouse,
+        w_to WestofHouse,
+   has  light;
+
+item  BehindHouse "Behind House"
+  with  description
+            "",
+        n_to NorthofHouse,
+        s_to SouthofHouse,
+        e_to Clearing,
+        w_to Kitchen,
+   has  light;
+
+Object ->  Smallwindow "Small window"
+  with  name 'Small' 'window',
+        description "Small window";
+
+item  NorthofHouse "North of House"
+  with  description
+            "",
+        n_to Forest3,
+        e_to BehindHouse,
+        w_to WestofHouse,
+   has  light;
+
+item  Clearing "Clearing"
+  with  description
+            "",
+        s_to Forest1,
+        w_to Forest3,
+        sw_to BehindHouse,
+   has  light;
+
+Object ->  Pileofleaves "Pile of leaves"
+  with  name 'Pile' 'of' 'leaves',
+        description "Pile of leaves";
+
+item  Kitchen "Kitchen"
+  with  description
+            "",
+        e_to BehindHouse,
+        w_to LivingRoom,
+        u_to Attic,
+   has  light;
+
+Object ->  Bottle "Bottle"
+  with  name 'Bottle',
+        description "Bottle";
+
+Object ->  Sack "Sack"
+  with  name 'Sack',
+        description "Sack";
+
+item  LivingRoom "Living Room"
+  with  description
+            "",
+        e_to Kitchen,
+   has  light;
+
+Object ->  Tropgycase "Tropgy case"
+  with  name 'Tropgy' 'case',
+        description "Tropgy case";
+
+Object ->  Lantern "Lantern"
+  with  name 'Lantern',
+        description "Lantern";
+
+Object ->  Rug "Rug"
+  with  name 'Rug',
+        description "Rug";
+
+item  Attic "Attic"
+  with  description
+            "",
+        d_to Kitchen,
+   has  light;
+
+Object ->  Rope "Rope"
+  with  name 'Rope',
+        description "Rope";
+
+Object ->  Knife "Knife"
+  with  name 'Knife',
+        description "Knife";
+
+item  Forest1 "Forest 1"
+  with  description
+            "",
+        n_to SouthofHouse,
+        e_to Clearing,
+        w_to Forest2,
+   has  light;
+
+item  Forest2 "Forest 2"
+  with  description
+            "",
+        e_to Forest3,
+   has  light;
+
+item  Forest3 "Forest 3"
+  with  description
+            "",
+        s_to Clearing,
+        e_to Clearing,
+        w_to NorthofHouse,
+   has  light;
+
+item  Cellar "Cellar"
+  with  description
+            "",
+        s_to WestofChasm,
+        e_to TrollRoom,
+   has  light;
+
+item  WestofChasm "West of Chasm"
+  with  description
+            "",
+        n_to NorthSouthCrawlway,
+        s_to Gallery,
+        w_to Cellar,
+   has  light;
+
+item  Gallery "Gallery"
+  with  description
+            "",
+        n_to WestofChasm,
+        s_to Studio,
+   has  light;
+
+Object ->  Painting "Painting"
+  with  name 'Painting',
+        description "Painting";
+
+item  Studio "Studio"
+  with  description
+            "",
+        n_to NorthSouthCrawlway,
+        nw_to Gallery,
+   has  light;
+
+Object ->  Chimney "Chimney"
+  with  name 'Chimney',
+        description "Chimney";
+
+item  NorthSouthCrawlway "North-South Crawlway"
+  with  description
+            "",
+        n_to WestofChasm,
+        s_to Studio,
+        e_to TrollRoom,
+   has  light;
+
+item  TrollRoom "Troll Room"
+  with  description
+            "",
+        n_to EastWestPassage,
+        e_to NorthSouthCrawlway,
+        w_to Cellar,
+   has  light;
+
+Object ->  Troll "Troll"
+  with  name 'Troll',
+        description "Troll";
+
+item  EastWestPassage "East-West Passage"
+  with  description
+            "",
+        n_to DeepRavine,
+        e_to RoundRoom,
+        w_to TrollRoom,
+   has  light;
+
+item  CyclopsRoom "Cyclops Room"
+  with  description
+            "",
+        u_to TreasureRoom,
+   has  light;
+
+Object ->  Cyclop "Cyclop"
+  with  name 'Cyclop',
+        description "Cyclop";
+
+item  StrangePassage "Strange Passage"
+  with  description
+            "",
+   has  light;
+
+item  TreasureRoom "Treasure Room"
+  with  description
+            "",
+        d_to CyclopsRoom,
+   has  light;
+
+Object ->  Thief "Thief"
+  with  name 'Thief',
+        description "Thief";
+
+Object ->  Chalice "Chalice"
+  with  name 'Chalice',
+        description "Chalice";
+
+item  DomeRoom "Dome Room"
+  with  description
+            "",
+        e_to RockyCrawl,
+        d_to TorchRoom,
+   has  light;
+
+Object ->  Railing "Railing"
+  with  name 'Railing',
+        description "Railing";
+
+item  RockyCrawl "Rocky Crawl"
+  with  description
+            "",
+        e_to DomeRoom,
+        w_to DeepRavine,
+        nw_to EgyptianRoom,
+   has  light;
+
+item  DeepRavine "Deep Ravine"
+  with  description
+            "",
+        s_to EastWestPassage,
+        e_to Chasm,
+        w_to RockyCrawl,
+        d_to ReservoirSouth,
+   has  light;
+
+item  Chasm "Chasm"
+  with  description
+            "",
+        s_to DeepRavine,
+        e_to NorthSouthPassage,
+   has  light;
+
+item  NorthSouthPassage "North-South Passage"
+  with  description
+            "",
+        n_to Chasm,
+        s_to RoundRoom,
+        ne_to LoudRoom,
+   has  light;
+
+item  LoudRoom "Loud Room"
+  with  description
+            "",
+        e_to AncientChasm,
+        w_to NorthSouthPassage,
+        u_to DampCave,
+   has  light;
+
+Object ->  PlatinumBar "Platinum Bar"
+  with  name 'Platinum' 'Bar',
+        description "Platinum Bar";
+
+item  RoundRoom "Round Room"
+  with  description
+            "",
+   has  light;
+
+item  EgyptianRoom "Egyptian Room"
+  with  description
+            "",
+        e_to RockyCrawl,
+        w_to GlacierRoom,
+   has  light;
+
+Object ->  GoldCoffin "Gold Coffin"
+  with  name 'Gold' 'Coffin',
+        description "Gold Coffin";
+
+item  GlacierRoom "Glacier Room"
+  with  description
+            "",
+        n_to StreamView,
+        e_to EgyptianRoom,
+        w_to RubyRoom,
+   has  light;
+
+Object ->  Ice "Ice"
+  with  name 'Ice',
+        description "Ice";
+
+item  StreamView "Stream View"
+  with  description
+            "",
+        n_to GlacierRoom,
+        e_to ReservoirSouth,
+   has  light;
+
+item  ReservoirSouth "Reservoir South"
+  with  description
+            "",
+        n_to ReservoirNorth,
+        s_to DeepRavine,
+        w_to StreamView,
+        u_to DeepCanyon,
+   has  light;
+
+Object ->  Rope2 "Rope"
+  with  name 'Rope',
+        description "Rope";
+
+Object ->  TrunkwithJewels "Trunk with Jewels"
+  with  name 'Trunk' 'with' 'Jewels',
+        description "Trunk with Jewels";
+
+item  DeepCanyon "Deep Canyon"
+  with  description
+            "",
+        e_to Dam,
+        se_to ReservoirSouth,
+   has  light;
+
+item  TorchRoom "Torch Room"
+  with  description
+            "",
+   has  light;
+
+Object ->  Torch "Torch"
+  with  name 'Torch',
+        description "Torch";
+
+item  Dam "Dam"
+  with  description
+            "",
+        n_to DamLobby,
+        s_to DeepCanyon,
+        e_to DampCave,
+   has  light;
+
+item  DampCave " Damp Cave"
+  with  description
+            "",
+        s_to LoudRoom,
+        e_to Dam,
+   has  light;
+
+Object ->  SmallCrack "Small Crack"
+  with  name 'Small' 'Crack',
+        description "Small Crack";
+
+item  DamLobby "Dam Lobby"
+  with  description
+            "",
+        n_to MaintenanceRoom,
+        s_to Dam,
+        e_to MaintenanceRoom,
+   has  light;
+
+Object ->  Matchbook "Matchbook"
+  with  name 'Matchbook',
+        description "Matchbook";
+
+Object ->  Guidebooks "Guidebooks"
+  with  name 'Guidebooks',
+        description "Guidebooks";
+
+item  MaintenanceRoom "Maintenance Room"
+  with  description
+            "",
+        s_to DamLobby,
+        w_to DamLobby,
+   has  light;
+
+Object ->  Tubeoftoothpaste "Tube of toothpaste"
+  with  name 'Tube' 'of' 'toothpaste',
+        description "Tube of toothpaste";
+
+Object ->  Wrench "Wrench"
+  with  name 'Wrench',
+        description "Wrench";
+
+Object ->  Screwdriver "Screwdriver"
+  with  name 'Screwdriver',
+        description "Screwdriver";
+
+item  AncientChasm "Ancient Chasm"
+  with  description
+            "",
+        n_to DeadEnd2,
+        s_to LoudRoom,
+        w_to DeadEnd,
+   has  light;
+
+item  ReservoirNorth "Reservoir North"
+  with  description
+            "",
+        n_to AtlantisRoom,
+        s_to ReservoirSouth,
+   has  light;
+
+item  AtlantisRoom "Atlantis Room"
+  with  description
+            "",
+        se_to ReservoirNorth,
+        u_to Cave,
+   has  light;
+
+Object ->  Trident "Trident"
+  with  name 'Trident',
+        description "Trident";
+
+item  Cave "Cave"
+  with  description
+            "",
+        n_to MirrorRoom,
+        d_to AtlantisRoom,
+   has  light;
+
+item  MirrorRoom "Mirror Room"
+  with  description
+            "",
+        n_to SteepCrawlway,
+        e_to Cave,
+        w_to ColdPassage,
+   has  light;
+
+item  ColdPassage "Cold Passage"
+  with  description
+            "",
+        n_to SteepCrawlway,
+        e_to MirrorRoom,
+        w_to SlideRoom,
+   has  light;
+
+item  SteepCrawlway "Steep Crawlway"
+  with  description
+            "",
+        s_to MirrorRoom,
+        sw_to ColdPassage,
+   has  light;
+
+item  SlideRoom "Slide Room"
+  with  description
+            "",
+        e_to ColdPassage,
+        d_to Cellar,
+   has  light;
+
+item  EntrancetoHades "*Entrance to Hades"
+  with  description
+            "",
+        e_to LandoftheLivingDead,
+        u_to Cave2,
+   has  light;
+
+Object ->  EvilSpirits "Evil Spirits"
+  with  name 'Evil' 'Spirits',
+        description "Evil Spirits";
+
+item  NarrowCrawlway "Narrow Crawlway"
+  with  description
+            "",
+        n_to GrailRoom,
+        s_to Cave2,
+        sw_to MirrorRoom2,
+   has  light;
+
+item  GrailRoom "Grail Room"
+  with  description
+            "",
+        e_to NarrowCrawlway,
+        w_to RoundRoom2,
+        u_to Temple,
+   has  light;
+
+Object ->  Grail "Grail"
+  with  name 'Grail',
+        description "Grail";
+
+item  RoundRoom2 "Round Room"
+  with  description
+            "",
+        n_to DeepCanyon2,
+        s_to WindingPassage,
+        e_to GrailRoom,
+        w_to EastWestPassage2,
+        ne_to Maze,
+        sw_to EngravingsCave,
+        nw_to NorthSouthPassage2,
+   has  light;
+
+item  EastWestPassage2 "East-West Passage"
+  with  description
+            "",
+        e_to RoundRoom2,
+   has  light;
+
+item  NorthSouthPassage2 "North-South Passage"
+  with  description
+            "",
+        se_to RoundRoom2,
+   has  light;
+
+item  WindingPassage "Winding Passage"
+  with  description
+            "",
+        n_to RoundRoom2,
+        e_to MirrorRoom2,
+   has  light;
+
+item  MirrorRoom2 "Mirror Room"
+  with  description
+            "",
+        n_to NarrowCrawlway,
+        e_to Cave2,
+        w_to WindingPassage,
+   has  light;
+
+Object ->  Mirror "Mirror"
+  with  name 'Mirror',
+        description "Mirror";
+
+item  Cave2 "Cave"
+  with  description
+            "",
+        n_to NarrowCrawlway,
+        w_to MirrorRoom2,
+        d_to EntrancetoHades,
+   has  light;
+
+item  DeepCanyon2 "Deep Canyon"
+  with  description
+            "",
+        s_to RoundRoom2,
+   has  light;
+
+item  Maze "Maze"
+  with  description
+            "",
+        sw_to RoundRoom2,
+   has  light;
+
+item  EngravingsCave "Engravings Cave"
+  with  description
+            "",
+        n_to RoundRoom2,
+        se_to RiddleRoom,
+   has  light;
+
+Object ->  Engravings "Engravings"
+  with  name 'Engravings',
+        description "Engravings";
+
+item  RiddleRoom "Riddle Room"
+  with  description
+            "",
+        e_to PearlRoom,
+        d_to EngravingsCave,
+   has  light;
+
+item  PearlRoom "Pearl Room"
+  with  description
+            "",
+        w_to RiddleRoom,
+   has  light;
+
+Object ->  PearlNecklace "Pearl Necklace"
+  with  name 'Pearl' 'Necklace',
+        description "Pearl Necklace";
+
+item  Temple "Temple"
+  with  description
+            "",
+        e_to Altar,
+        w_to GrailRoom,
+   has  light;
+
+Object ->  Brassbell "Brass bell"
+  with  name 'Brass' 'bell',
+        description "Brass bell";
+
+item  Altar "Altar"
+  with  description
+            "",
+        w_to Temple,
+   has  light;
+
+Object ->  BlackBook "Black Book"
+  with  name 'Black' 'Book',
+        description "Black Book";
+
+Object ->  Candles "Candles"
+  with  name 'Candles',
+        description "Candles";
+
+item  DeadEnd "Dead End"
+  with  description
+            "",
+        e_to AncientChasm,
+   has  light;
+
+item  DeadEnd2 "Dead End"
+  with  description
+            "",
+        sw_to AncientChasm,
+   has  light;
+
+item  LandoftheLivingDead "Land of the Living Dead"
+  with  description
+            "",
+        w_to EntrancetoHades,
+   has  light;
+
+item  RubyRoom "Ruby Room"
+  with  description
+            "",
+        s_to GlacierRoom,
+   has  light;
+
+Object ->  Ruby "Ruby"
+  with  name 'Ruby',
+        description "Ruby";
+
+[ Initialise;
+    location = WestofHouse;
+    ! "^^Your opening paragraph here...^^";
+];
+
+Include "Grammar";
+

@@ -1,0 +1,809 @@
+#include "verblib.g" ! grammar must come first
+
+#include "hugolib.h"
+
+routine init
+{
+	cls
+	verbosity = 2
+	counter = -1
+	STATUSTYPE = 1 !1 = score / turns, 2 = time, 3 = moves: score:
+	player = you
+	Font(BOLD_ON)
+	"Slasher Swamp map"
+	Font(BOLD_OFF)
+	"This is a map for Slasher Swamp, an IFComp 2014 entry. The dotted lines indicate places you need to search, and in what order., by Andrew Schultz"
+	location = Road
+	MovePlayer(location)
+}
+
+property region
+room Road
+{
+
+	s_to MuddySwamp
+
+}
+
+object TRUCK1
+{
+	in Road
+}
+
+room Pond
+{
+
+	e_to SwampForest
+
+}
+
+room MuddySwamp
+{
+
+	n_to Road
+	s_to RottingWoodenWalkway
+	e_to ConcreteBuilding
+	w_to MangroveForest
+
+}
+
+room EmptyFloridaHighway
+{
+
+	n_to SwampForest
+	s_to ConcreteBuilding
+	e_to GravelRoad
+
+}
+
+room BlacktopHighway
+{
+
+	s_to MangroveForest
+	w_to CreepyHighway
+
+}
+
+room BambooForest
+{
+
+	n_to DarkGrove
+	w_to DryEverglades
+
+}
+
+room SwampForest
+{
+
+	n_to PineForest
+	s_to EmptyFloridaHighway
+	e_to OakSwamp
+	w_to Pond
+
+}
+
+object BRIARPATCH5
+{
+	in SwampForest
+}
+
+room DryEverglades
+{
+
+	n_to FrontPorch
+	s_to CreepyHighway
+	e_to BambooForest
+	w_to PalmettoFlat
+
+}
+
+room DarkGrove
+{
+
+	n_to SouthBankofaBayou
+	s_to BambooForest
+
+}
+
+object Etoswampforest
+{
+	in DarkGrove
+}
+
+room CreepyHighway
+{
+
+	n_to DryEverglades
+	s_to ScrubForest
+	e_to BlacktopHighway
+	w_to DesolateHighway
+
+}
+
+room MangroveForest
+{
+
+	n_to BlacktopHighway
+	e_to MuddySwamp
+	w_to ScrubForest
+
+}
+
+room DesolateHighway
+{
+
+	n_to PalmettoFlat
+	s_to PineFlatwood
+	e_to CreepyHighway
+
+}
+
+room ScrubForest
+{
+
+	n_to CreepyHighway
+	e_to MangroveForest
+	w_to PineFlatwood
+
+}
+
+room PineFlatwood
+{
+
+	n_to DesolateHighway
+	e_to ScrubForest
+
+}
+
+object WStoswamp
+{
+	in PineFlatwood
+}
+
+room RottingWoodenWalkway
+{
+
+	n_to MuddySwamp
+	s_to SandyGrass
+
+}
+
+room ConcreteBuilding
+{
+
+	n_to EmptyFloridaHighway
+	s_to DarkConcreteBuilding
+	e_to ConcreteSlab
+	w_to MuddySwamp
+
+}
+
+room SandyGrass
+{
+
+	n_to RottingWoodenWalkway
+	s_to DustyClearing
+	e_to DustyClearing
+	w_to Gazebo
+
+}
+
+object KingofSpades
+{
+	in SandyGrass
+}
+
+room Gazebo
+{
+
+	e_to SandyGrass
+
+}
+
+object QueenofClubs
+{
+	in Gazebo
+}
+
+room DustyClearing
+{
+
+	n_to SandyGrass
+	e_to Gate
+
+}
+
+room Gate
+{
+
+	e_to Garden
+	w_to DustyClearing
+
+}
+
+room Garden
+{
+
+	n_to Garden2
+	e_to ConcreteRuins
+	w_to Gate
+
+}
+
+room ConcreteRuins
+{
+
+	n_to RoseBush
+	w_to Garden
+
+}
+
+object JackofSpades
+{
+	in ConcreteRuins
+}
+
+room RoseBush
+{
+
+	s_to ConcreteRuins
+	w_to Garden2
+
+}
+
+room Garden2
+{
+
+	s_to Garden
+	e_to RoseBush
+
+}
+
+room DarkConcreteBuilding
+{
+
+	n_to ConcreteBuilding
+
+	is not light
+}
+
+object Deerdollhead
+{
+	in DarkConcreteBuilding
+}
+
+room ConcreteSlab
+{
+
+	n_to GravelRoad
+	s_to Graveyard
+	e_to BushThicket
+	w_to ConcreteBuilding
+
+}
+
+room GravelRoad
+{
+
+	n_to OakSwamp
+	s_to BushThicket
+	e_to GasStationParkingLot
+	w_to EmptyFloridaHighway
+
+}
+
+room BushThicket
+{
+
+	n_to GravelRoad
+	e_to Meadow
+	w_to ConcreteSlab
+
+}
+
+object StoSwampForest
+{
+	in BushThicket
+}
+
+room OakSwamp
+{
+
+	n_to SwampClearingEtograssfield
+	s_to GravelRoad
+	w_to SwampForest
+
+}
+
+object EtoSwampForest2
+{
+	in OakSwamp
+}
+
+room PalmettoFlat
+{
+
+	n_to DustyHill
+	s_to DesolateHighway
+	e_to DryEverglades
+
+}
+
+object WtoSwampForest
+{
+	in PalmettoFlat
+}
+
+room DustyHill
+{
+
+	n_to SouthBankofaBayou
+	s_to PalmettoFlat
+
+}
+
+room FrontPorch
+{
+
+	n_to LivingRoom
+	s_to DryEverglades
+
+}
+
+room LivingRoom
+{
+
+	n_to Kitchen
+	s_to FrontPorch
+
+	is not light
+}
+
+room Kitchen
+{
+
+	n_to SouthBankofaBayou
+	s_to LivingRoom
+
+}
+
+object SINK2
+{
+	in Kitchen
+}
+
+room SouthBankofaBayou
+{
+
+	s_to Kitchen
+	e_to DarkGrove
+	w_to DustyHill
+
+}
+
+room Meadow
+{
+
+	n_to GravelRoad
+	s_to PalmettoClearing
+
+}
+
+room SwampClearingEtograssfield
+{
+
+	s_to OakSwamp
+
+}
+
+object NWtoSwampForest
+{
+	in SwampClearingEtograssfield
+}
+
+room PalmettoClearing
+{
+
+	n_to Meadow
+	s_to PalmettoField
+
+}
+
+object WEtoSwampForest
+{
+	in PalmettoClearing
+}
+
+room PalmettoField
+{
+
+	n_to PalmettoClearing
+	s_to InFrontofaStrawHut
+
+}
+
+object WEtoSwampForest2
+{
+	in PalmettoField
+}
+
+room InFrontofaStrawHut
+{
+
+	n_to PalmettoField
+	s_to StrawHut
+
+}
+
+room StrawHut
+{
+
+	n_to InFrontofaStrawHut
+
+}
+
+object SHACK11
+{
+	in StrawHut
+}
+
+object Needseveredheadandrevolvernotmanwrevolver
+{
+	in StrawHut
+}
+
+room PineForest
+{
+	region Forest
+
+	n_to PineForest2
+	s_to SwampForest
+	e_to PineForest6
+
+}
+
+room PineForest2
+{
+	region Forest
+
+	n_to PineForest3
+	s_to PineForest
+	e_to PineForest5
+
+}
+
+room PineForest3
+{
+	region Forest
+
+	s_to PineForest2
+	e_to PineForest4
+
+}
+
+room PineForest4
+{
+	region Forest
+
+	s_to PineForest5
+	e_to PineForest9
+	w_to PineForest3
+
+}
+
+room PineForest5
+{
+	region Forest
+
+	n_to PineForest4
+	s_to PineForest6
+	e_to PineForest8
+	w_to PineForest2
+
+}
+
+room PineForest6
+{
+	region Forest
+
+	n_to PineForest5
+	e_to PineForest7
+	w_to PineForest
+
+}
+
+room PineForest7
+{
+	region Forest
+
+	n_to PineForest8
+	w_to PineForest6
+
+}
+
+room PineForest8
+{
+	region Forest
+
+	n_to PineForest9
+	s_to PineForest7
+	w_to PineForest5
+
+}
+
+room PineForest9
+{
+	region Forest
+
+	s_to PineForest8
+	e_to InFrontofShack
+	w_to PineForest4
+
+}
+
+room InFrontofShack
+{
+
+	n_to InShack
+	w_to PineForest9
+
+}
+
+room InShack
+{
+
+	n_to Altar
+	s_to InFrontofShack
+
+}
+
+room Altar
+{
+
+	s_to InShack
+	w_to Shrine
+
+}
+
+object ALTAR6BODY7
+{
+	in Altar
+}
+
+room Graveyard
+{
+
+	n_to ConcreteSlab
+
+}
+
+object GRAVE9needshovel
+{
+	in Graveyard
+}
+
+object COFFINwironkeyMAN10
+{
+	in Graveyard
+}
+
+room GasStationParkingLot
+{
+
+	n_to AlleyNorthofGasStation
+	s_to SouthoftheGasStation
+	e_to InsideGasStation
+	w_to GravelRoad
+
+}
+
+room AlleyNorthofGasStation
+{
+
+	e_to GasStationDumpster
+	w_to GasStationParkingLot
+
+}
+
+room SouthoftheGasStation
+{
+
+	e_to GasStationDumpster
+	w_to GasStationParkingLot
+
+}
+
+room GasStationDumpster
+{
+
+	n_to AlleyNorthofGasStation
+	s_to SouthoftheGasStation
+
+}
+
+object DUMPSTER3
+{
+	in GasStationDumpster
+}
+
+object ESwampForest
+{
+	in GasStationDumpster
+}
+
+room InsideGasStation
+{
+
+	n_to GasStationOffice
+	w_to GasStationParkingLot
+
+}
+
+object GARBAGE
+{
+	in InsideGasStation
+}
+
+room GasStationOffice
+{
+
+	s_to InsideGasStation
+
+	is not light
+}
+
+object BLANKET4
+{
+	in GasStationOffice
+}
+
+room Shrine
+{
+
+	e_to Altar
+
+	is not light
+}
+
+object Headneededtowin
+{
+	in Shrine
+}
+
+room GrassField
+{
+
+	n_to CloverField
+	s_to SunflowerField
+	w_to FlowerField
+
+}
+
+object Wtoflower
+{
+	in GrassField
+}
+
+room CloverField
+{
+
+	s_to MuckField
+	e_to FlowerField
+	w_to GrassField
+
+}
+
+object NtoSwamp
+{
+	in CloverField
+}
+
+room MuckField
+{
+
+	n_to InFrontofanOuthouse
+	s_to FlowerField
+	e_to MuckField
+	w_to CloverField
+
+}
+
+object Etograss
+{
+	in MuckField
+}
+
+room SunflowerField
+{
+
+	n_to GrassField
+	s_to FlowerField
+	e_to FlowerField
+	w_to SunflowerField
+
+}
+
+room FlowerField
+{
+
+	s_to CloverField
+	e_to MuckField
+	w_to SunflowerField
+
+}
+
+object Wtograss
+{
+	in FlowerField
+}
+
+room InFrontofanOuthouse
+{
+
+	n_to Outhouse
+	s_to MuckField
+
+}
+
+room Outhouse
+{
+
+	s_to InFrontofanOuthouse
+
+}
+
+object HOLE8
+{
+	in Outhouse
+}
+
+room Swamp1fromvariouslocations
+{
+
+	s_to Swamp2fromvariouslocations
+
+}
+
+object Northto
+{
+	in Swamp1fromvariouslocations
+}
+
+object DesolateHighway2
+{
+	in Swamp1fromvariouslocations
+}
+
+room Swamp2fromvariouslocations
+{
+
+	s_to Swamp3
+
+}
+
+object Alwaysto
+{
+	in Swamp2fromvariouslocations
+}
+
+object Swamp32
+{
+	in Swamp2fromvariouslocations
+}
+
+room Swamp3
+{
+
+	s_to Pond
+
+}
+
+object SouthtoPondOtherwisetoSwamp2
+{
+	in Swamp3
+}
+
+player_character you "you"
+{
+}
+
