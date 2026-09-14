@@ -32,6 +32,7 @@ add_executable(trizbort-qt
     src/export/TadsExporter.cpp
     src/export/Inform6Exporter.cpp
     src/export/Inform7Exporter.cpp
+    src/export/QuestExporter.cpp
 )
 
 target_link_libraries(trizbort-qt PRIVATE Qt6::Widgets)

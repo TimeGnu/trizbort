@@ -25,10 +25,23 @@ tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
 # Formats the C++ app can currently export: "<extension>:<cli-flag>".
-FORMATS="zil:--zil adv:--adventuron hug:--hugo i:--alan t:--tads inf:--inform6 ni:--inform7"
+FORMATS="zil:--zil adv:--adventuron hug:--hugo i:--alan t:--tads inf:--inform6 ni:--inform7 aslx:--quest"
 
 pass=0
 fail=0
+
+# Quest output embeds a fresh GUID (<gameid>) and the current year
+# (<firstpublished>) on every run, so those two lines cannot be byte-matched.
+# Canonicalize them before diffing; everything else must be byte-identical.
+normalize() {
+    if [ "$1" = "aslx" ]; then
+        sed -e 's:<gameid>[^<]*</gameid>:<gameid>NORMALIZED</gameid>:' \
+            -e 's:<firstpublished>[^<]*</firstpublished>:<firstpublished>NORMALIZED</firstpublished>:' \
+            "$2"
+    else
+        cat "$2"
+    fi
+}
 
 for m in "$SAMPLES"/*.trizbort; do
     base=$(basename "${m%.trizbort}")
@@ -43,11 +56,13 @@ for m in "$SAMPLES"/*.trizbort; do
             fail=$((fail + 1))
             continue
         fi
-        if diff -q "$gold" "$out" >/dev/null 2>&1; then
+        normalize "$ext" "$gold" >"$tmp/gold.norm"
+        normalize "$ext" "$out" >"$tmp/out.norm"
+        if diff -q "$tmp/gold.norm" "$tmp/out.norm" >/dev/null 2>&1; then
             pass=$((pass + 1))
         else
             echo "FAIL (diff) $base.$ext"
-            diff "$gold" "$out" | head -20
+            diff "$tmp/gold.norm" "$tmp/out.norm" | head -20
             fail=$((fail + 1))
         fi
     done
