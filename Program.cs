@@ -1,4 +1,4 @@
-/*
+﻿/*
     Copyright (c) 2010-2018 by Genstein and Jason Lautzenheiser.
 
     This file is (or was originally) part of Trizbort, the Interactive Fiction Mapper.
@@ -28,29 +28,29 @@ using CommandLine;
 using Trizbort.Domain;
 using Trizbort.UI;
 
-namespace Trizbort
+namespace Trizbort; 
+
+internal static class Program
 {
-  internal static class Program
+  public static MainForm MainForm { get; private set; }
+
+  /// <summary>
+  ///   The main entry point for the application.
+  /// </summary>
+  [STAThread]
+  private static void Main(string[] args)
   {
-    public static MainForm MainForm { get; private set; }
+    System.Windows.Forms.Application.EnableVisualStyles();
+    Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
+    System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
 
-    /// <summary>
-    ///   The main entry point for the application.
-    /// </summary>
-    [STAThread]
-    private static void Main(string[] args)
+    Console.WriteLine(AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName);
+
+    using (var form = new MainForm())
     {
-      System.Windows.Forms.Application.EnableVisualStyles();
-      System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
-
-      Console.WriteLine(AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName);
-
-      using (var form = new MainForm())
-      {
-        MainForm = form;
-        System.Windows.Forms.Application.Run(form);
-        MainForm = null;
-      }
+      MainForm = form;
+      System.Windows.Forms.Application.Run(form);
+      MainForm = null;
     }
   }
 }
