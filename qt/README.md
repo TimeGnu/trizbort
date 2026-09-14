@@ -28,13 +28,21 @@ A working editor with a complete file format and all exporters.
 - **Interactive editor** (`QGraphicsView`): create, move (grid-snapped), edit
   and delete rooms; draw, edit and delete connections; a full properties dialog
   for rooms (name, region, description, objects, shape, colours, dark/start/end)
-  and connections (flow, style, texts, doors); map properties (title/author/…).
+  and connections (flow, style, texts, doors); map properties (title/author/…)
+  and a tabbed appearance/settings dialog (palette, grid, lines, room defaults,
+  regions).
+- **Undo/redo** for every edit, with the window's modified state tied to the
+  undo stack.
+- **Automap**: add a connected room in any compass direction (Edit > Add
+  Connected Room; Ctrl+Alt+Arrow for the cardinals), placed a grid step away and
+  wired up in one undoable action.
 - **File & export UI**: New / Open / Save / Save As with unsaved-change
-  prompts, and an Export menu covering every format. Rubber-band selection,
-  wheel zoom, middle-button pan.
+  prompts, an Export menu covering every code format plus **PDF** and **PNG**.
+  Rubber-band selection, wheel zoom, middle-button pan.
 
 The editing layer is covered headlessly by `qt/tests/run-editor.sh`. Still to
-come: undo/redo, automap, and the finer rendering options of the C# original.
+come: transcript-driven automapping and the finer rendering options of the C#
+original.
 
 ## Building (GNU/Linux)
 
@@ -55,6 +63,7 @@ trizbort-qt map.trizbort --save out.trizbort   # load and re-save (round-trip)
 trizbort-qt map.trizbort --zil out.zil   # export (--inform6/7, --tads, --hugo,
                                          #   --alan, --quest, --adventuron, …)
 trizbort-qt map.trizbort --render out.png
+trizbort-qt map.trizbort --pdf out.pdf
 ```
 
 ### Windows builds without Windows
