@@ -25,7 +25,12 @@ add_executable(trizbort-qt
     src/MapScene.cpp
     src/MapView.cpp
     src/MainWindow.cpp
+    src/RoomItem.cpp
+    src/ConnectionItem.cpp
+    src/RoomDialog.cpp
+    src/ConnectionDialog.cpp
     src/export/ExportModel.cpp
+    src/export/ExporterFactory.cpp
     src/export/CodeExporter.cpp
     src/export/ZilExporter.cpp
     src/export/AdventuronExporter.cpp

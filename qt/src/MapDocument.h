@@ -258,6 +258,25 @@ public:
     const Region *regionByName(const QString &name) const;
     int nextRoomId() const;                   // smallest unused positive id
     int nextConnectionId() const;
+    int nextSeq() const;                      // element order for a new element
+
+    // --- Editing operations (GUI-independent). Structural changes keep the
+    // id index consistent; returned pointers are invalidated by later edits, so
+    // re-fetch by id after any further mutation. ---
+
+    // Add a room at (x, y) with the document's default name/size. Returns its id.
+    int addRoom(double x, double y);
+    // Remove a room and every connection docked to it.
+    void removeRoom(int roomId);
+    // Add a two-way connection docked between two rooms' ports. Returns its id.
+    int addConnection(int roomA, const QString &portA, int roomB, const QString &portB);
+    // Remove a connection by id.
+    void removeConnection(int connId);
+    // Connection index by id, or -1.
+    int connectionIndex(int connId) const;
+
+    // The dock port on "from" that best faces "to" (one of n/s/e/w/ne/nw/se/sw).
+    static QString portFacing(const Room &from, const Room &to);
 
     // Convenience accessors for the three colours the renderer reads most; these
     // resolve to the settings palette (ColorCanvas / ColorLine / ColorBorder).

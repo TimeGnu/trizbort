@@ -44,3 +44,6 @@ jobs:
 
       - name: Round-trip fidelity tests
         run: sh qt/tests/run-roundtrip.sh
+
+      - name: Editor tests
+        run: sh qt/tests/run-editor.sh

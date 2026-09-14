@@ -40,16 +40,29 @@
 
 #include "MainWindow.h"
 
+#include <QAction>
+#include <QCloseEvent>
+#include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QFormLayout>
 #include <QKeySequence>
+#include <QLineEdit>
+#include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QPlainTextEdit>
 #include <QStatusBar>
+#include <QToolBar>
 
+#include "ConnectionDialog.h"
 #include "MapScene.h"
 #include "MapView.h"
+#include "RoomDialog.h"
 #include "TrizbortReader.h"
+#include "TrizbortWriter.h"
+#include "export/CodeExporter.h"
+#include "export/ExporterFactory.h"
 
 namespace trizbort {
 
@@ -61,60 +74,301 @@ MainWindow::MainWindow(QWidget *parent)
     m_view->setScene(m_scene);
     setCentralWidget(m_view);
 
+    connect(m_scene, &MapScene::documentChanged, this, &MainWindow::onDocumentChanged);
+    connect(m_scene, &MapScene::editRoomRequested, this, &MainWindow::editRoom);
+    connect(m_scene, &MapScene::editConnectionRequested, this, &MainWindow::editConnection);
+    connect(m_scene, &MapScene::selectionSummary, this,
+            [this](const QString &text) { statusBar()->showMessage(text); });
+
+    createActions();
+
+    // Start with a fresh, empty document.
+    newFile();
+    statusBar()->showMessage(tr("Ready. Double-click empty canvas actions in the Edit menu."));
+}
+
+void MainWindow::createActions()
+{
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+    QToolBar *toolBar = addToolBar(tr("Main"));
 
-    QAction *openAction = fileMenu->addAction(tr("&Open..."));
-    openAction->setShortcut(QKeySequence::Open);
-    connect(openAction, &QAction::triggered, this, &MainWindow::openFile);
-
+    auto *newAct = fileMenu->addAction(tr("&New"), QKeySequence::New, this, &MainWindow::newFile);
+    auto *openAct = fileMenu->addAction(tr("&Open…"), QKeySequence::Open, this, &MainWindow::openFile);
+    auto *saveAct = fileMenu->addAction(tr("&Save"), QKeySequence::Save, this, [this] { save(); });
+    fileMenu->addAction(tr("Save &As…"), QKeySequence::SaveAs, this, [this] { saveAs(); });
     fileMenu->addSeparator();
 
-    QAction *quitAction = fileMenu->addAction(tr("&Quit"));
-    quitAction->setShortcut(QKeySequence::Quit);
-    connect(quitAction, &QAction::triggered, this, &QWidget::close);
+    QMenu *exportMenu = fileMenu->addMenu(tr("&Export"));
+    for (const ExportFormat &fmt : exportFormats()) {
+        const QString key = fmt.key;
+        exportMenu->addAction(fmt.label, this, [this, key] { exportMap(key); });
+    }
+    fileMenu->addSeparator();
+    fileMenu->addAction(tr("&Quit"), QKeySequence::Quit, this, &QWidget::close);
 
-    setWindowTitle(tr("Trizbort (Qt)"));
-    statusBar()->showMessage(tr("Open a .trizbort map to begin."));
+    QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
+    auto *addRoomAct =
+        editMenu->addAction(tr("Add &Room"), QKeySequence(Qt::Key_Insert), this, &MainWindow::addRoom);
+    auto *deleteAct = editMenu->addAction(tr("&Delete Selection"), QKeySequence::Delete, this,
+                                          &MainWindow::deleteSelection);
+    m_connectAction = editMenu->addAction(tr("&Connect Mode"));
+    m_connectAction->setCheckable(true);
+    m_connectAction->setShortcut(QKeySequence(Qt::Key_C));
+    connect(m_connectAction, &QAction::toggled, this, &MainWindow::toggleConnectMode);
+    editMenu->addSeparator();
+    editMenu->addAction(tr("&Map Properties…"), this, &MainWindow::editMapProperties);
+
+    QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
+    viewMenu->addAction(tr("Zoom &In"), QKeySequence::ZoomIn, m_view, &MapView::zoomIn);
+    viewMenu->addAction(tr("Zoom &Out"), QKeySequence::ZoomOut, m_view, &MapView::zoomOut);
+    viewMenu->addAction(tr("&Reset Zoom"), QKeySequence(Qt::CTRL | Qt::Key_0), m_view,
+                        &MapView::resetZoom);
+    viewMenu->addAction(tr("&Fit to Window"), QKeySequence(Qt::CTRL | Qt::Key_F), m_view,
+                        &MapView::zoomToFit);
+
+    toolBar->addAction(newAct);
+    toolBar->addAction(openAct);
+    toolBar->addAction(saveAct);
+    toolBar->addSeparator();
+    toolBar->addAction(addRoomAct);
+    toolBar->addAction(m_connectAction);
+    toolBar->addAction(deleteAct);
+}
+
+void MainWindow::newFile()
+{
+    if (!maybeSave())
+        return;
+    m_map.clear();
+    // A fresh document has the default palette and a single NoRegion region.
+    m_map.regions.append(Region{kNoRegion, QColor(0, 0, 255), QColor(255, 255, 255), QString(), QString()});
+    m_filePath.clear();
+    m_scene->setDocument(&m_map);
+    setDirty(false);
 }
 
 void MainWindow::openFile()
 {
+    if (!maybeSave())
+        return;
     const QString path = QFileDialog::getOpenFileName(
-        this, tr("Open Trizbort Map"), QString(),
-        tr("Trizbort maps (*.trizbort);;All files (*)"));
-    if (!path.isEmpty())
-        loadFile(path);
+        this, tr("Open Map"), QString(), tr("Trizbort maps (*.trizbort);;All files (*)"));
+    if (path.isEmpty())
+        return;
+    loadFile(path);
 }
 
 bool MainWindow::loadFile(const QString &path)
 {
+    Map loaded;
     QString error;
-    Map map;
-    if (!TrizbortReader::load(path, map, &error)) {
-        QMessageBox::warning(this, tr("Trizbort (Qt)"),
-                             tr("Could not load the map:\n%1").arg(error));
+    if (!TrizbortReader::load(path, loaded, &error)) {
+        QMessageBox::warning(this, tr("Open Failed"), error);
         return false;
     }
-
-    m_map = map;
-    m_scene->setMap(m_map);
-    fitMap();
-
-    setWindowTitle(tr("%1 - Trizbort (Qt)").arg(QFileInfo(path).fileName()));
-    statusBar()->showMessage(tr("%1: %2 rooms, %3 connections")
-                                 .arg(QFileInfo(path).fileName())
-                                 .arg(m_map.rooms.size())
-                                 .arg(m_map.connections.size()));
+    m_map = loaded;
+    m_map.reindex();
+    m_filePath = path;
+    m_scene->setDocument(&m_map);
+    setDirty(false);
+    m_view->zoomToFit();
+    statusBar()->showMessage(tr("Opened %1").arg(QFileInfo(path).fileName()));
     return true;
 }
 
-void MainWindow::fitMap()
+bool MainWindow::save()
 {
-    const QRectF bounds = m_scene->itemsBoundingRect().adjusted(-40, -40, 40, 40);
-    if (bounds.isEmpty())
+    if (m_filePath.isEmpty())
+        return saveAs();
+    return writeToPath(m_filePath);
+}
+
+bool MainWindow::saveAs()
+{
+    QString path = QFileDialog::getSaveFileName(this, tr("Save Map"), m_filePath,
+                                                tr("Trizbort maps (*.trizbort)"));
+    if (path.isEmpty())
+        return false;
+    if (!path.endsWith(QLatin1String(".trizbort"), Qt::CaseInsensitive))
+        path += QLatin1String(".trizbort");
+    if (!writeToPath(path))
+        return false;
+    m_filePath = path;
+    updateTitle();
+    return true;
+}
+
+bool MainWindow::writeToPath(const QString &path)
+{
+    QString error;
+    if (!TrizbortWriter::save(path, m_map, &error)) {
+        QMessageBox::warning(this, tr("Save Failed"), error);
+        return false;
+    }
+    setDirty(false);
+    statusBar()->showMessage(tr("Saved %1").arg(QFileInfo(path).fileName()));
+    return true;
+}
+
+void MainWindow::exportMap(const QString &format)
+{
+    const ExportFormat *fmt = nullptr;
+    for (const ExportFormat &f : exportFormats()) {
+        if (f.key == format) {
+            fmt = &f;
+            break;
+        }
+    }
+    if (!fmt)
         return;
-    m_view->setSceneRect(bounds);
-    m_view->fitInView(bounds, Qt::KeepAspectRatio);
+
+    const QString suggested =
+        m_filePath.isEmpty() ? fmt->key : QFileInfo(m_filePath).completeBaseName();
+    const QString filter = tr("%1 (*.%2);;All files (*)").arg(fmt->label, fmt->extension);
+    QString path = QFileDialog::getSaveFileName(
+        this, tr("Export as %1").arg(fmt->label), suggested + QLatin1Char('.') + fmt->extension,
+        filter);
+    if (path.isEmpty())
+        return;
+
+    auto exporter = makeExporter(format, m_map, m_filePath.isEmpty() ? path : m_filePath);
+    if (!exporter)
+        return;
+    const QString text = exporter->exportToString();
+
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        QMessageBox::warning(this, tr("Export Failed"), tr("Could not write %1").arg(path));
+        return;
+    }
+    file.write(text.toUtf8());
+    statusBar()->showMessage(tr("Exported %1").arg(QFileInfo(path).fileName()));
+}
+
+void MainWindow::addRoom()
+{
+    const QPointF center = m_view->mapToScene(m_view->viewport()->rect().center());
+    const int id = m_scene->addRoomAt(center);
+    if (id >= 0)
+        statusBar()->showMessage(tr("Added room %1 (double-click to edit)").arg(id));
+}
+
+void MainWindow::deleteSelection()
+{
+    m_scene->deleteSelection();
+}
+
+void MainWindow::toggleConnectMode(bool on)
+{
+    m_scene->setConnectMode(on);
+    statusBar()->showMessage(on ? tr("Connect mode: drag between two rooms to connect them.")
+                                : tr("Select mode."));
+}
+
+void MainWindow::ensureRegionExists(const QString &name)
+{
+    if (name.isEmpty() || name == kNoRegion)
+        return;
+    if (m_map.regionByName(name))
+        return;
+    m_map.regions.append(Region{name, QColor(0, 0, 255), QColor(255, 255, 255), QString(), QString()});
+}
+
+void MainWindow::editRoom(int roomId)
+{
+    const Room *room = m_map.roomById(roomId);
+    if (!room)
+        return;
+    RoomDialog dialog(m_map, *room, this);
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+    const Room edited = dialog.result();
+    ensureRegionExists(edited.region);
+    if (Room *target = m_map.roomById(roomId))
+        *target = edited;
+    m_scene->refreshRoom(roomId);
+    setDirty(true);
+}
+
+void MainWindow::editConnection(int connId)
+{
+    const int idx = m_map.connectionIndex(connId);
+    if (idx < 0)
+        return;
+    ConnectionDialog dialog(m_map.connections.at(idx), this);
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+    m_map.connections[idx] = dialog.result();
+    m_scene->refreshConnection(connId);
+    setDirty(true);
+}
+
+void MainWindow::editMapProperties()
+{
+    QDialog dialog(this);
+    dialog.setWindowTitle(tr("Map Properties"));
+    auto *form = new QFormLayout(&dialog);
+    auto *title = new QLineEdit(m_map.title, &dialog);
+    auto *author = new QLineEdit(m_map.author, &dialog);
+    auto *description = new QPlainTextEdit(m_map.description, &dialog);
+    description->setFixedHeight(64);
+    auto *history = new QPlainTextEdit(m_map.history, &dialog);
+    history->setFixedHeight(64);
+    form->addRow(tr("&Title:"), title);
+    form->addRow(tr("&Author:"), author);
+    form->addRow(tr("&Description:"), description);
+    form->addRow(tr("&History:"), history);
+    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
+    connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    form->addRow(buttons);
+
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+    m_map.title = title->text();
+    m_map.author = author->text();
+    m_map.description = description->toPlainText();
+    m_map.history = history->toPlainText();
+    setDirty(true);
+}
+
+void MainWindow::onDocumentChanged()
+{
+    setDirty(true);
+}
+
+void MainWindow::setDirty(bool dirty)
+{
+    m_dirty = dirty;
+    setWindowModified(dirty);
+    updateTitle();
+}
+
+void MainWindow::updateTitle()
+{
+    const QString name = m_filePath.isEmpty() ? tr("Untitled") : QFileInfo(m_filePath).fileName();
+    setWindowTitle(tr("%1[*] — Trizbort (Qt)").arg(name));
+}
+
+bool MainWindow::maybeSave()
+{
+    if (!m_dirty)
+        return true;
+    const auto choice = QMessageBox::warning(
+        this, tr("Unsaved Changes"),
+        tr("The map has unsaved changes. Save them?"),
+        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    if (choice == QMessageBox::Save)
+        return save();
+    return choice == QMessageBox::Discard;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (maybeSave())
+        event->accept();
+    else
+        event->ignore();
 }
 
 } // namespace trizbort

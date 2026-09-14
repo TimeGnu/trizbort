@@ -41,6 +41,7 @@
 #include <memory>
 
 #include <QApplication>
+#include <QDir>
 #include <QFile>
 #include <QImage>
 #include <QPainter>
@@ -49,20 +50,15 @@
 #include <QStringList>
 #include <QTextStream>
 
+#include "ConnectionItem.h"
 #include "MainWindow.h"
 #include "MapDocument.h"
 #include "MapScene.h"
+#include "RoomItem.h"
 #include "TrizbortReader.h"
 #include "TrizbortWriter.h"
-#include "export/AdventuronExporter.h"
-#include "export/AlanExporter.h"
 #include "export/CodeExporter.h"
-#include "export/HugoExporter.h"
-#include "export/Inform6Exporter.h"
-#include "export/Inform7Exporter.h"
-#include "export/QuestExporter.h"
-#include "export/TadsExporter.h"
-#include "export/ZilExporter.h"
+#include "export/ExporterFactory.h"
 
 // Headless render: load a map and write a PNG, no window. Useful for CI smoke
 // tests and thumbnails. Run with QT_QPA_PLATFORM=offscreen on a headless host.
@@ -78,7 +74,7 @@ static int renderToPng(const QString &mapPath, const QString &pngPath)
     }
 
     trizbort::MapScene scene;
-    scene.setMap(map);
+    scene.setDocument(&map);
 
     QRectF bounds = scene.itemsBoundingRect().adjusted(-20, -20, 20, 20);
     if (bounds.isEmpty())
@@ -103,30 +99,7 @@ static int renderToPng(const QString &mapPath, const QString &pngPath)
     return 0;
 }
 
-// Construct an exporter by short format name. Adding a format is one line here.
-static std::unique_ptr<trizbort::CodeExporter> makeExporter(const QString &fmt,
-                                                            const trizbort::Map &map,
-                                                            const QString &path)
-{
-    using namespace trizbort;
-    if (fmt == QLatin1String("zil"))
-        return std::make_unique<ZilExporter>(map, path);
-    if (fmt == QLatin1String("adventuron"))
-        return std::make_unique<AdventuronExporter>(map, path);
-    if (fmt == QLatin1String("hugo"))
-        return std::make_unique<HugoExporter>(map, path);
-    if (fmt == QLatin1String("alan"))
-        return std::make_unique<AlanExporter>(map, path);
-    if (fmt == QLatin1String("tads"))
-        return std::make_unique<TadsExporter>(map, path);
-    if (fmt == QLatin1String("inform6"))
-        return std::make_unique<Inform6Exporter>(map, path);
-    if (fmt == QLatin1String("inform7"))
-        return std::make_unique<Inform7Exporter>(map, path);
-    if (fmt == QLatin1String("quest"))
-        return std::make_unique<QuestExporter>(map, path);
-    return nullptr;
-}
+using trizbort::makeExporter;
 
 // Headless export: load a map, run the named exporter, write the result. Used
 // to validate the C++ exporters against the golden fixtures.
@@ -176,10 +149,140 @@ static int runSave(const QString &mapPath, const QString &outPath)
     return 0;
 }
 
+// Headless self-test for the GUI-independent editing API: build a small map,
+// round-trip it through the writer/reader, and export it. Prints PASS/FAIL.
+static int runEditSelftest()
+{
+    using namespace trizbort;
+    QTextStream out(stdout);
+    int failures = 0;
+    auto check = [&](bool ok, const char *what) {
+        if (!ok) {
+            out << "  FAIL: " << what << Qt::endl;
+            ++failures;
+        }
+    };
+
+    Map map;
+    const int a = map.addRoom(0, 0);
+    const int b = map.addRoom(0, -128);
+    check(map.rooms.size() == 2, "two rooms added");
+    check(a != b, "distinct room ids");
+
+    Room *ra = map.roomById(a);
+    Room *rb = map.roomById(b);
+    check(ra && rb, "rooms fetchable by id");
+    if (ra) {
+        ra->name = QStringLiteral("Start Room");
+        ra->isStartRoom = true;
+        ra->objectsText = QStringLiteral("a brass lantern");
+    }
+    if (rb)
+        rb->name = QStringLiteral("North Room");
+
+    const QString portA = Map::portFacing(*map.roomById(a), *map.roomById(b));
+    const QString portB = Map::portFacing(*map.roomById(b), *map.roomById(a));
+    check(portA == QLatin1String("n"), "portFacing north");
+    check(portB == QLatin1String("s"), "portFacing south");
+    map.addConnection(a, portA, b, portB);
+    check(map.connections.size() == 1, "one connection added");
+
+    // Save, reload, and verify the model survived.
+    const QString path = QDir(QDir::tempPath()).filePath(QStringLiteral("tz-edit-selftest.trizbort"));
+    QString err;
+    check(TrizbortWriter::save(path, map, &err), "save");
+    Map reloaded;
+    check(TrizbortReader::load(path, reloaded, &err), "reload");
+    check(reloaded.rooms.size() == 2, "reloaded two rooms");
+    check(reloaded.connections.size() == 1, "reloaded one connection");
+    if (const Room *r = reloaded.roomById(a)) {
+        check(r->name == QLatin1String("Start Room"), "reloaded room name");
+        check(r->isStartRoom, "reloaded start flag");
+        check(r->objectsText == QLatin1String("a brass lantern"), "reloaded objects");
+    }
+
+    // The reloaded map must export.
+    auto exporter = makeExporter(QStringLiteral("zil"), reloaded, path);
+    const QString zil = exporter ? exporter->exportToString() : QString();
+    check(zil.contains(QLatin1String("START-ROOM")) || zil.contains(QLatin1String("ROOM")),
+          "export produced rooms");
+
+    // Deleting the start room drops its connection too.
+    reloaded.removeRoom(a);
+    check(reloaded.rooms.size() == 1, "removeRoom left one room");
+    check(reloaded.connections.isEmpty(), "removeRoom dropped its connection");
+
+    QFile::remove(path);
+    out << (failures == 0 ? "edit-selftest: PASS" : "edit-selftest: FAIL") << Qt::endl;
+    return failures == 0 ? 0 : 1;
+}
+
+// Headless smoke test for the editing canvas: exercises the scene's item
+// machinery (add/move/connect/delete) and confirms MainWindow loads a map.
+static int runGuiSelftest(const QString &samplePath)
+{
+    using namespace trizbort;
+    QTextStream out(stdout);
+    int failures = 0;
+    auto check = [&](bool ok, const char *what) {
+        if (!ok) {
+            out << "  FAIL: " << what << Qt::endl;
+            ++failures;
+        }
+    };
+
+    if (!samplePath.isEmpty()) {
+        MainWindow win;
+        check(win.loadFile(samplePath), "MainWindow loads a sample map");
+    }
+
+    Map map;
+    MapScene scene;
+    scene.setDocument(&map);
+    const int a = scene.addRoomAt(QPointF(0, 0));
+    const int b = scene.addRoomAt(QPointF(0, -128));
+    check(map.rooms.size() == 2 && a >= 0 && b >= 0, "addRoomAt created two rooms");
+
+    scene.roomMovedTo(a, QPointF(64, -64));
+    check(map.roomById(a) && map.roomById(a)->x == 64 && map.roomById(a)->y == -64,
+          "roomMovedTo persisted to the model");
+
+    map.addConnection(a, QStringLiteral("n"), b, QStringLiteral("s"));
+    scene.setDocument(&map);
+    int roomItems = 0;
+    int connItems = 0;
+    for (QGraphicsItem *it : scene.items()) {
+        if (dynamic_cast<RoomItem *>(it))
+            ++roomItems;
+        else if (dynamic_cast<ConnectionItem *>(it))
+            ++connItems;
+    }
+    check(roomItems == 2, "scene has two room items");
+    check(connItems == 1, "scene has one connection item");
+
+    for (QGraphicsItem *it : scene.items()) {
+        if (auto *ri = dynamic_cast<RoomItem *>(it)) {
+            if (ri->roomId() == a)
+                ri->setSelected(true);
+        }
+    }
+    scene.deleteSelection();
+    check(map.rooms.size() == 1, "deleteSelection removed the room");
+    check(map.connections.isEmpty(), "deleteSelection removed its connection");
+
+    out << (failures == 0 ? "gui-selftest: PASS" : "gui-selftest: FAIL") << Qt::endl;
+    return failures == 0 ? 0 : 1;
+}
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     QApplication::setApplicationName(QStringLiteral("Trizbort (Qt)"));
+
+    if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--edit-selftest"))
+        return runEditSelftest();
+    if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--gui-selftest"))
+        return runGuiSelftest(argc >= 3 ? QString::fromLocal8Bit(argv[2]) : QString());
 
     QString mapPath;
     QString renderPath;

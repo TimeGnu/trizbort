@@ -44,16 +44,30 @@
 #include <QGraphicsView>
 
 class QWheelEvent;
+class QMouseEvent;
 
 namespace trizbort {
 
-// A QGraphicsView with mouse-wheel zoom and click-drag panning.
+// A QGraphicsView for the editing canvas: rubber-band selection, mouse-wheel
+// zoom, and middle-button panning.
 class MapView : public QGraphicsView {
 public:
     explicit MapView(QWidget *parent = nullptr);
 
+    void zoomIn();
+    void zoomOut();
+    void resetZoom();
+    void zoomToFit();
+
 protected:
     void wheelEvent(QWheelEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+
+private:
+    bool m_panning = false;
+    QPoint m_lastPanPoint;
 };
 
 } // namespace trizbort

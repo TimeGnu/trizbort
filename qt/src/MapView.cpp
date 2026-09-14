@@ -40,7 +40,9 @@
 
 #include "MapView.h"
 
+#include <QMouseEvent>
 #include <QPainter>
+#include <QScrollBar>
 #include <QWheelEvent>
 
 namespace trizbort {
@@ -50,9 +52,19 @@ MapView::MapView(QWidget *parent)
 {
     setRenderHint(QPainter::Antialiasing, true);
     setRenderHint(QPainter::TextAntialiasing, true);
-    setDragMode(QGraphicsView::ScrollHandDrag);
+    setDragMode(QGraphicsView::RubberBandDrag);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     setResizeAnchor(QGraphicsView::AnchorViewCenter);
+}
+
+void MapView::zoomIn() { scale(1.15, 1.15); }
+void MapView::zoomOut() { scale(1.0 / 1.15, 1.0 / 1.15); }
+void MapView::resetZoom() { resetTransform(); }
+
+void MapView::zoomToFit()
+{
+    if (scene())
+        fitInView(scene()->itemsBoundingRect().adjusted(-40, -40, 40, 40), Qt::KeepAspectRatio);
 }
 
 void MapView::wheelEvent(QWheelEvent *event)
@@ -61,6 +73,42 @@ void MapView::wheelEvent(QWheelEvent *event)
     const double factor = (event->angleDelta().y() > 0) ? step : 1.0 / step;
     scale(factor, factor);
     event->accept();
+}
+
+void MapView::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::MiddleButton) {
+        m_panning = true;
+        m_lastPanPoint = event->pos();
+        setCursor(Qt::ClosedHandCursor);
+        event->accept();
+        return;
+    }
+    QGraphicsView::mousePressEvent(event);
+}
+
+void MapView::mouseMoveEvent(QMouseEvent *event)
+{
+    if (m_panning) {
+        const QPoint delta = event->pos() - m_lastPanPoint;
+        m_lastPanPoint = event->pos();
+        horizontalScrollBar()->setValue(horizontalScrollBar()->value() - delta.x());
+        verticalScrollBar()->setValue(verticalScrollBar()->value() - delta.y());
+        event->accept();
+        return;
+    }
+    QGraphicsView::mouseMoveEvent(event);
+}
+
+void MapView::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::MiddleButton && m_panning) {
+        m_panning = false;
+        setCursor(Qt::ArrowCursor);
+        event->accept();
+        return;
+    }
+    QGraphicsView::mouseReleaseEvent(event);
 }
 
 } // namespace trizbort

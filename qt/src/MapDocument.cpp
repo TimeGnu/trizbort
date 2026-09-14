@@ -156,4 +156,110 @@ QColor Map::canvasColor() const { return settings.colors[ColorCanvas]; }
 QColor Map::lineColor() const { return settings.colors[ColorLine]; }
 QColor Map::borderColor() const { return settings.colors[ColorBorder]; }
 
+int Map::nextSeq() const
+{
+    int maxSeq = 0;
+    for (const Room &r : rooms)
+        maxSeq = qMax(maxSeq, r.seq);
+    for (const Connection &c : connections)
+        maxSeq = qMax(maxSeq, c.seq);
+    return maxSeq + 1;
+}
+
+int Map::addRoom(double x, double y)
+{
+    Room r;
+    r.id = nextRoomId();
+    r.seq = nextSeq();
+    r.name = settings.defaultRoomName;
+    r.x = x;
+    r.y = y;
+    // The document's default room shape maps onto the boolean shape flags.
+    switch (static_cast<RoomShape>(settings.defaultRoomShape)) {
+    case RoomShape::RoundedCorners: r.roundedCorners = true; break;
+    case RoomShape::Ellipse: r.ellipse = true; break;
+    case RoomShape::Octagonal: r.octagonal = true; break;
+    default: break;
+    }
+    rooms.append(r);
+    reindex();
+    return r.id;
+}
+
+void Map::removeRoom(int roomId)
+{
+    for (int i = connections.size() - 1; i >= 0; --i) {
+        for (const Vertex &v : connections.at(i).vertices) {
+            if (v.docked && v.roomId == roomId) {
+                connections.removeAt(i);
+                break;
+            }
+        }
+    }
+    for (int i = 0; i < rooms.size(); ++i) {
+        if (rooms.at(i).id == roomId) {
+            rooms.removeAt(i);
+            break;
+        }
+    }
+    reindex();
+}
+
+int Map::addConnection(int roomA, const QString &portA, int roomB, const QString &portB)
+{
+    Connection c;
+    c.id = nextConnectionId();
+    c.seq = nextSeq();
+
+    Vertex a;
+    a.index = 0;
+    a.docked = true;
+    a.roomId = roomA;
+    a.port = portA;
+    Vertex b;
+    b.index = 1;
+    b.docked = true;
+    b.roomId = roomB;
+    b.port = portB;
+    c.vertices.append(a);
+    c.vertices.append(b);
+
+    connections.append(c);
+    return c.id;
+}
+
+int Map::connectionIndex(int connId) const
+{
+    for (int i = 0; i < connections.size(); ++i)
+        if (connections.at(i).id == connId)
+            return i;
+    return -1;
+}
+
+void Map::removeConnection(int connId)
+{
+    const int i = connectionIndex(connId);
+    if (i >= 0)
+        connections.removeAt(i);
+}
+
+QString Map::portFacing(const Room &from, const Room &to)
+{
+    const double dx = (to.x + to.w / 2.0) - (from.x + from.w / 2.0);
+    const double dy = (to.y + to.h / 2.0) - (from.y + from.h / 2.0);
+    // Screen coordinates: +y is down. Classify into 8 compass ports by octant.
+    const double adx = qAbs(dx);
+    const double ady = qAbs(dy);
+    const bool horizontal = adx > ady * 2.0;
+    const bool vertical = ady > adx * 2.0;
+    if (vertical)
+        return dy < 0 ? QStringLiteral("n") : QStringLiteral("s");
+    if (horizontal)
+        return dx < 0 ? QStringLiteral("w") : QStringLiteral("e");
+    if (dx >= 0 && dy < 0) return QStringLiteral("ne");
+    if (dx >= 0 && dy >= 0) return QStringLiteral("se");
+    if (dx < 0 && dy < 0) return QStringLiteral("nw");
+    return QStringLiteral("sw");
+}
+
 } // namespace trizbort

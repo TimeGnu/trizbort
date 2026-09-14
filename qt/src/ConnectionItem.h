@@ -38,62 +38,39 @@
  *     THE SOFTWARE.
  */
 
-#ifndef TRIZBORT_MAINWINDOW_H
-#define TRIZBORT_MAINWINDOW_H
+#ifndef TRIZBORT_CONNECTIONITEM_H
+#define TRIZBORT_CONNECTIONITEM_H
 
-#include <QMainWindow>
-
-#include "MapDocument.h"
-
-class QAction;
+#include <QGraphicsItem>
+#include <QVector>
 
 namespace trizbort {
 
 class MapScene;
-class MapView;
 
-class MainWindow : public QMainWindow {
-    Q_OBJECT
-
+// A connection drawn as a polyline between its endpoints. Recomputes its route
+// from the document whenever an attached room moves or the model changes.
+class ConnectionItem : public QGraphicsItem {
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    ConnectionItem(MapScene *scene, int connId);
 
-    bool loadFile(const QString &path);
+    int connId() const { return m_connId; }
+    void updateRoute();      // recompute geometry from the model
+
+    QRectF boundingRect() const override;
+    QPainterPath shape() const override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+               QWidget *widget) override;
 
 protected:
-    void closeEvent(QCloseEvent *event) override;
-
-private slots:
-    void newFile();
-    void openFile();
-    bool save();
-    bool saveAs();
-    void exportMap(const QString &format);
-    void addRoom();
-    void deleteSelection();
-    void toggleConnectMode(bool on);
-    void editMapProperties();
-    void editRoom(int roomId);
-    void editConnection(int connId);
-    void onDocumentChanged();
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
-    void createActions();
-    void setDirty(bool dirty);
-    void updateTitle();
-    bool maybeSave();                 // returns false to cancel the pending action
-    bool writeToPath(const QString &path);
-    void ensureRegionExists(const QString &name);
-
-    Map m_map;
-    QString m_filePath;
-    bool m_dirty = false;
-
-    MapScene *m_scene = nullptr;
-    MapView *m_view = nullptr;
-    QAction *m_connectAction = nullptr;
+    MapScene *m_scene;
+    int m_connId;
+    QVector<QPointF> m_points;
 };
 
 } // namespace trizbort
 
-#endif // TRIZBORT_MAINWINDOW_H
+#endif // TRIZBORT_CONNECTIONITEM_H

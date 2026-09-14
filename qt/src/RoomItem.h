@@ -38,62 +38,43 @@
  *     THE SOFTWARE.
  */
 
-#ifndef TRIZBORT_MAINWINDOW_H
-#define TRIZBORT_MAINWINDOW_H
+#ifndef TRIZBORT_ROOMITEM_H
+#define TRIZBORT_ROOMITEM_H
 
-#include <QMainWindow>
-
-#include "MapDocument.h"
-
-class QAction;
+#include <QGraphicsItem>
 
 namespace trizbort {
 
 class MapScene;
-class MapView;
 
-class MainWindow : public QMainWindow {
-    Q_OBJECT
-
+// An interactive room on the editing canvas. Reads its geometry and appearance
+// from the room in the document (looked up by id) and, when dragged, writes the
+// new grid-snapped position back through the scene.
+class RoomItem : public QGraphicsItem {
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    RoomItem(MapScene *scene, int roomId);
 
-    bool loadFile(const QString &path);
+    int roomId() const { return m_roomId; }
+
+    // Re-read geometry from the model and reposition (called after edits).
+    void syncFromModel();
+
+    QRectF boundingRect() const override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+               QWidget *widget) override;
 
 protected:
-    void closeEvent(QCloseEvent *event) override;
-
-private slots:
-    void newFile();
-    void openFile();
-    bool save();
-    bool saveAs();
-    void exportMap(const QString &format);
-    void addRoom();
-    void deleteSelection();
-    void toggleConnectMode(bool on);
-    void editMapProperties();
-    void editRoom(int roomId);
-    void editConnection(int connId);
-    void onDocumentChanged();
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
-    void createActions();
-    void setDirty(bool dirty);
-    void updateTitle();
-    bool maybeSave();                 // returns false to cancel the pending action
-    bool writeToPath(const QString &path);
-    void ensureRegionExists(const QString &name);
-
-    Map m_map;
-    QString m_filePath;
-    bool m_dirty = false;
-
-    MapScene *m_scene = nullptr;
-    MapView *m_view = nullptr;
-    QAction *m_connectAction = nullptr;
+    MapScene *m_scene;
+    int m_roomId;
+    double m_w = 96.0;
+    double m_h = 64.0;
+    bool m_applyingModel = false; // guard against feedback while syncing
 };
 
 } // namespace trizbort
 
-#endif // TRIZBORT_MAINWINDOW_H
+#endif // TRIZBORT_ROOMITEM_H
