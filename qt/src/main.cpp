@@ -54,6 +54,7 @@
 #include "MapScene.h"
 #include "TrizbortReader.h"
 #include "export/AdventuronExporter.h"
+#include "export/AlanExporter.h"
 #include "export/CodeExporter.h"
 #include "export/HugoExporter.h"
 #include "export/ZilExporter.h"
@@ -109,6 +110,8 @@ static std::unique_ptr<trizbort::CodeExporter> makeExporter(const QString &fmt,
         return std::make_unique<AdventuronExporter>(map, path);
     if (fmt == QLatin1String("hugo"))
         return std::make_unique<HugoExporter>(map, path);
+    if (fmt == QLatin1String("alan"))
+        return std::make_unique<AlanExporter>(map, path);
     return nullptr;
 }
 

@@ -28,6 +28,7 @@ add_executable(trizbort-qt
     src/export/ZilExporter.cpp
     src/export/AdventuronExporter.cpp
     src/export/HugoExporter.cpp
+    src/export/AlanExporter.cpp
 )
 
 target_link_libraries(trizbort-qt PRIVATE Qt6::Widgets)
