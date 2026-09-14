@@ -114,3 +114,7 @@ UpgradeLog*.XML
 /*.DotSettings
 /.vs/Trizbort/v15/sqlite3/storage.ide
 .vs
+
+# .NET Upgrade Assistant log (accidentally committed on 1.7.5)
+*.clef
+upgrade-assistant.clef
