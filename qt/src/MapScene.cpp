@@ -141,10 +141,11 @@ void MapScene::addRoomLabel(const QString &text, const QRectF &rect, const QColo
 void MapScene::setMap(const Map &map)
 {
     clear();
-    setBackgroundBrush(map.canvasColor.isValid() ? map.canvasColor : QColor(Qt::white));
+    const QColor canvas = map.canvasColor();
+    setBackgroundBrush(canvas.isValid() ? canvas : QColor(Qt::white));
 
-    const QColor defaultLine = map.lineColor.isValid() ? map.lineColor : QColor(Qt::darkBlue);
-    const QColor defaultBorder = map.borderColor.isValid() ? map.borderColor : QColor(Qt::black);
+    const QColor defaultLine = map.lineColor().isValid() ? map.lineColor() : QColor(Qt::darkBlue);
+    const QColor defaultBorder = map.borderColor().isValid() ? map.borderColor() : QColor(Qt::black);
 
     // Connections first, so rooms paint over the line ends.
     for (const Connection &c : map.connections) {

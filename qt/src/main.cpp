@@ -53,6 +53,7 @@
 #include "MapDocument.h"
 #include "MapScene.h"
 #include "TrizbortReader.h"
+#include "TrizbortWriter.h"
 #include "export/AdventuronExporter.h"
 #include "export/AlanExporter.h"
 #include "export/CodeExporter.h"
@@ -156,6 +157,25 @@ static int runExport(const QString &fmt, const QString &mapPath, const QString &
     return 0;
 }
 
+// Headless save: load a map and write it back out via the .trizbort writer.
+// Used to validate that a load/save round trip preserves the whole document.
+static int runSave(const QString &mapPath, const QString &outPath)
+{
+    QTextStream err(stderr);
+
+    trizbort::Map map;
+    QString error;
+    if (!trizbort::TrizbortReader::load(mapPath, map, &error)) {
+        err << "load failed: " << error << Qt::endl;
+        return 1;
+    }
+    if (!trizbort::TrizbortWriter::save(outPath, map, &error)) {
+        err << "save failed: " << error << Qt::endl;
+        return 3;
+    }
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -163,6 +183,7 @@ int main(int argc, char *argv[])
 
     QString mapPath;
     QString renderPath;
+    QString savePath;
     QString exportFmt;
     QString exportOut;
     static const struct {
@@ -178,6 +199,10 @@ int main(int argc, char *argv[])
     for (int i = 1; i < args.size(); ++i) {
         if (args.at(i) == QLatin1String("--render") && i + 1 < args.size()) {
             renderPath = args.at(++i);
+            continue;
+        }
+        if (args.at(i) == QLatin1String("--save") && i + 1 < args.size()) {
+            savePath = args.at(++i);
             continue;
         }
         bool matched = false;
@@ -199,6 +224,15 @@ int main(int argc, char *argv[])
             return 2;
         }
         return runExport(exportFmt, mapPath, exportOut);
+    }
+
+    if (!savePath.isEmpty()) {
+        if (mapPath.isEmpty()) {
+            QTextStream(stderr) << "usage: trizbort-qt <map.trizbort> --save <out.trizbort>"
+                                << Qt::endl;
+            return 2;
+        }
+        return runSave(mapPath, savePath);
     }
 
     if (!renderPath.isEmpty()) {

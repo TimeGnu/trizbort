@@ -19,7 +19,9 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets)
 add_executable(trizbort-qt
     src/main.cpp
     src/MapDocument.cpp
+    src/DotNetColor.cpp
     src/TrizbortReader.cpp
+    src/TrizbortWriter.cpp
     src/MapScene.cpp
     src/MapView.cpp
     src/MainWindow.cpp

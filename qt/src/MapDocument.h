@@ -48,34 +48,86 @@
 #include <QString>
 #include <QStringList>
 
-// In-memory model of a .trizbort map. See qt/docs/trizbort-file-format.md.
+// Complete in-memory model of a .trizbort map. Every element and attribute the
+// Trizbort file format defines is modelled here as a typed field; nothing is
+// dropped or preserved as opaque text. See qt/docs/trizbort-file-format.md and
+// the C# originals (Domain/Elements/Room.cs, Connection.cs, Setup/Settings.cs)
+// which this mirrors.
 namespace trizbort {
+
+// The default region name; rooms and the region list use it for "no region".
+inline const QString kNoRegion = QStringLiteral("NoRegion");
+
+// A room's shape, matching the C# RoomShape enum (persisted as an int in
+// <settings><rooms><defaultRoomShape>).
+enum class RoomShape { SquareCorners, RoundedCorners, Ellipse, Octagonal, NotARoom };
 
 struct Region {
     QString name;
-    QColor textColor;   // invalid => default
-    QColor fillColor;   // invalid => default
+    QColor textColor;   // invalid => default (Blue)
+    QColor fillColor;   // invalid => default (White)
+    // The exact serialized token each colour was read from (e.g. "#F5F5F5" vs
+    // "WhiteSmoke"), so an unedited colour is written back byte-for-byte. Empty
+    // => serialize the QColor via ColorTranslator.ToHtml.
+    QString textColorToken;
+    QString fillColorToken;
+};
+
+// Where a room's object list is anchored, persisted as a compass token in the
+// <objects at="..."> attribute. South is the default and is omitted on save.
+struct ObjectsPosition {
+    QString at;                   // compass token ("n","sw",...); empty => default (South)
+    bool custom = false;
+    int customRight = 0;
+    int customDown = 0;
 };
 
 struct Room {
     int id = 0;
+    int seq = 0;                  // position among all elements, to preserve file order
     QString name;
     QString subtitle;
     QString description;
-    QString region;               // region name; "NoRegion" or empty => none
+    QString region = kNoRegion;   // region name; "NoRegion" => none
+    int referenceRoom = -1;       // id of the room this references, or -1
+
     double x = 0.0;               // top-left corner, map units
     double y = 0.0;
     double w = 96.0;
     double h = 64.0;
-    QString borderStyle = QStringLiteral("Solid");   // Solid | Dashed | None
-    QColor fill;                  // invalid => inherit map default
-    QColor secondFill;
-    QColor border;
-    QColor largeText;
-    QColor smallText;
+
+    // Shape / border.
+    bool handDrawn = false;
+    bool allCornersEqual = false;
+    bool ellipse = false;
+    bool roundedCorners = false;
+    bool octagonal = false;
+    double cornerTopLeft = 0.0;
+    double cornerTopRight = 0.0;
+    double cornerBottomLeft = 0.0;
+    double cornerBottomRight = 0.0;
+    QString borderStyle = QStringLiteral("Solid");   // Solid | Dashed | None | Dot | ...
+
+    // Flags.
     bool isDark = false;
     bool isStartRoom = false;
-    QString objectsText;          // raw <objects> text (indentation + [props] preserved)
+    bool isEndRoom = false;
+
+    // Colours (invalid => inherit the map/settings default).
+    QColor fill;
+    QColor secondFill;
+    QString secondFillLocation = QStringLiteral("Bottom");
+    QColor border;
+    QColor largeText;             // roomLargeText
+    QColor subtitleColor;         // roomSubtitleColor
+    QColor smallText;             // roomSmallText
+
+    int zOrder = 0;
+
+    // Objects: the raw list text (indentation denotes containment, [..] encodes
+    // properties) with newlines as real '\n'; plus where the list is anchored.
+    QString objectsText;
+    ObjectsPosition objectsPosition;
 };
 
 enum class ConnectionStyle { Solid, Dashed };
@@ -98,6 +150,7 @@ struct Vertex {
 
 struct Connection {
     int id = 0;
+    int seq = 0;                  // position among all elements, to preserve file order
     ConnectionStyle style = ConnectionStyle::Solid;
     ConnectionFlow flow = ConnectionFlow::TwoWay;
     QString name;
@@ -111,6 +164,79 @@ struct Connection {
     QList<Vertex> vertices;       // ordered; >= 2 endpoints when valid
 };
 
+// A font as stored in <settings><fonts>: family plus size and style flags.
+struct FontSpec {
+    QString family;
+    double size = 0.0;
+    bool bold = false;
+    bool italic = false;
+    bool underline = false;
+    bool strikeout = false;
+};
+
+// Which slot each colour occupies in <settings><colors>, matching Colors.cs.
+// The order is the persisted order (Colors.Names).
+enum ColorSlot {
+    ColorCanvas = 0,
+    ColorBorder,
+    ColorLine,
+    ColorSelectedLine,
+    ColorHoverLine,
+    ColorSubtitle,
+    ColorSmallText,
+    ColorLineText,
+    ColorGrid,
+    ColorStartRoom,
+    ColorEndRoom,
+    ColorCount
+};
+
+// The full <settings> block: per-map when saved, mirroring Setup/Settings.cs.
+struct MapSettings {
+    QColor colors[ColorCount];    // indexed by ColorSlot; invalid => default
+    // Exact serialized token for each palette colour (see Region), so a colour
+    // Trizbort stored as hex is not rewritten as its equivalent name and back.
+    QString colorTokens[ColorCount];
+
+    FontSpec roomFont;            // <fonts><room>
+    FontSpec objectFont;          // <fonts><object>
+    FontSpec subtitleFont;        // <fonts><subTitle>
+    FontSpec lineFont;            // <fonts><line>
+
+    bool snapToGrid = true;
+    bool gridVisible = true;
+    bool showOrigin = true;
+    double gridSize = 32.0;
+
+    double lineWidth = 2.0;
+    double arrowSize = 12.0;
+    double textOffset = 4.0;
+
+    double darknessStripeSize = 24.0;
+    double objectListOffset = 4.0;
+    double connectionStalkLength = 32.0;
+    double preferredDistanceBetweenRooms = 64.0;
+    QString defaultRoomName = QStringLiteral("Cave");
+    int defaultRoomShape = 0;     // RoomShape as int
+
+    double handleSize = 12.0;
+    double snapToElementSize = 16.0;
+
+    bool documentSpecificMargins = false;
+    double horizontalMargin = 0.0;
+    double verticalMargin = 0.0;
+    bool wrapTextAtDashes = true;
+
+    QString keypadCreationModifier = QStringLiteral("control");
+    QString keypadUnexploredModifier = QStringLiteral("alt");
+
+    // True once a settings block has actually been read from a file, so a
+    // freshly-created document can be told apart from a loaded one.
+    bool loaded = false;
+
+    MapSettings();
+};
+
 class Map {
 public:
     QString version;
@@ -122,16 +248,22 @@ public:
     QList<Room> rooms;
     QList<Connection> connections;
     QList<Region> regions;
-
-    // A small subset of <settings>/<colors> the renderer uses.
-    QColor canvasColor;
-    QColor lineColor;
-    QColor borderColor;
+    MapSettings settings;
 
     void clear();
     void reindex();                           // rebuild id -> room lookup
     const Room *roomById(int id) const;       // nullptr if not found
+    Room *roomById(int id);
     QColor regionFill(const QString &name) const;   // invalid if unknown
+    const Region *regionByName(const QString &name) const;
+    int nextRoomId() const;                   // smallest unused positive id
+    int nextConnectionId() const;
+
+    // Convenience accessors for the three colours the renderer reads most; these
+    // resolve to the settings palette (ColorCanvas / ColorLine / ColorBorder).
+    QColor canvasColor() const;
+    QColor lineColor() const;
+    QColor borderColor() const;
 
 private:
     QHash<int, int> m_roomIndex;              // room id -> index in rooms

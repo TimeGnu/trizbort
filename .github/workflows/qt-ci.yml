@@ -41,3 +41,6 @@ jobs:
 
       - name: Golden-corpus tests
         run: sh qt/tests/run-golden.sh
+
+      - name: Round-trip fidelity tests
+        run: sh qt/tests/run-roundtrip.sh
