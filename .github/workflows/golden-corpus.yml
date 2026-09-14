@@ -57,6 +57,13 @@ jobs:
             @{ opt = '--adventuron'; ext = 'adv'  }
           )
           $samples = Get-ChildItem -Path 'samples' -Filter '*.trizbort' | Sort-Object Name
+          # Curated feature maps that exercise export paths the samples do not
+          # (object property flags, doored connections).
+          $featureNames = @('object-testing', 'properties-in-brackets-basic', 'doors-basic')
+          $featureMaps = $featureNames | ForEach-Object {
+            Get-Item (Join-Path 'testing' ($_ + '.trizbort'))
+          }
+          $samples = @($samples) + @($featureMaps)
           foreach ($s in $samples) {
             $base = [System.IO.Path]::GetFileNameWithoutExtension($s.Name)
             $outDir = Join-Path 'qt/tests/golden' $base

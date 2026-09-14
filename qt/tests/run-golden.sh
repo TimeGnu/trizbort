@@ -18,6 +18,12 @@ ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 BIN=${1:-"$ROOT/qt/build/trizbort-qt"}
 GOLDEN="$ROOT/qt/tests/golden"
 SAMPLES="$ROOT/samples"
+# Curated feature maps that exercise export paths the sample corpus does not
+# (object property flags, doored connections). Golden for these is minted the
+# same way; until it exists these entries are skipped by the -f guard below.
+FEATURE_MAPS="$ROOT/testing/object-testing.trizbort \
+$ROOT/testing/properties-in-brackets-basic.trizbort \
+$ROOT/testing/doors-basic.trizbort"
 
 export QT_QPA_PLATFORM=offscreen
 
@@ -43,7 +49,8 @@ normalize() {
     fi
 }
 
-for m in "$SAMPLES"/*.trizbort; do
+for m in "$SAMPLES"/*.trizbort $FEATURE_MAPS; do
+    [ -f "$m" ] || continue
     base=$(basename "${m%.trizbort}")
     for fmt in $FORMATS; do
         ext=${fmt%%:*}
