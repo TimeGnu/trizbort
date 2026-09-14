@@ -74,6 +74,7 @@ private slots:
     void deleteSelection();
     void toggleConnectMode(bool on);
     void editMapProperties();
+    void editMapSettings();
     void editRoom(int roomId);
     void editConnection(int connId);
 

@@ -57,6 +57,7 @@
 #include "MapDocument.h"
 #include "MapScene.h"
 #include "RoomItem.h"
+#include "SettingsDialog.h"
 #include "TrizbortReader.h"
 #include "TrizbortWriter.h"
 #include "export/CodeExporter.h"
@@ -236,6 +237,21 @@ static int runGuiSelftest(const QString &samplePath)
     if (!samplePath.isEmpty()) {
         MainWindow win;
         check(win.loadFile(samplePath), "MainWindow loads a sample map");
+
+        // Settings dialog plumbing: a no-op edit reads its inputs back unchanged.
+        Map sm;
+        QString err;
+        if (TrizbortReader::load(samplePath, sm, &err)) {
+            SettingsDialog dlg(sm.settings, sm.regions);
+            const MapSettings rs = dlg.resultSettings();
+            check(rs.colors[ColorCanvas] == sm.settings.colors[ColorCanvas]
+                      && rs.colors[ColorGrid] == sm.settings.colors[ColorGrid]
+                      && rs.gridSize == sm.settings.gridSize
+                      && rs.defaultRoomName == sm.settings.defaultRoomName,
+                  "settings dialog reads back its inputs");
+            check(dlg.resultRegions().size() == sm.regions.size(),
+                  "settings dialog preserves the region count");
+        }
     }
 
     Map map;

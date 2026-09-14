@@ -60,6 +60,7 @@
 #include "MapScene.h"
 #include "MapView.h"
 #include "RoomDialog.h"
+#include "SettingsDialog.h"
 #include "TrizbortReader.h"
 #include "TrizbortWriter.h"
 #include "export/CodeExporter.h"
@@ -127,6 +128,7 @@ void MainWindow::createActions()
     connect(m_connectAction, &QAction::toggled, this, &MainWindow::toggleConnectMode);
     editMenu->addSeparator();
     editMenu->addAction(tr("&Map Properties…"), this, &MainWindow::editMapProperties);
+    editMenu->addAction(tr("Map &Settings…"), this, &MainWindow::editMapSettings);
 
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
     viewMenu->addAction(tr("Zoom &In"), QKeySequence::ZoomIn, m_view, &MapView::zoomIn);
@@ -333,6 +335,15 @@ void MainWindow::editMapProperties()
         && before.description == after.description && before.history == after.history)
         return;
     m_undo.push(new EditMapInfoCommand(m_scene, before, after));
+}
+
+void MainWindow::editMapSettings()
+{
+    SettingsDialog dialog(m_map.settings, m_map.regions, this);
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+    m_undo.push(new EditSettingsCommand(m_scene, m_map.settings, m_map.regions,
+                                        dialog.resultSettings(), dialog.resultRegions()));
 }
 
 void MainWindow::updateTitle()
