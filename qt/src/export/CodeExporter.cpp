@@ -283,6 +283,7 @@ void CodeExporter::findThings()
             thing->container = container;
             thing->indent = indent;
             thing->propString = propString;
+            thing->parseProperties();
             m_ownedThings.append(thing);
             if (container != nullptr)
                 container->contents.append(thing);

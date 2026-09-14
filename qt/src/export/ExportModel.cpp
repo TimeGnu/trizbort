@@ -42,6 +42,8 @@
 
 #include <algorithm>
 
+#include <QRegularExpression>
+
 namespace trizbort {
 
 const QList<MappableDirection> &allDirections()
@@ -97,6 +99,10 @@ Exit::Exit(Location *source, Location *target, CompassPoint visualCompassPoint,
     : source(source), target(target), visualCompassPoint(visualCompassPoint)
 {
     conditional = (connection.style == ConnectionStyle::Dashed);
+    hasDoor = connection.hasDoor;
+    door = connection.door;
+    connectionName = connection.name;
+    connectionDescription = connection.description;
 
     // Order matters and is preserved from the C#: priority is computed while
     // secondaryDirection is still unset, which makes the negative branches dead.
@@ -204,6 +210,83 @@ bool Exit::isReciprocated(Location *source, MappableDirection direction, Locatio
             return reciprocal->target == source;
     }
     return false;
+}
+
+// --- Thing ---
+
+void Thing::parseProperties()
+{
+    auto genderName = [](Gender g) -> QString {
+        switch (g) {
+        case Gender::Neuter: return QStringLiteral("Neuter");
+        case Gender::Male:   return QStringLiteral("Male");
+        case Gender::Female: return QStringLiteral("Female");
+        }
+        return QString();
+    };
+
+    QString errString = propString;
+    errString.remove(QRegularExpression(QStringLiteral("[fmp12csuwh!]")));
+    if (!errString.trimmed().isEmpty())
+        warningText += QStringLiteral("The properties string ") + propString
+                       + QStringLiteral(" has the invalid character")
+                       + (errString.length() == 1 ? QString() : QStringLiteral("s"))
+                       + QLatin1Char(' ') + errString + QStringLiteral(".\n");
+
+    if (propString.contains(QLatin1Char('f'))) {
+        isPerson = true;
+        gender = Gender::Female;
+    }
+    if (propString.contains(QLatin1Char('m'))) {
+        if (isPerson)
+            warningText += QStringLiteral("You defined two different genders: ") + genderName(gender)
+                           + QStringLiteral(" then male.\n");
+        gender = Gender::Male;
+        isPerson = true;
+    }
+    if (propString.contains(QLatin1Char('p'))) {
+        if (isPerson)
+            warningText += QStringLiteral("You defined two different genders: ") + genderName(gender)
+                           + QStringLiteral(" then neuter.\n");
+        gender = Gender::Neuter;
+        isPerson = true;
+    }
+    if (propString.contains(QLatin1Char('w')))
+        worn = true;
+    if (propString.contains(QLatin1Char('h')))
+        partOf = true;
+
+    forceplural = Amounts::Noforce;
+    if (propString.contains(QLatin1Char('1')))
+        forceplural = Amounts::Singular;
+    if (propString.contains(QLatin1Char('2'))) {
+        if (forceplural != Amounts::Noforce)
+            warningText += QStringLiteral("You defined this object as both singular and plural.\n");
+        forceplural = Amounts::Plural;
+    }
+
+    if (propString.contains(QLatin1Char('c'))) {
+        if (isPerson)
+            warningText += QStringLiteral("You defined this as a person and container. This will "
+                                          "cause Inform to throw an error.\n");
+        else
+            isContainer = true;
+    }
+    if (propString.contains(QLatin1Char('s'))) {
+        if (isPerson)
+            warningText += QStringLiteral("You defined this as a person and scenery. Inform allows "
+                                          "that, but you may not want to hide this person.\n");
+        isScenery = true;
+    }
+    if (propString.contains(QLatin1Char('u'))) {
+        if (isPerson)
+            warningText += QStringLiteral("You defined this as a person and a supporter. This will "
+                                          "cause Inform to throw an error.\n");
+        else
+            isSupporter = true;
+    }
+    if (propString.contains(QLatin1Char('!')))
+        properNamed = true;
 }
 
 // --- Location ---

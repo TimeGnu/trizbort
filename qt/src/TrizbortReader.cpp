@@ -127,6 +127,14 @@ Connection readLine(QXmlStreamReader &xml)
     c.midText = attr(a, "midText");
     c.endText = attr(a, "endText");
     c.color = parseTrizbortColor(attr(a, "color"));
+    if (attr(a, "door").toLower() == QLatin1String("yes")) {
+        c.hasDoor = true;
+        auto yes = [&](const char *n) { return attr(a, n).toLower() == QLatin1String("yes"); };
+        c.door.lockable = yes("lockable");
+        c.door.openable = yes("openable");
+        c.door.locked = yes("locked");
+        c.door.open = yes("open");
+    }
 
     while (xml.readNextStartElement()) {
         const auto n = xml.name();

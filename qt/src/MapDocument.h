@@ -81,6 +81,13 @@ struct Room {
 enum class ConnectionStyle { Solid, Dashed };
 enum class ConnectionFlow { TwoWay, OneWay };
 
+struct Door {
+    bool lockable = false;
+    bool locked = false;
+    bool open = false;
+    bool openable = false;
+};
+
 struct Vertex {
     int index = 0;
     bool docked = false;          // true => (roomId, port); false => point
@@ -99,6 +106,8 @@ struct Connection {
     QString midText;
     QString endText;
     QColor color;                 // invalid => inherit map line color
+    bool hasDoor = false;
+    Door door;
     QList<Vertex> vertices;       // ordered; >= 2 endpoints when valid
 };
 

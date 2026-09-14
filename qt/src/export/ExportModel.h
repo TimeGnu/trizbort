@@ -86,6 +86,10 @@ public:
     CompassPoint visualCompassPoint = CompassPoint::North;
     bool conditional = false; // dashed connection
     bool exported = false;
+    bool hasDoor = false;
+    Door door;
+    QString connectionName;
+    QString connectionDescription;
     MappableDirection primaryDirection = MappableDirection::North;
     std::optional<MappableDirection> secondaryDirection;
 
@@ -102,6 +106,9 @@ private:
 // One object parsed from a room's Objects text.
 class Thing {
 public:
+    enum class Amounts { Noforce, Singular, Plural };
+    enum class Gender { Neuter, Male, Female };
+
     QString displayName;
     QString exportName;
     Location *location = nullptr;
@@ -109,6 +116,20 @@ public:
     int indent = 0;
     QString propString;
     QList<Thing *> contents;
+
+    // Derived from propString (see parseProperties), ported from Thing.cs.
+    bool isPerson = false;
+    Gender gender = Gender::Neuter;
+    bool isContainer = false;
+    bool isScenery = false;
+    bool isSupporter = false;
+    bool worn = false;
+    bool partOf = false;
+    bool properNamed = false;
+    Amounts forceplural = Amounts::Noforce;
+    QString warningText;
+
+    void parseProperties();
 };
 
 class ExportRegion {

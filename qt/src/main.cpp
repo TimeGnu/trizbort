@@ -38,6 +38,8 @@
  *     THE SOFTWARE.
  */
 
+#include <memory>
+
 #include <QApplication>
 #include <QFile>
 #include <QImage>
@@ -51,6 +53,8 @@
 #include "MapDocument.h"
 #include "MapScene.h"
 #include "TrizbortReader.h"
+#include "export/AdventuronExporter.h"
+#include "export/CodeExporter.h"
 #include "export/ZilExporter.h"
 
 // Headless render: load a map and write a PNG, no window. Useful for CI smoke
@@ -92,9 +96,22 @@ static int renderToPng(const QString &mapPath, const QString &pngPath)
     return 0;
 }
 
-// Headless ZIL export: load a map and write ZIL source. Used to validate the
-// C++ exporter against the golden fixtures.
-static int exportZil(const QString &mapPath, const QString &outPath)
+// Construct an exporter by short format name. Adding a format is one line here.
+static std::unique_ptr<trizbort::CodeExporter> makeExporter(const QString &fmt,
+                                                            const trizbort::Map &map,
+                                                            const QString &path)
+{
+    using namespace trizbort;
+    if (fmt == QLatin1String("zil"))
+        return std::make_unique<ZilExporter>(map, path);
+    if (fmt == QLatin1String("adventuron"))
+        return std::make_unique<AdventuronExporter>(map, path);
+    return nullptr;
+}
+
+// Headless export: load a map, run the named exporter, write the result. Used
+// to validate the C++ exporters against the golden fixtures.
+static int runExport(const QString &fmt, const QString &mapPath, const QString &outPath)
 {
     QTextStream err(stderr);
 
@@ -105,8 +122,12 @@ static int exportZil(const QString &mapPath, const QString &outPath)
         return 1;
     }
 
-    trizbort::ZilExporter exporter(map, mapPath);
-    const QString text = exporter.exportToString();
+    auto exporter = makeExporter(fmt, map, mapPath);
+    if (!exporter) {
+        err << "unknown/unimplemented format: " << fmt << Qt::endl;
+        return 2;
+    }
+    const QString text = exporter->exportToString();
 
     QFile file(outPath);
     if (!file.open(QIODevice::WriteOnly)) {
@@ -124,23 +145,42 @@ int main(int argc, char *argv[])
 
     QString mapPath;
     QString renderPath;
-    QString zilPath;
+    QString exportFmt;
+    QString exportOut;
+    static const struct {
+        const char *flag;
+        const char *fmt;
+    } kFormats[] = {
+        {"--zil", "zil"},         {"--adventuron", "adventuron"}, {"--inform6", "inform6"},
+        {"--inform7", "inform7"}, {"--tads", "tads"},             {"--alan", "alan"},
+        {"--hugo", "hugo"},       {"--quest", "quest"},
+    };
+
     const QStringList args = QApplication::arguments();
     for (int i = 1; i < args.size(); ++i) {
-        if (args.at(i) == QLatin1String("--render") && i + 1 < args.size())
+        if (args.at(i) == QLatin1String("--render") && i + 1 < args.size()) {
             renderPath = args.at(++i);
-        else if (args.at(i) == QLatin1String("--zil") && i + 1 < args.size())
-            zilPath = args.at(++i);
-        else
+            continue;
+        }
+        bool matched = false;
+        for (const auto &f : kFormats) {
+            if (args.at(i) == QLatin1String(f.flag) && i + 1 < args.size()) {
+                exportFmt = QLatin1String(f.fmt);
+                exportOut = args.at(++i);
+                matched = true;
+                break;
+            }
+        }
+        if (!matched)
             mapPath = args.at(i);
     }
 
-    if (!zilPath.isEmpty()) {
+    if (!exportFmt.isEmpty()) {
         if (mapPath.isEmpty()) {
-            QTextStream(stderr) << "usage: trizbort-qt <map.trizbort> --zil <out.zil>" << Qt::endl;
+            QTextStream(stderr) << "usage: trizbort-qt <map.trizbort> --<format> <out>" << Qt::endl;
             return 2;
         }
-        return exportZil(mapPath, zilPath);
+        return runExport(exportFmt, mapPath, exportOut);
     }
 
     if (!renderPath.isEmpty()) {
