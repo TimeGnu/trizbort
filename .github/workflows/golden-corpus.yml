@@ -8,6 +8,14 @@ name: Golden Corpus
 
 on:
   workflow_dispatch:
+  # Also runs when this workflow file changes on a claude/** branch, so it can
+  # be triggered (and re-run while iterating) without being on the default
+  # branch. Remove this push trigger once the corpus is minted.
+  push:
+    branches:
+      - 'claude/**'
+    paths:
+      - '.github/workflows/golden-corpus.yml'
 
 permissions:
   contents: write
