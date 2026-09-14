@@ -72,6 +72,7 @@ private slots:
     void exportMap(const QString &format);
     void exportImage();
     void exportPdf();
+    void importTranscript();
     void addRoom();
     void addConnectedRoom(const QString &direction);
     void deleteSelection();

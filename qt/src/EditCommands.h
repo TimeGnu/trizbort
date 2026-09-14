@@ -153,6 +153,27 @@ private:
     Info m_new;
 };
 
+// Replace the whole map content (rooms, connections, regions) as one step.
+// Used by bulk operations such as transcript import.
+class ReplaceContentCommand : public QUndoCommand {
+public:
+    struct Content {
+        QList<Room> rooms;
+        QList<Connection> connections;
+        QList<Region> regions;
+    };
+    ReplaceContentCommand(MapScene *scene, const Content &oldContent, const Content &newContent,
+                          const QString &text);
+    void redo() override;
+    void undo() override;
+
+private:
+    void apply(const Content &content);
+    MapScene *m_scene;
+    Content m_old;
+    Content m_new;
+};
+
 // The full settings block (palette, fonts, grid, geometry) plus the region list.
 class EditSettingsCommand : public QUndoCommand {
 public:

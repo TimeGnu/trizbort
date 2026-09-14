@@ -38,9 +38,26 @@ out=$("$BIN" --automap-selftest 2>/dev/null) || fail=1
 echo "$out"
 echo "$out" | grep -q "automap-selftest: PASS" || fail=1
 
-# Image and PDF export produce non-empty, well-formed files.
+out=$("$BIN" --transcript-selftest 2>/dev/null) || fail=1
+echo "$out"
+echo "$out" | grep -q "transcript-selftest: PASS" || fail=1
+
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
+
+# Import a transcript from the CLI and confirm the result loads and exports.
+tsample="$ROOT/testing/transcript-sample.txt"
+if [ -f "$tsample" ]; then
+    "$BIN" --import-transcript "$tsample" "$tmp/imported.trizbort" >/dev/null 2>&1
+    if "$BIN" "$tmp/imported.trizbort" --inform7 "$tmp/imported.ni" >/dev/null 2>&1 \
+        && grep -q "Hall of the Guildmasters" "$tmp/imported.ni"; then
+        echo "import-transcript-cli: PASS"
+    else
+        echo "import-transcript-cli: FAIL"; fail=1
+    fi
+fi
+
+# Image and PDF export produce non-empty, well-formed files.
 "$BIN" "$SAMPLE" --render "$tmp/out.png" >/dev/null 2>&1
 "$BIN" "$SAMPLE" --pdf "$tmp/out.pdf" >/dev/null 2>&1
 if [ -s "$tmp/out.png" ]; then echo "render-png: PASS"; else echo "render-png: FAIL"; fail=1; fi

@@ -1,0 +1,33 @@
+Spellbreaker
+An Interactive Fiction
+
+Hall of the Guildmasters
+You are in a large hall, its walls hung with tapestries.
+
+>north
+Antechamber
+A small room north of the hall.
+
+>east
+Library
+Dusty shelves line the walls.
+
+>tb see brass key
+
+>south
+Study
+A cramped study with a writing desk.
+
+>west
+Antechamber
+A small room north of the hall.
+
+>down
+Cellar
+A dank cellar beneath the guild.
+
+>up
+Antechamber
+A small room north of the hall.
+
+>

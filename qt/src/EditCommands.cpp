@@ -394,6 +394,30 @@ void EditMapInfoCommand::apply(const Info &info)
 void EditMapInfoCommand::redo() { apply(m_new); }
 void EditMapInfoCommand::undo() { apply(m_old); }
 
+// ---- ReplaceContentCommand ------------------------------------------------
+
+ReplaceContentCommand::ReplaceContentCommand(MapScene *scene, const Content &oldContent,
+                                             const Content &newContent, const QString &text)
+    : m_scene(scene)
+    , m_old(oldContent)
+    , m_new(newContent)
+{
+    setText(text);
+}
+
+void ReplaceContentCommand::apply(const Content &content)
+{
+    Map *map = m_scene->document();
+    map->rooms = content.rooms;
+    map->connections = content.connections;
+    map->regions = content.regions;
+    map->reindex();
+    m_scene->rebuild();
+}
+
+void ReplaceContentCommand::redo() { apply(m_new); }
+void ReplaceContentCommand::undo() { apply(m_old); }
+
 // ---- EditSettingsCommand --------------------------------------------------
 
 EditSettingsCommand::EditSettingsCommand(MapScene *scene, const MapSettings &oldS,

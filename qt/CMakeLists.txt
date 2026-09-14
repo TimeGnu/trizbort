@@ -22,6 +22,7 @@ add_executable(trizbort-qt
     src/DotNetColor.cpp
     src/TrizbortReader.cpp
     src/TrizbortWriter.cpp
+    src/TranscriptAutomapper.cpp
     src/MapScene.cpp
     src/MapView.cpp
     src/MapRender.cpp

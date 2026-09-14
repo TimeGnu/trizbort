@@ -36,13 +36,18 @@ A working editor with a complete file format and all exporters.
 - **Automap**: add a connected room in any compass direction (Edit > Add
   Connected Room; Ctrl+Alt+Arrow for the cardinals), placed a grid step away and
   wired up in one undoable action.
+- **Transcript-driven automapping** (File > Import Transcript, or the CLI
+  `--import-transcript`): reads a play-session transcript and builds the map from
+  the player's movements — detecting room names and directions, placing new
+  rooms a step away, shifting the map aside to avoid overlaps, matching returns
+  to known rooms, and honouring `tb region`/`tb see` commands.
 - **File & export UI**: New / Open / Save / Save As with unsaved-change
   prompts, an Export menu covering every code format plus **PDF** and **PNG**.
   Rubber-band selection, wheel zoom, middle-button pan.
 
 The editing layer is covered headlessly by `qt/tests/run-editor.sh`. Still to
-come: transcript-driven automapping and the finer rendering options of the C#
-original.
+come: the finer rendering options of the C# original (hand-drawn edges,
+second-fill gradients, custom fonts on the canvas) and quality-of-life polish.
 
 ## Building (GNU/Linux)
 
@@ -64,6 +69,7 @@ trizbort-qt map.trizbort --zil out.zil   # export (--inform6/7, --tads, --hugo,
                                          #   --alan, --quest, --adventuron, …)
 trizbort-qt map.trizbort --render out.png
 trizbort-qt map.trizbort --pdf out.pdf
+trizbort-qt --import-transcript play.txt out.trizbort   # build a map from a transcript
 ```
 
 ### Windows builds without Windows

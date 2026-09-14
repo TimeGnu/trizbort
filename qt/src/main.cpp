@@ -59,6 +59,7 @@
 #include "MapScene.h"
 #include "RoomItem.h"
 #include "SettingsDialog.h"
+#include "TranscriptAutomapper.h"
 #include "TrizbortReader.h"
 #include "TrizbortWriter.h"
 #include "export/CodeExporter.h"
@@ -117,6 +118,34 @@ static int runExport(const QString &fmt, const QString &mapPath, const QString &
         return 3;
     }
     file.write(text.toUtf8());
+    return 0;
+}
+
+// Headless transcript import: build a new map from a play transcript and save
+// it as a .trizbort file.
+static int runImportTranscript(const QString &transcriptPath, const QString &outPath)
+{
+    QTextStream err(stderr);
+    QFile file(transcriptPath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        err << "could not read " << transcriptPath << Qt::endl;
+        return 1;
+    }
+    const QString text = QString::fromUtf8(file.readAll());
+
+    trizbort::Map map;
+    map.regions.append(trizbort::Region{trizbort::kNoRegion, QColor(0, 0, 255), QColor(255, 255, 255),
+                                        QString(), QString()});
+    trizbort::TranscriptAutomapper mapper;
+    const int added = mapper.run(map, text);
+
+    QString error;
+    if (!trizbort::TrizbortWriter::save(outPath, map, &error)) {
+        err << "save failed: " << error << Qt::endl;
+        return 3;
+    }
+    QTextStream(stdout) << "imported transcript: " << added << " rooms, "
+                        << mapper.connectionsAdded() << " connections -> " << outPath << Qt::endl;
     return 0;
 }
 
@@ -418,6 +447,77 @@ static int runAutomapSelftest()
     return failures == 0 ? 0 : 1;
 }
 
+// Headless test for the transcript automapper: a short walk builds a 2x2 grid.
+static int runTranscriptSelftest()
+{
+    using namespace trizbort;
+    QTextStream out(stdout);
+    int failures = 0;
+    auto check = [&](bool ok, const char *what) {
+        if (!ok) {
+            out << "  FAIL: " << what << Qt::endl;
+            ++failures;
+        }
+    };
+
+    const QString transcript = QStringLiteral(
+        "Cave Adventure\n"
+        "An interactive fiction\n"
+        "\n"
+        "West of House\n"
+        "You are standing in an open field west of a white house.\n"
+        "\n"
+        ">north\n"
+        "North of House\n"
+        "You are facing the north side of a white house.\n"
+        "\n"
+        ">east\n"
+        "Behind House\n"
+        "You are behind the white house.\n"
+        "\n"
+        ">south\n"
+        "South of House\n"
+        "This is the south side of a white house.\n"
+        "\n"
+        ">tb see brass lantern\n"
+        ">\n");
+
+    Map map;
+    TranscriptAutomapper mapper;
+    mapper.run(map, transcript);
+
+    check(map.rooms.size() == 4, "four rooms created");
+    check(map.connections.size() == 3, "three connections created");
+
+    auto roomNamed = [&](const QString &n) -> const Room * {
+        for (const Room &r : map.rooms)
+            if (r.name == n)
+                return &r;
+        return nullptr;
+    };
+    const Room *west = roomNamed(QStringLiteral("West of House"));
+    const Room *north = roomNamed(QStringLiteral("North of House"));
+    const Room *behind = roomNamed(QStringLiteral("Behind House"));
+    const Room *south = roomNamed(QStringLiteral("South of House"));
+    check(west && north && behind && south, "all four rooms present by name");
+    check(west && west->isStartRoom, "first room is the start room");
+    if (west && north)
+        check(north->x == west->x && north->y == west->y - 128, "north placed above west");
+    if (behind && north)
+        check(behind->y == north->y && behind->x == north->x + 160, "behind placed east of north");
+    // The 'tb see' command adds an object to the last room (South of House).
+    check(south && south->objectsText.contains(QLatin1String("brass lantern")),
+          "tb see added an object");
+
+    // Re-exports cleanly.
+    auto exporter = makeExporter(QStringLiteral("inform7"), map, QStringLiteral("t.trizbort"));
+    check(exporter && exporter->exportToString().contains(QLatin1String("West of House")),
+          "automapped map exports");
+
+    out << (failures == 0 ? "transcript-selftest: PASS" : "transcript-selftest: FAIL") << Qt::endl;
+    return failures == 0 ? 0 : 1;
+}
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -425,6 +525,8 @@ int main(int argc, char *argv[])
 
     if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--edit-selftest"))
         return runEditSelftest();
+    if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--transcript-selftest"))
+        return runTranscriptSelftest();
     if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--automap-selftest"))
         return runAutomapSelftest();
     if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--undo-selftest"))
@@ -436,6 +538,8 @@ int main(int argc, char *argv[])
     QString renderPath;
     QString pdfPath;
     QString savePath;
+    QString transcriptPath;
+    QString transcriptOut;
     QString exportFmt;
     QString exportOut;
     static const struct {
@@ -461,6 +565,11 @@ int main(int argc, char *argv[])
             savePath = args.at(++i);
             continue;
         }
+        if (args.at(i) == QLatin1String("--import-transcript") && i + 2 < args.size()) {
+            transcriptPath = args.at(++i);
+            transcriptOut = args.at(++i);
+            continue;
+        }
         bool matched = false;
         for (const auto &f : kFormats) {
             if (args.at(i) == QLatin1String(f.flag) && i + 1 < args.size()) {
@@ -480,6 +589,10 @@ int main(int argc, char *argv[])
             return 2;
         }
         return runExport(exportFmt, mapPath, exportOut);
+    }
+
+    if (!transcriptPath.isEmpty()) {
+        return runImportTranscript(transcriptPath, transcriptOut);
     }
 
     if (!savePath.isEmpty()) {

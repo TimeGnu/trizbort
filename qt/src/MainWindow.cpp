@@ -62,6 +62,7 @@
 #include "MapView.h"
 #include "RoomDialog.h"
 #include "SettingsDialog.h"
+#include "TranscriptAutomapper.h"
 #include "TrizbortReader.h"
 #include "TrizbortWriter.h"
 #include "export/CodeExporter.h"
@@ -111,6 +112,8 @@ void MainWindow::createActions()
     exportMenu->addSeparator();
     exportMenu->addAction(tr("PDF…"), this, &MainWindow::exportPdf);
     exportMenu->addAction(tr("PNG image…"), this, &MainWindow::exportImage);
+    fileMenu->addSeparator();
+    fileMenu->addAction(tr("&Import Transcript…"), this, &MainWindow::importTranscript);
     fileMenu->addSeparator();
     fileMenu->addAction(tr("&Quit"), QKeySequence::Quit, this, &QWidget::close);
 
@@ -320,6 +323,42 @@ void MainWindow::exportPdf()
         QMessageBox::warning(this, tr("Export Failed"), error);
     else
         statusBar()->showMessage(tr("Exported %1").arg(QFileInfo(path).fileName()));
+}
+
+void MainWindow::importTranscript()
+{
+    const QString path = QFileDialog::getOpenFileName(
+        this, tr("Import Transcript"), QString(),
+        tr("Transcripts (*.txt *.log *.scr);;All files (*)"));
+    if (path.isEmpty())
+        return;
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, tr("Import Failed"), tr("Could not read %1").arg(path));
+        return;
+    }
+    const QString text = QString::fromUtf8(file.readAll());
+
+    ReplaceContentCommand::Content before{m_map.rooms, m_map.connections, m_map.regions};
+
+    Map working = m_map;
+    AutomapSettings settings;
+    settings.preferredDistanceBetweenRooms = m_map.settings.preferredDistanceBetweenRooms;
+    settings.gridSize = m_map.settings.gridSize;
+    TranscriptAutomapper mapper(settings);
+    const int added = mapper.run(working, text);
+    if (added == 0) {
+        QMessageBox::information(this, tr("Import Transcript"),
+                                tr("No rooms were found in the transcript."));
+        return;
+    }
+    ReplaceContentCommand::Content after{working.rooms, working.connections, working.regions};
+    m_undo.push(new ReplaceContentCommand(m_scene, before, after, tr("Import Transcript")));
+    m_view->zoomToFit();
+    statusBar()->showMessage(tr("Imported %1: added %2 rooms, %3 connections")
+                                 .arg(QFileInfo(path).fileName())
+                                 .arg(added)
+                                 .arg(mapper.connectionsAdded()));
 }
 
 void MainWindow::addRoom()
