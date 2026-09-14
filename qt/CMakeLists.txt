@@ -30,6 +30,7 @@ add_executable(trizbort-qt
     src/export/HugoExporter.cpp
     src/export/AlanExporter.cpp
     src/export/TadsExporter.cpp
+    src/export/Inform6Exporter.cpp
 )
 
 target_link_libraries(trizbort-qt PRIVATE Qt6::Widgets)

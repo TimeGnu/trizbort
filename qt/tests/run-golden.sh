@@ -25,7 +25,7 @@ tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
 # Formats the C++ app can currently export: "<extension>:<cli-flag>".
-FORMATS="zil:--zil adv:--adventuron hug:--hugo i:--alan t:--tads"
+FORMATS="zil:--zil adv:--adventuron hug:--hugo i:--alan t:--tads inf:--inform6"
 
 pass=0
 fail=0
