@@ -14,19 +14,27 @@ depend on Windows or Microsoft's toolchain, this rewrite uses only free software
 
 ## Status
 
-Early, but real. Current capability:
+A working editor with a complete file format and all exporters.
 
-- Loads a `.trizbort` map file (rooms, connections, regions).
-- Renders the map in a pannable / zoomable canvas (`QGraphicsView`).
-- **ZIL exporter** (`--zil <out>`): byte-identical to the C# exporter across
-  all 11 sample maps, verified against the golden corpus by
-  `qt/tests/run-golden.sh` (and CI). This includes the shared export pipeline
-  (naming/dedup, best-exit selection, object parsing) that the remaining
-  exporters will reuse.
+- **Complete `.trizbort` file format**, modelled with typed fields (not a
+  subset): every room, connection, region and settings attribute. Loading and
+  saving round-trip losslessly — re-saving a modern-format map is byte-identical
+  to the original, and older maps are upgraded to the current format exactly as
+  Trizbort itself would. Verified by `qt/tests/run-roundtrip.sh`.
+- **All eight exporters** — ZIL, Inform 6, Inform 7, TADS 3, Hugo, Alan, Quest,
+  Adventuron — byte-identical to the C# exporters across the whole golden corpus
+  (`qt/tests/run-golden.sh`, in CI), including the door and object-property
+  paths exercised by dedicated feature maps.
+- **Interactive editor** (`QGraphicsView`): create, move (grid-snapped), edit
+  and delete rooms; draw, edit and delete connections; a full properties dialog
+  for rooms (name, region, description, objects, shape, colours, dark/start/end)
+  and connections (flow, style, texts, doors); map properties (title/author/…).
+- **File & export UI**: New / Open / Save / Save As with unsaved-change
+  prompts, and an Export menu covering every format. Rubber-band selection,
+  wheel zoom, middle-button pan.
 
-Not yet: editing, saving, and the other seven exporters (Inform 6/7, TADS, Hugo,
-Alan, Quest, Adventuron) — each a smaller job now that the pipeline exists, and
-each validated the same way against `docs/exporters.md` and the golden corpus.
+The editing layer is covered headlessly by `qt/tests/run-editor.sh`. Still to
+come: undo/redo, automap, and the finer rendering options of the C# original.
 
 ## Building (GNU/Linux)
 
@@ -37,6 +45,16 @@ sudo apt install qt6-base-dev cmake g++
 cmake -S qt -B qt/build
 cmake --build qt/build -j
 ./qt/build/trizbort-qt [path/to/map.trizbort]
+```
+
+### Command line
+
+```sh
+trizbort-qt map.trizbort                 # open in the editor
+trizbort-qt map.trizbort --save out.trizbort   # load and re-save (round-trip)
+trizbort-qt map.trizbort --zil out.zil   # export (--inform6/7, --tads, --hugo,
+                                         #   --alan, --quest, --adventuron, …)
+trizbort-qt map.trizbort --render out.png
 ```
 
 ### Windows builds without Windows

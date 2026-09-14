@@ -141,6 +141,15 @@ fix for orphaned connections, #575).
 
 Each `<regions>` child is named by the region name (element tag == region name),
 with `@Name`, `@TextColor`, and the element text being the region's fill color.
+Spaces in a region name are stored in the element tag as `____` (and otherwise
+run through `XmlConvert.EncodeName`); the authoritative name is always `@Name`.
+
+The Qt port models every element and attribute above as a typed field —
+nothing is dropped or kept as opaque text — and `TrizbortWriter` serializes it
+back with the same conventions (yes/no booleans, shortest-float formatting,
+`SaveColor` hex for room/connection colours, `ColorTranslator.ToHtml` named
+colours for the palette and regions, pipe-encoded objects, element order, and a
+UTF-8 BOM). A load/save round trip is lossless; see `qt/tests/run-roundtrip.sh`.
 
 ## Color values
 
