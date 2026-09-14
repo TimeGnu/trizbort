@@ -76,6 +76,8 @@ public:
 
     // Select only the given room's item (used after an add).
     void selectRoomItem(int roomId);
+    // The id of a currently-selected room (the first one), or -1.
+    int selectedRoomId() const;
 
     double gridSize() const;
     QPointF snap(const QPointF &p) const;

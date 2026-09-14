@@ -90,6 +90,23 @@ private:
     Room m_new;
 };
 
+// Automap primitive: create a new room one grid step away from an existing room
+// in a compass direction, and connect the two. A single undoable step.
+class AddConnectedRoomCommand : public QUndoCommand {
+public:
+    AddConnectedRoomCommand(MapScene *scene, int fromRoomId, const QString &direction);
+    void redo() override;
+    void undo() override;
+    bool valid() const { return m_valid; }
+    int newRoomId() const { return m_room.id; }
+
+private:
+    MapScene *m_scene;
+    Room m_room;
+    Connection m_conn;
+    bool m_valid = false;
+};
+
 class AddConnectionCommand : public QUndoCommand {
 public:
     AddConnectionCommand(MapScene *scene, int fromId, const QString &portA, int toId,

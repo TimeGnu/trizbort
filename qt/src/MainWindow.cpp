@@ -130,6 +130,30 @@ void MainWindow::createActions()
     m_connectAction->setCheckable(true);
     m_connectAction->setShortcut(QKeySequence(Qt::Key_C));
     connect(m_connectAction, &QAction::toggled, this, &MainWindow::toggleConnectMode);
+
+    // Automap: create a connected room in a compass direction from the selection.
+    QMenu *automapMenu = editMenu->addMenu(tr("Add Connec&ted Room"));
+    struct Dir {
+        const char *label;
+        const char *dir;
+        QKeySequence shortcut;
+    };
+    const Dir dirs[] = {
+        {"North", "n", QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_Up)},
+        {"South", "s", QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_Down)},
+        {"East", "e", QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_Right)},
+        {"West", "w", QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_Left)},
+        {"North-East", "ne", QKeySequence()},
+        {"North-West", "nw", QKeySequence()},
+        {"South-East", "se", QKeySequence()},
+        {"South-West", "sw", QKeySequence()},
+    };
+    for (const Dir &d : dirs) {
+        const QString dir = QString::fromLatin1(d.dir);
+        QAction *act = automapMenu->addAction(tr(d.label), this, [this, dir] { addConnectedRoom(dir); });
+        if (!d.shortcut.isEmpty())
+            act->setShortcut(d.shortcut);
+    }
     editMenu->addSeparator();
     editMenu->addAction(tr("&Map Properties…"), this, &MainWindow::editMapProperties);
     editMenu->addAction(tr("Map &Settings…"), this, &MainWindow::editMapSettings);
@@ -304,6 +328,23 @@ void MainWindow::addRoom()
     const int id = m_scene->addRoomAt(center);
     if (id >= 0)
         statusBar()->showMessage(tr("Added room %1 (double-click to edit)").arg(id));
+}
+
+void MainWindow::addConnectedRoom(const QString &direction)
+{
+    const int fromId = m_scene->selectedRoomId();
+    if (fromId < 0) {
+        statusBar()->showMessage(tr("Select a room first, then add a connected room."));
+        return;
+    }
+    auto *cmd = new AddConnectedRoomCommand(m_scene, fromId, direction);
+    if (!cmd->valid()) {
+        delete cmd;
+        return;
+    }
+    const int newId = cmd->newRoomId();
+    m_undo.push(cmd);
+    statusBar()->showMessage(tr("Added room %1 (%2)").arg(newId).arg(direction.toUpper()));
 }
 
 void MainWindow::deleteSelection()

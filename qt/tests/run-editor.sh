@@ -34,6 +34,10 @@ out=$("$BIN" --undo-selftest 2>/dev/null) || fail=1
 echo "$out"
 echo "$out" | grep -q "undo-selftest: PASS" || fail=1
 
+out=$("$BIN" --automap-selftest 2>/dev/null) || fail=1
+echo "$out"
+echo "$out" | grep -q "automap-selftest: PASS" || fail=1
+
 # Image and PDF export produce non-empty, well-formed files.
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT

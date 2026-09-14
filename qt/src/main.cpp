@@ -357,6 +357,67 @@ static int runUndoSelftest()
     return failures == 0 ? 0 : 1;
 }
 
+// Headless test for the automap primitive: create connected rooms in each
+// direction and check placement and the resulting connection.
+static int runAutomapSelftest()
+{
+    using namespace trizbort;
+    QTextStream out(stdout);
+    int failures = 0;
+    auto check = [&](bool ok, const char *what) {
+        if (!ok) {
+            out << "  FAIL: " << what << Qt::endl;
+            ++failures;
+        }
+    };
+
+    struct Case {
+        const char *dir;
+        double x;
+        double y;
+    };
+    // From a 96x64 room at (0,0) with a 64-unit gap: north/west subtract the new
+    // room size + gap; east/south add the source size + gap; all snapped.
+    const Case cases[] = {
+        {"n", 0, -128}, {"s", 0, 128}, {"e", 160, 0}, {"w", -160, 0},
+        {"ne", 160, -128}, {"sw", -160, 128},
+    };
+
+    for (const Case &c : cases) {
+        Map map;
+        MapScene scene;
+        QUndoStack stack;
+        scene.setUndoStack(&stack);
+        scene.setDocument(&map);
+        const int a = scene.addRoomAt(QPointF(0, 0));
+        scene.selectRoomItem(a);
+
+        auto *cmd = new AddConnectedRoomCommand(&scene, a, QString::fromLatin1(c.dir));
+        check(cmd->valid(), "command valid");
+        const int nid = cmd->newRoomId();
+        stack.push(cmd);
+
+        check(map.rooms.size() == 2, "room added");
+        check(map.connections.size() == 1, "connection added");
+        const Room *nr = map.roomById(nid);
+        check(nr && nr->x == c.x && nr->y == c.y, c.dir);
+        if (!(nr && nr->x == c.x && nr->y == c.y))
+            out << "    (" << c.dir << " got " << (nr ? nr->x : 0) << "," << (nr ? nr->y : 0)
+                << ")" << Qt::endl;
+        // The connection docks the source's direction port to the new room.
+        const Connection &conn = map.connections.first();
+        check(conn.vertices.size() == 2 && conn.vertices.at(0).roomId == a
+                  && conn.vertices.at(0).port == QLatin1String(c.dir),
+              "connection docks source port");
+
+        stack.undo();
+        check(map.rooms.size() == 1 && map.connections.isEmpty(), "undo removes both");
+    }
+
+    out << (failures == 0 ? "automap-selftest: PASS" : "automap-selftest: FAIL") << Qt::endl;
+    return failures == 0 ? 0 : 1;
+}
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -364,6 +425,8 @@ int main(int argc, char *argv[])
 
     if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--edit-selftest"))
         return runEditSelftest();
+    if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--automap-selftest"))
+        return runAutomapSelftest();
     if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--undo-selftest"))
         return runUndoSelftest();
     if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--gui-selftest"))

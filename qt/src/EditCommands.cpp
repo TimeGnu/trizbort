@@ -194,6 +194,119 @@ void EditRoomCommand::undo()
     m_scene->refreshRoom(m_id);
 }
 
+// ---- AddConnectedRoomCommand ----------------------------------------------
+
+namespace {
+
+QString oppositePort(const QString &p)
+{
+    if (p == QLatin1String("n")) return QStringLiteral("s");
+    if (p == QLatin1String("s")) return QStringLiteral("n");
+    if (p == QLatin1String("e")) return QStringLiteral("w");
+    if (p == QLatin1String("w")) return QStringLiteral("e");
+    if (p == QLatin1String("ne")) return QStringLiteral("sw");
+    if (p == QLatin1String("sw")) return QStringLiteral("ne");
+    if (p == QLatin1String("nw")) return QStringLiteral("se");
+    if (p == QLatin1String("se")) return QStringLiteral("nw");
+    return QStringLiteral("n");
+}
+
+// Unit step for a compass port in screen coordinates (+y is down).
+void directionVector(const QString &dir, int &dx, int &dy)
+{
+    dx = (dir.contains(QLatin1Char('e'))) ? 1 : (dir.contains(QLatin1Char('w')) ? -1 : 0);
+    dy = (dir.contains(QLatin1Char('s'))) ? 1 : (dir.contains(QLatin1Char('n')) ? -1 : 0);
+}
+
+} // namespace
+
+AddConnectedRoomCommand::AddConnectedRoomCommand(MapScene *scene, int fromRoomId,
+                                                 const QString &direction)
+    : m_scene(scene)
+{
+    Map *map = scene->document();
+    const Room *from = map->roomById(fromRoomId);
+    if (!from)
+        return;
+
+    int dx = 0;
+    int dy = 0;
+    directionVector(direction, dx, dy);
+    if (dx == 0 && dy == 0)
+        return;
+
+    const double newW = 96.0;
+    const double newH = 64.0;
+    double gap = map->settings.preferredDistanceBetweenRooms;
+    if (gap <= 0)
+        gap = 64.0;
+
+    double nx = from->x;
+    double ny = from->y;
+    if (dx > 0)
+        nx = from->x + from->w + gap;
+    else if (dx < 0)
+        nx = from->x - newW - gap;
+    if (dy > 0)
+        ny = from->y + from->h + gap;
+    else if (dy < 0)
+        ny = from->y - newH - gap;
+    const QPointF snapped = scene->snap(QPointF(nx, ny));
+
+    m_room.id = map->nextRoomId();
+    m_room.seq = map->nextSeq();
+    m_room.name = map->settings.defaultRoomName;
+    m_room.w = newW;
+    m_room.h = newH;
+    m_room.x = snapped.x();
+    m_room.y = snapped.y();
+    switch (static_cast<RoomShape>(map->settings.defaultRoomShape)) {
+    case RoomShape::RoundedCorners: m_room.roundedCorners = true; break;
+    case RoomShape::Ellipse: m_room.ellipse = true; break;
+    case RoomShape::Octagonal: m_room.octagonal = true; break;
+    default: break;
+    }
+
+    m_conn.id = map->nextConnectionId() + 1; // distinct from the room's id space
+    m_conn.seq = m_room.seq + 1;
+    Vertex a;
+    a.index = 0;
+    a.docked = true;
+    a.roomId = fromRoomId;
+    a.port = direction;
+    Vertex b;
+    b.index = 1;
+    b.docked = true;
+    b.roomId = m_room.id;
+    b.port = oppositePort(direction);
+    m_conn.vertices << a << b;
+
+    m_valid = true;
+    setText(QObject::tr("Add Room %1").arg(direction.toUpper()));
+}
+
+void AddConnectedRoomCommand::redo()
+{
+    if (!m_valid)
+        return;
+    Map *map = m_scene->document();
+    map->rooms.append(m_room);
+    map->connections.append(m_conn);
+    map->reindex();
+    m_scene->rebuild();
+    m_scene->selectRoomItem(m_room.id);
+}
+
+void AddConnectedRoomCommand::undo()
+{
+    if (!m_valid)
+        return;
+    Map *map = m_scene->document();
+    map->removeConnection(m_conn.id);
+    map->removeRoom(m_room.id);
+    m_scene->rebuild();
+}
+
 // ---- AddConnectionCommand -------------------------------------------------
 
 AddConnectionCommand::AddConnectionCommand(MapScene *scene, int fromId, const QString &portA,

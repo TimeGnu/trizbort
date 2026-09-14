@@ -136,10 +136,9 @@ QColor Map::regionFill(const QString &name) const
 
 int Map::nextRoomId() const
 {
-    int maxId = 0;
-    for (const Room &r : rooms)
-        maxId = qMax(maxId, r.id);
-    return maxId + 1;
+    // Rooms and connections share one id space in the format, so a new id must
+    // clear both.
+    return nextConnectionId();
 }
 
 int Map::nextConnectionId() const

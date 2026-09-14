@@ -199,6 +199,15 @@ void MapScene::selectRoomItem(int roomId)
         item->setSelected(true);
 }
 
+int MapScene::selectedRoomId() const
+{
+    for (QGraphicsItem *item : selectedItems()) {
+        if (auto *ri = dynamic_cast<RoomItem *>(item))
+            return ri->roomId();
+    }
+    return -1;
+}
+
 int MapScene::addRoomAt(const QPointF &scenePos)
 {
     if (!m_map)
