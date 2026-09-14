@@ -57,6 +57,7 @@
 #include "export/AlanExporter.h"
 #include "export/CodeExporter.h"
 #include "export/HugoExporter.h"
+#include "export/TadsExporter.h"
 #include "export/ZilExporter.h"
 
 // Headless render: load a map and write a PNG, no window. Useful for CI smoke
@@ -112,6 +113,8 @@ static std::unique_ptr<trizbort::CodeExporter> makeExporter(const QString &fmt,
         return std::make_unique<HugoExporter>(map, path);
     if (fmt == QLatin1String("alan"))
         return std::make_unique<AlanExporter>(map, path);
+    if (fmt == QLatin1String("tads"))
+        return std::make_unique<TadsExporter>(map, path);
     return nullptr;
 }
 
