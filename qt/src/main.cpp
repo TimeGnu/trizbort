@@ -58,6 +58,7 @@
 #include "export/CodeExporter.h"
 #include "export/HugoExporter.h"
 #include "export/Inform6Exporter.h"
+#include "export/Inform7Exporter.h"
 #include "export/TadsExporter.h"
 #include "export/ZilExporter.h"
 
@@ -118,6 +119,8 @@ static std::unique_ptr<trizbort::CodeExporter> makeExporter(const QString &fmt,
         return std::make_unique<TadsExporter>(map, path);
     if (fmt == QLatin1String("inform6"))
         return std::make_unique<Inform6Exporter>(map, path);
+    if (fmt == QLatin1String("inform7"))
+        return std::make_unique<Inform7Exporter>(map, path);
     return nullptr;
 }
 
