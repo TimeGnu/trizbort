@@ -1,0 +1,53 @@
+name: Build (Windows)
+
+# Trizbort targets net7.0-windows (WinForms), which can only be built on
+# Windows because the Windows Desktop targeting pack is Windows-only.
+# This workflow gives the project its first CI build gate.
+
+on:
+  push:
+    branches: [master, "claude/**"]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            7.0.x
+            8.0.x
+
+      - name: Restore
+        run: dotnet restore Trizbort.csproj
+
+      # Manifest generation (ClickOnce) needs a signing key that is not in the
+      # repo; disable it for CI so the build gate does not depend on secrets.
+      - name: Build (Release)
+        run: dotnet build Trizbort.csproj -c Release --no-restore -p:GenerateManifests=false
+
+      # Self-contained single-file publish. A build produced this way carries
+      # its own runtime, so end users do NOT need any .NET Framework/runtime
+      # installed -- this is what fixes the "needs .NET Framework 3.5" prompt
+      # some users hit on Windows 11. Non-blocking for now.
+      - name: Publish self-contained (win-x64)
+        continue-on-error: true
+        run: >
+          dotnet publish Trizbort.csproj -c Release -r win-x64 --self-contained true
+          -p:PublishSingleFile=true -p:GenerateManifests=false -o publish/win-x64
+
+      - name: Upload published build
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: trizbort-win-x64
+          path: publish/win-x64
+          if-no-files-found: ignore
