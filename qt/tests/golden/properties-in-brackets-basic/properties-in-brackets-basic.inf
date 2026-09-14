@@ -1,0 +1,99 @@
+Constant Story "properties-in-brackets-basic";
+Constant Headline "^By A Trizbort User^^^";
+
+Include "Parser";
+Include "VerbLib";
+
+Object  Cave "Cave"
+  with  description
+            "",
+        e_to ErrorRoom,
+   has  light;
+
+Object ->  Fred "Fred"
+  with  name 'Fred',
+        description "Fred"
+  has proper animate male;
+
+Object ->  Wilma "Wilma"
+  with  name 'Wilma',
+        description "Wilma"
+  has proper animate female;
+
+Object ->  Pat "Pat"
+  with  name 'Pat',
+        description "Pat"
+  has proper animate neuter;
+
+Object ->  Mice "Mice"
+  with  name 'Mice',
+        description "Mice"
+  has pluralname;
+
+Object ->  Mess "Mess"
+  with  name 'Mess',
+        description "Mess";
+
+Object ->  Oven "Oven"
+  with  name 'Oven',
+        description "Oven"
+  has container;
+
+Object ->  Table "Table"
+  with  name 'Table',
+        description "Table"
+  has supporter;
+
+Object ->  Window "Window"
+  with  name 'Window',
+        description "Window"
+  has scenery;
+
+Object  ErrorRoom "Error Room"
+  with  description
+            "",
+        w_to Cave,
+   has  light;
+
+Object ->  Genders "Genders"
+  with  name 'Genders',
+        description "Genders"
+  has animate male;
+
+Object ->  Genders2 "Genders"
+  with  name 'Genders',
+        description "Genders"
+  has animate neuter;
+
+Object ->  Genders3 "Genders"
+  with  name 'Genders',
+        description "Genders"
+  has animate neuter;
+
+Object ->  Oddperson "Oddperson"
+  with  name 'Oddperson',
+        description "Oddperson"
+  has animate neuter;
+
+Object ->  Oddperson2 "Oddperson"
+  with  name 'Oddperson',
+        description "Oddperson"
+  has animate neuter scenery;
+
+Object ->  Oddperson3 "Oddperson"
+  with  name 'Oddperson',
+        description "Oddperson"
+  has animate neuter;
+
+Object ->  Singplur "Singplur"
+  with  name 'Singplur',
+        description "Singplur"
+  has pluralname;
+
+[ Initialise;
+    location = Cave;
+    ! "^^Your opening paragraph here...^^";
+];
+
+Include "Grammar";
+

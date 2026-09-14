@@ -1,0 +1,110 @@
+<asl version="550">
+
+  <include ref="English.aslx"/>
+  <include ref="Core.aslx"/>
+  <game name="properties-in-brackets-basic">
+    <gameid>1192ba28-0339-4490-9b0a-f3cdc812f383</gameid>
+    <version>1.0</version>
+    <firstpublished>2026</firstpublished>
+    <author>A Trizbort User</author>
+    <description></description>
+  </game>
+
+  <object name="Cave">
+    <inherit name="editor_room" />
+    <alias>Cave</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="ErrorRoom">
+      <inherit name="eastdirection" />
+    </exit>
+    <object name="Fred">
+      <inherit name="editor_object" />
+      <inherit name="namedmale" />
+      <alias>Fred</alias>
+    </object>
+    <object name="Wilma">
+      <inherit name="editor_object" />
+      <inherit name="namedfemale" />
+      <alias>Wilma</alias>
+    </object>
+    <object name="Pat">
+      <inherit name="editor_object" />
+      <alias>Pat</alias>
+    </object>
+    <object name="Mice">
+      <inherit name="editor_object" />
+      <inherit name="plural" />
+      <alias>Mice</alias>
+    </object>
+    <object name="Mess">
+      <inherit name="editor_object" />
+      <alias>Mess</alias>
+    </object>
+    <object name="Oven">
+      <inherit name="editor_object" />
+      <feature_container />
+      <inherit name="container_closed" />
+      <alias>Oven</alias>
+    </object>
+    <object name="Table">
+      <inherit name="editor_object" />
+      <alias>Table</alias>
+    </object>
+    <object name="Window">
+      <inherit name="editor_object" />
+      <scenery />
+      <alias>Window</alias>
+    </object>
+  </object>
+
+  <object name="ErrorRoom">
+    <inherit name="editor_room" />
+    <alias>Error Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="Cave">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="Genders">
+      <inherit name="editor_object" />
+      <inherit name="male" />
+      <alias>Genders</alias>
+    </object>
+    <object name="Genders2">
+      <inherit name="editor_object" />
+      <alias>Genders</alias>
+    </object>
+    <object name="Genders3">
+      <inherit name="editor_object" />
+      <alias>Genders</alias>
+    </object>
+    <object name="Oddperson">
+      <inherit name="editor_object" />
+      <alias>Oddperson</alias>
+    </object>
+    <object name="Oddperson2">
+      <inherit name="editor_object" />
+      <scenery />
+      <alias>Oddperson</alias>
+    </object>
+    <object name="Oddperson3">
+      <inherit name="editor_object" />
+      <alias>Oddperson</alias>
+    </object>
+    <object name="Singplur">
+      <inherit name="editor_object" />
+      <inherit name="plural" />
+      <alias>Singplur</alias>
+    </object>
+  </object>
+
+
+</asl>
+

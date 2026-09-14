@@ -1,0 +1,57 @@
+Constant Story "object-testing";
+Constant Headline "^By A Trizbort User^^^";
+
+Include "Parser";
+Include "VerbLib";
+
+Object  TestRoom "Test Room"
+  with  description
+            "",
+        e_to cave,
+   has  light;
+
+Object ->  MrJones "Mr Jones"
+  with  name 'Mr' 'Jones',
+        description "Mr Jones"
+  has open container animate male;
+
+Object -> ->  Hat "Hat"
+  with  name 'Hat',
+        description "Hat"
+  has open container;
+
+Object -> -> ->  Hatband "Hatband"
+  with  name 'Hatband',
+        description "Hatband";
+
+Object -> ->  fishbowl "fishbowl"
+  with  name 'fishbowl',
+        description "fishbowl"
+  has open container;
+
+Object -> -> ->  goldfish "goldfish"
+  with  name 'goldfish',
+        description "goldfish";
+
+Object ->  MrsJones "Mrs Jones"
+  with  name 'Mrs' 'Jones',
+        description "Mrs Jones"
+  has open container animate female;
+
+Object -> ->  rabbit "rabbit"
+  with  name 'rabbit',
+        description "rabbit";
+
+Object  cave "cave"
+  with  description
+            "",
+        w_to TestRoom,
+   has  light;
+
+[ Initialise;
+    location = TestRoom;
+    ! "^^Your opening paragraph here...^^";
+];
+
+Include "Grammar";
+

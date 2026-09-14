@@ -3,7 +3,7 @@
   <include ref="English.aslx"/>
   <include ref="Core.aslx"/>
   <game name="Slasher Swamp map">
-    <gameid>ff9dd851-e65e-484e-9888-231dcbac099f</gameid>
+    <gameid>bb493982-3ed0-433c-a11e-12ba60838278</gameid>
     <version>1.0</version>
     <firstpublished>2026</firstpublished>
     <author>Andrew Schultz</author>

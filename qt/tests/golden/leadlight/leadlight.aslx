@@ -3,7 +3,7 @@
   <include ref="English.aslx"/>
   <include ref="Core.aslx"/>
   <game name="Leadlight Gamma Map">
-    <gameid>4cfa8c81-88c0-4630-b319-e301d19d0410</gameid>
+    <gameid>c593ca72-f135-4938-81a2-4e8faad551f0</gameid>
     <version>1.0</version>
     <firstpublished>2026</firstpublished>
     <author>Andrew Schultz</author>

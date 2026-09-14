@@ -1,0 +1,20 @@
+
+start_at = west_room
+
+locations {
+   west_room  : location "" header = "West Room";
+   east_room  : location "" header = "East Room";
+   north_room : location "" header = "North Room";
+}
+
+
+connections {
+   from, direction, to = [
+      west_room, north_oneway, north_room,
+      west_room, east_oneway, east_room,
+      east_room, west_oneway, west_room,
+      north_room, south_oneway, west_room,
+   ]
+}
+
+

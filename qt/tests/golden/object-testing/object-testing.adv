@@ -1,0 +1,17 @@
+
+start_at = test_room
+
+locations {
+   test_room : location "" header = "Test Room";
+   cave      : location "" header = "cave";
+}
+
+
+connections {
+   from, direction, to = [
+      test_room, east_oneway, cave,
+      cave, west_oneway, test_room,
+   ]
+}
+
+

@@ -3,7 +3,7 @@
   <include ref="English.aslx"/>
   <include ref="Core.aslx"/>
   <game name="Gemstone Warrior Trizbort map">
-    <gameid>f0e62cbe-6e17-4126-9e87-4fc51b26e62c</gameid>
+    <gameid>e11e0dfb-da54-4215-a9fb-1312049483ad</gameid>
     <version>1.0</version>
     <firstpublished>2026</firstpublished>
     <author>Andrew Schultz</author>
