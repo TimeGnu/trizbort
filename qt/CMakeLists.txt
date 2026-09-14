@@ -23,6 +23,9 @@ add_executable(trizbort-qt
     src/MapScene.cpp
     src/MapView.cpp
     src/MainWindow.cpp
+    src/export/ExportModel.cpp
+    src/export/CodeExporter.cpp
+    src/export/ZilExporter.cpp
 )
 
 target_link_libraries(trizbort-qt PRIVATE Qt6::Widgets)

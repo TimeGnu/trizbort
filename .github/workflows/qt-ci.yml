@@ -1,0 +1,43 @@
+# Copyright (c) 2026  Jason Self <j@jxself.org>. GPLv3-or-later; see qt/COPYING.
+#
+# Builds the native C++/Qt app on Linux and checks every C++ exporter against
+# the golden corpus. This is fast, free, and runs on GNU/Linux -- the project's
+# primary platform -- so exporter regressions are caught without any Windows.
+
+name: Qt (Linux) build & golden tests
+
+on:
+  push:
+    branches: [master, "claude/**"]
+    paths:
+      - "qt/**"
+      - "samples/**"
+      - ".github/workflows/qt-ci.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "qt/**"
+      - "samples/**"
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Qt 6 and build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qt6-base-dev cmake g++
+
+      - name: Configure & build
+        run: |
+          cmake -S qt -B qt/build
+          cmake --build qt/build -j
+
+      - name: Golden-corpus tests
+        run: sh qt/tests/run-golden.sh

@@ -38,35 +38,67 @@
  *     THE SOFTWARE.
  */
 
-#ifndef TRIZBORT_MAPSCENE_H
-#define TRIZBORT_MAPSCENE_H
+#ifndef TRIZBORT_EXPORT_CODEEXPORTER_H
+#define TRIZBORT_EXPORT_CODEEXPORTER_H
 
-#include <QColor>
-#include <QGraphicsScene>
-#include <QPointF>
-#include <QRectF>
+#include <optional>
+
+#include <QHash>
+#include <QList>
+#include <QSet>
 #include <QString>
 
-#include "MapDocument.h"
+#include "../MapDocument.h"
+#include "ExportModel.h"
 
+// Base class for the code exporters, ported from Export/CodeExporter.cs.
+// Builds the intermediate model (regions, locations, exits, things) from a Map,
+// then a subclass serializes it to a target language.
 namespace trizbort {
 
-// Builds a read-only QGraphicsScene from a Map: rooms as rectangles with
-// labels, connections as polylines (dashed/one-way honored). This is the
-// rendering seed for the eventual editing canvas.
-class MapScene : public QGraphicsScene {
+class CodeExporter {
 public:
-    explicit MapScene(QObject *parent = nullptr);
-    void setMap(const Map &map);
+    CodeExporter(const Map &map, const QString &sourcePath);
+    virtual ~CodeExporter();
+
+    // Runs the pipeline and returns the full exported source.
+    QString exportToString();
+
+protected:
+    virtual QStringList reservedWords() const = 0;
+    virtual void exportHeader(QString &out, const QString &title, const QString &author,
+                              const QString &description, const QString &history) = 0;
+    virtual void exportContent(QString &out) = 0;
+    virtual QString getExportName(const Room &room, std::optional<int> suffix) = 0;
+    virtual QString getExportName(const QString &displayName, std::optional<int> suffix) = 0;
+
+    static QString deaccent(const QString &s);
+
+    const Map &m_map;
+    QString m_sourcePath;
+    QList<Location *> m_locationsInExportOrder;
+    QList<ExportRegion *> m_regionsInExportOrder;
 
 private:
-    QPointF portPoint(const Room &room, const QString &port) const;
-    void addArrowHead(const QPointF &from, const QPointF &to, const QColor &color);
-    void addLabel(const QString &text, const QPointF &pos, const QColor &color);
-    // A room name centered and shrunk to stay inside the room rectangle.
-    void addRoomLabel(const QString &text, const QRectF &rect, const QColor &color);
+    void prepareContent();
+    void findRegions();
+    void findRooms();
+    void findExits();
+    void pickBestExits();
+    void findThings();
+
+    const Room *sourceRoom(const Connection &c, CompassPoint &cp) const;
+    const Room *targetRoom(const Connection &c, CompassPoint &cp) const;
+
+    QHash<int, Location *> m_roomIdToLocation;
+
+    // Owned heap objects, freed in the destructor.
+    QList<Location *> m_ownedLocations;
+    QList<Exit *> m_ownedExits;
+    QList<Thing *> m_ownedThings;
+    QList<ExportRegion *> m_ownedRegions;
 };
 
 } // namespace trizbort
 
-#endif // TRIZBORT_MAPSCENE_H
+#endif // TRIZBORT_EXPORT_CODEEXPORTER_H

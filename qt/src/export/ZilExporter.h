@@ -38,35 +38,27 @@
  *     THE SOFTWARE.
  */
 
-#ifndef TRIZBORT_MAPSCENE_H
-#define TRIZBORT_MAPSCENE_H
+#ifndef TRIZBORT_EXPORT_ZILEXPORTER_H
+#define TRIZBORT_EXPORT_ZILEXPORTER_H
 
-#include <QColor>
-#include <QGraphicsScene>
-#include <QPointF>
-#include <QRectF>
-#include <QString>
+#include "CodeExporter.h"
 
-#include "MapDocument.h"
-
+// ZIL (Infocom / ZILF) exporter, ported from Export/Languages/ZilExporter.cs.
 namespace trizbort {
 
-// Builds a read-only QGraphicsScene from a Map: rooms as rectangles with
-// labels, connections as polylines (dashed/one-way honored). This is the
-// rendering seed for the eventual editing canvas.
-class MapScene : public QGraphicsScene {
+class ZilExporter : public CodeExporter {
 public:
-    explicit MapScene(QObject *parent = nullptr);
-    void setMap(const Map &map);
+    using CodeExporter::CodeExporter;
 
-private:
-    QPointF portPoint(const Room &room, const QString &port) const;
-    void addArrowHead(const QPointF &from, const QPointF &to, const QColor &color);
-    void addLabel(const QString &text, const QPointF &pos, const QColor &color);
-    // A room name centered and shrunk to stay inside the room rectangle.
-    void addRoomLabel(const QString &text, const QRectF &rect, const QColor &color);
+protected:
+    QStringList reservedWords() const override;
+    void exportHeader(QString &out, const QString &title, const QString &author,
+                      const QString &description, const QString &history) override;
+    void exportContent(QString &out) override;
+    QString getExportName(const Room &room, std::optional<int> suffix) override;
+    QString getExportName(const QString &displayName, std::optional<int> suffix) override;
 };
 
 } // namespace trizbort
 
-#endif // TRIZBORT_MAPSCENE_H
+#endif // TRIZBORT_EXPORT_ZILEXPORTER_H

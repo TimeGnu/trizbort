@@ -13,9 +13,33 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see https://www.gnu.org/licenses/.
+ *
+ * This file incorporates work covered by the following copyright and
+ * permission notice:
+ *
+ *     Copyright (c) 2010-2022 by Genstein and Jason Lautzenheiser
+ *
+ *     Permission is hereby granted, free of charge, to any person obtaining a copy
+ *     of this software and associated documentation files (the "Software"), to deal
+ *     in the Software without restriction, including without limitation the rights
+ *     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *     copies of the Software, and to permit persons to whom the Software is
+ *     furnished to do so, subject to the following conditions:
+ *
+ *     The above copyright notice and this permission notice shall be included in
+ *     all copies or substantial portions of the Software.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *     THE SOFTWARE.
  */
 
 #include <QApplication>
+#include <QFile>
 #include <QImage>
 #include <QPainter>
 #include <QRectF>
@@ -27,6 +51,7 @@
 #include "MapDocument.h"
 #include "MapScene.h"
 #include "TrizbortReader.h"
+#include "export/ZilExporter.h"
 
 // Headless render: load a map and write a PNG, no window. Useful for CI smoke
 // tests and thumbnails. Run with QT_QPA_PLATFORM=offscreen on a headless host.
@@ -67,6 +92,31 @@ static int renderToPng(const QString &mapPath, const QString &pngPath)
     return 0;
 }
 
+// Headless ZIL export: load a map and write ZIL source. Used to validate the
+// C++ exporter against the golden fixtures.
+static int exportZil(const QString &mapPath, const QString &outPath)
+{
+    QTextStream err(stderr);
+
+    trizbort::Map map;
+    QString error;
+    if (!trizbort::TrizbortReader::load(mapPath, map, &error)) {
+        err << "load failed: " << error << Qt::endl;
+        return 1;
+    }
+
+    trizbort::ZilExporter exporter(map, mapPath);
+    const QString text = exporter.exportToString();
+
+    QFile file(outPath);
+    if (!file.open(QIODevice::WriteOnly)) {
+        err << "could not write " << outPath << Qt::endl;
+        return 3;
+    }
+    file.write(text.toUtf8());
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -74,12 +124,23 @@ int main(int argc, char *argv[])
 
     QString mapPath;
     QString renderPath;
+    QString zilPath;
     const QStringList args = QApplication::arguments();
     for (int i = 1; i < args.size(); ++i) {
         if (args.at(i) == QLatin1String("--render") && i + 1 < args.size())
             renderPath = args.at(++i);
+        else if (args.at(i) == QLatin1String("--zil") && i + 1 < args.size())
+            zilPath = args.at(++i);
         else
             mapPath = args.at(i);
+    }
+
+    if (!zilPath.isEmpty()) {
+        if (mapPath.isEmpty()) {
+            QTextStream(stderr) << "usage: trizbort-qt <map.trizbort> --zil <out.zil>" << Qt::endl;
+            return 2;
+        }
+        return exportZil(mapPath, zilPath);
     }
 
     if (!renderPath.isEmpty()) {

@@ -10,6 +10,15 @@ changes that.
 
 There are two kinds of files in this directory, with two different headers.
 
+**Default for this project:** because the entire `qt/` reimplementation was
+developed by studying the MIT-licensed C# Trizbort, all `qt/` **source files
+carry the dual header** (section 2 below) as a safe, generous default —
+over-attribution costs nothing, under-attribution is the real risk. The
+GPL-only header (section 1) is reserved for files with no derivation from the
+original, such as build scripts (`CMakeLists.txt`) and this repository's own
+tooling. Files that are *direct translations* of the C# code (the exporters and
+export pipeline) require the dual header regardless.
+
 ## 1. Original files (written from scratch)
 
 Files that are our own original work — no code copied or translated from the

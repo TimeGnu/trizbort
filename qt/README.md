@@ -14,14 +14,19 @@ depend on Windows or Microsoft's toolchain, this rewrite uses only free software
 
 ## Status
 
-Early scaffolding. Current capability:
+Early, but real. Current capability:
 
 - Loads a `.trizbort` map file (rooms, connections, regions).
 - Renders the map in a pannable / zoomable canvas (`QGraphicsView`).
+- **ZIL exporter** (`--zil <out>`): byte-identical to the C# exporter across
+  all 11 sample maps, verified against the golden corpus by
+  `qt/tests/run-golden.sh` (and CI). This includes the shared export pipeline
+  (naming/dedup, best-exit selection, object parsing) that the remaining
+  exporters will reuse.
 
-Not yet: editing, saving, objects/handles, and the code exporters (Inform 6/7,
-TADS, ZIL, Hugo, Alan, Quest, Adventuron). Those are the next milestones and are
-validated against the specs in [`docs/`](docs/) and a golden-output corpus.
+Not yet: editing, saving, and the other seven exporters (Inform 6/7, TADS, Hugo,
+Alan, Quest, Adventuron) — each a smaller job now that the pipeline exists, and
+each validated the same way against `docs/exporters.md` and the golden corpus.
 
 ## Building (GNU/Linux)
 

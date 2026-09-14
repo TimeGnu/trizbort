@@ -13,6 +13,29 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see https://www.gnu.org/licenses/.
+ *
+ * This file incorporates work covered by the following copyright and
+ * permission notice:
+ *
+ *     Copyright (c) 2010-2022 by Genstein and Jason Lautzenheiser
+ *
+ *     Permission is hereby granted, free of charge, to any person obtaining a copy
+ *     of this software and associated documentation files (the "Software"), to deal
+ *     in the Software without restriction, including without limitation the rights
+ *     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *     copies of the Software, and to permit persons to whom the Software is
+ *     furnished to do so, subject to the following conditions:
+ *
+ *     The above copyright notice and this permission notice shall be included in
+ *     all copies or substantial portions of the Software.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *     THE SOFTWARE.
  */
 
 #include "TrizbortReader.h"
@@ -67,16 +90,21 @@ Room readRoom(QXmlStreamReader &xml)
     r.border = parseTrizbortColor(attr(a, "roomBorder"));
     r.largeText = parseTrizbortColor(attr(a, "roomLargeText"));
     r.smallText = parseTrizbortColor(attr(a, "roomSmallText"));
+    const QString dark = attr(a, "isDark").toLower();
+    r.isDark = (dark == QLatin1String("yes") || dark == QLatin1String("true"));
+    const QString start = attr(a, "isStartRoom").toLower();
+    r.isStartRoom = (start == QLatin1String("yes") || start == QLatin1String("true"));
 
     while (xml.readNextStartElement()) {
         if (xml.name() == QLatin1String("objects")) {
-            const QString text = xml.readElementText();
-            const QStringList lines = text.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
-            for (const QString &line : lines) {
-                const QString trimmed = line.trimmed();
-                if (!trimmed.isEmpty())
-                    r.objects.append(trimmed);
-            }
+            // Trizbort encodes newlines in the objects text as '|' (and an
+            // escaped literal pipe as '\|'); decode exactly as Room.cs:1162
+            // does. Indentation denotes containment and [..] encodes
+            // properties; the exporters parse that themselves.
+            QString text = xml.readElementText();
+            text.replace(QLatin1String("|"), QLatin1String("\r\n"));
+            text.replace(QLatin1String("\\\r\n"), QLatin1String("|"));
+            r.objectsText = text;
         } else {
             xml.skipCurrentElement();
         }
