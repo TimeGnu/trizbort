@@ -47,6 +47,8 @@
 
 #include "MapDocument.h"
 
+class QUndoStack;
+
 namespace trizbort {
 
 class RoomItem;
@@ -66,6 +68,14 @@ public:
     void setDocument(Map *map);
     Map *document() const { return m_map; }
     void rebuild();
+
+    // The undo stack edits are pushed to (not owned). When unset, edits apply
+    // directly (used by headless callers and rendering).
+    void setUndoStack(QUndoStack *stack) { m_undo = stack; }
+    QUndoStack *undoStack() const { return m_undo; }
+
+    // Select only the given room's item (used after an add).
+    void selectRoomItem(int roomId);
 
     double gridSize() const;
     QPointF snap(const QPointF &p) const;
@@ -115,6 +125,9 @@ private:
     bool m_connectMode = false;
     int m_connectFromRoom = -1;
     QGraphicsLineItem *m_rubberLine = nullptr;
+
+    QUndoStack *m_undo = nullptr;
+    QHash<int, QPointF> m_dragStartPos; // room id -> position at drag start
 };
 
 } // namespace trizbort

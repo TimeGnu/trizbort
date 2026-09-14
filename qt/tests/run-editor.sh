@@ -30,6 +30,10 @@ out=$("$BIN" --gui-selftest "$SAMPLE" 2>/dev/null) || fail=1
 echo "$out"
 echo "$out" | grep -q "gui-selftest: PASS" || fail=1
 
+out=$("$BIN" --undo-selftest 2>/dev/null) || fail=1
+echo "$out"
+echo "$out" | grep -q "undo-selftest: PASS" || fail=1
+
 if [ "$fail" -eq 0 ]; then
     echo "editor: PASS"
 else

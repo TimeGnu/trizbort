@@ -42,6 +42,7 @@
 #define TRIZBORT_MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QUndoStack>
 
 #include "MapDocument.h"
 
@@ -75,19 +76,16 @@ private slots:
     void editMapProperties();
     void editRoom(int roomId);
     void editConnection(int connId);
-    void onDocumentChanged();
 
 private:
     void createActions();
-    void setDirty(bool dirty);
     void updateTitle();
     bool maybeSave();                 // returns false to cancel the pending action
     bool writeToPath(const QString &path);
-    void ensureRegionExists(const QString &name);
 
     Map m_map;
     QString m_filePath;
-    bool m_dirty = false;
+    QUndoStack m_undo;
 
     MapScene *m_scene = nullptr;
     MapView *m_view = nullptr;

@@ -45,8 +45,10 @@
 #include <QGraphicsLineItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <QUndoStack>
 
 #include "ConnectionItem.h"
+#include "EditCommands.h"
 #include "RoomItem.h"
 
 namespace trizbort {
@@ -190,16 +192,29 @@ void MapScene::roomMovedTo(int roomId, const QPointF &topLeft)
     emit documentChanged();
 }
 
+void MapScene::selectRoomItem(int roomId)
+{
+    clearSelection();
+    if (RoomItem *item = m_roomItems.value(roomId, nullptr))
+        item->setSelected(true);
+}
+
 int MapScene::addRoomAt(const QPointF &scenePos)
 {
     if (!m_map)
         return -1;
     const QPointF tl = snap(scenePos);
+    if (m_undo) {
+        auto *cmd = new AddRoomCommand(this, tl.x(), tl.y());
+        const int id = cmd->roomId();
+        m_undo->push(cmd);
+        return id;
+    }
+    // Direct path for headless callers with no undo stack.
     const int id = m_map->addRoom(tl.x(), tl.y());
     auto *item = new RoomItem(this, id);
     addItem(item);
     m_roomItems.insert(id, item);
-    // Grow the scene rect if needed.
     setSceneRect(sceneRect().united(item->sceneBoundingRect().adjusted(-400, -400, 400, 400)));
     emit documentChanged();
     return id;
@@ -220,11 +235,18 @@ void MapScene::deleteSelection()
     if (roomsToDelete.isEmpty() && connsToDelete.isEmpty())
         return;
 
+    if (m_undo) {
+        auto *cmd = new DeleteElementsCommand(this, roomsToDelete, connsToDelete);
+        if (cmd->isEmpty())
+            delete cmd;
+        else
+            m_undo->push(cmd);
+        return;
+    }
     for (int id : connsToDelete)
         m_map->removeConnection(id);
     for (int id : roomsToDelete)
         m_map->removeRoom(id); // also drops connections docked to it
-
     rebuild();
     emit documentChanged();
 }
@@ -285,6 +307,18 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         }
     }
     QGraphicsScene::mousePressEvent(event);
+
+    // Snapshot the positions of the rooms about to be dragged, so the move can
+    // be pushed as one undoable command on release.
+    m_dragStartPos.clear();
+    if (event->button() == Qt::LeftButton && !m_connectMode && m_map) {
+        for (QGraphicsItem *item : selectedItems()) {
+            if (auto *ri = dynamic_cast<RoomItem *>(item)) {
+                if (const Room *r = m_map->roomById(ri->roomId()))
+                    m_dragStartPos.insert(ri->roomId(), QPointF(r->x, r->y));
+            }
+        }
+    }
 }
 
 void MapScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -312,16 +346,37 @@ void MapScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             if (from && to) {
                 const QString portA = Map::portFacing(*from, *to);
                 const QString portB = Map::portFacing(*to, *from);
-                m_map->addConnection(from->id, portA, to->id, portB);
-                rebuildConnections();
-                emit documentChanged();
+                if (m_undo) {
+                    m_undo->push(
+                        new AddConnectionCommand(this, from->id, portA, to->id, portB));
+                } else {
+                    m_map->addConnection(from->id, portA, to->id, portB);
+                    rebuildConnections();
+                    emit documentChanged();
+                }
             }
         }
         m_connectFromRoom = -1;
         event->accept();
         return;
     }
+
     QGraphicsScene::mouseReleaseEvent(event);
+
+    // If a drag moved one or more rooms, record it as a single undoable command.
+    if (!m_dragStartPos.isEmpty()) {
+        QList<RoomMove> moves;
+        for (auto it = m_dragStartPos.constBegin(); it != m_dragStartPos.constEnd(); ++it) {
+            if (const Room *r = m_map ? m_map->roomById(it.key()) : nullptr) {
+                const QPointF cur(r->x, r->y);
+                if (cur != it.value())
+                    moves.append({it.key(), it.value(), cur});
+            }
+        }
+        m_dragStartPos.clear();
+        if (!moves.isEmpty() && m_undo)
+            m_undo->push(new MoveRoomsCommand(this, moves));
+    }
 }
 
 void MapScene::drawBackground(QPainter *painter, const QRectF &rect)

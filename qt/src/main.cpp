@@ -44,6 +44,7 @@
 #include <QDir>
 #include <QFile>
 #include <QImage>
+#include <QUndoStack>
 #include <QPainter>
 #include <QRectF>
 #include <QString>
@@ -51,6 +52,7 @@
 #include <QTextStream>
 
 #include "ConnectionItem.h"
+#include "EditCommands.h"
 #include "MainWindow.h"
 #include "MapDocument.h"
 #include "MapScene.h"
@@ -274,6 +276,84 @@ static int runGuiSelftest(const QString &samplePath)
     return failures == 0 ? 0 : 1;
 }
 
+// Headless test for the undo/redo command classes.
+static int runUndoSelftest()
+{
+    using namespace trizbort;
+    QTextStream out(stdout);
+    int failures = 0;
+    auto check = [&](bool ok, const char *what) {
+        if (!ok) {
+            out << "  FAIL: " << what << Qt::endl;
+            ++failures;
+        }
+    };
+
+    Map map;
+    MapScene scene;
+    QUndoStack stack;
+    scene.setUndoStack(&stack);
+    scene.setDocument(&map);
+
+    check(stack.isClean(), "starts clean");
+    const int a = scene.addRoomAt(QPointF(0, 0));
+    const int b = scene.addRoomAt(QPointF(0, -128));
+    check(map.rooms.size() == 2, "two rooms after add");
+    check(!stack.isClean(), "dirty after edits");
+
+    stack.push(new AddConnectionCommand(&scene, a, QStringLiteral("n"), b, QStringLiteral("s")));
+    check(map.connections.size() == 1, "connection added");
+
+    // Undo the connection, then redo it.
+    stack.undo();
+    check(map.connections.isEmpty(), "undo removed connection");
+    stack.redo();
+    check(map.connections.size() == 1, "redo restored connection");
+
+    // Edit a room name, then undo.
+    {
+        Room before = *map.roomById(a);
+        Room after = before;
+        after.name = QStringLiteral("Renamed");
+        stack.push(new EditRoomCommand(&scene, a, before, after));
+        check(map.roomById(a)->name == QLatin1String("Renamed"), "room renamed");
+        stack.undo();
+        check(map.roomById(a)->name == before.name, "undo restored room name");
+    }
+
+    // Move a room, then undo.
+    {
+        const QPointF oldPos(map.roomById(a)->x, map.roomById(a)->y);
+        QList<RoomMove> moves{{a, oldPos, QPointF(96, 96)}};
+        stack.push(new MoveRoomsCommand(&scene, moves));
+        check(map.roomById(a)->x == 96 && map.roomById(a)->y == 96, "room moved");
+        stack.undo();
+        check(map.roomById(a)->x == oldPos.x() && map.roomById(a)->y == oldPos.y(),
+              "undo restored room position");
+    }
+
+    // Delete a room (and its connection), then undo to restore both.
+    {
+        const int roomsBefore = map.rooms.size();
+        const int connsBefore = map.connections.size();
+        stack.push(new DeleteElementsCommand(&scene, QList<int>{a}, QList<int>{}));
+        check(map.rooms.size() == roomsBefore - 1, "delete removed the room");
+        check(map.connections.isEmpty(), "delete removed its connection");
+        stack.undo();
+        check(map.rooms.size() == roomsBefore, "undo restored the room");
+        check(map.connections.size() == connsBefore, "undo restored its connection");
+    }
+
+    // Clean-state tracking round-trips.
+    stack.setClean();
+    check(stack.isClean(), "clean after setClean");
+    stack.undo();
+    check(!stack.isClean(), "dirty after undoing past the clean point");
+
+    out << (failures == 0 ? "undo-selftest: PASS" : "undo-selftest: FAIL") << Qt::endl;
+    return failures == 0 ? 0 : 1;
+}
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -281,6 +361,8 @@ int main(int argc, char *argv[])
 
     if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--edit-selftest"))
         return runEditSelftest();
+    if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--undo-selftest"))
+        return runUndoSelftest();
     if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--gui-selftest"))
         return runGuiSelftest(argc >= 3 ? QString::fromLocal8Bit(argv[2]) : QString());
 

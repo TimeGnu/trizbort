@@ -27,6 +27,7 @@ add_executable(trizbort-qt
     src/MainWindow.cpp
     src/RoomItem.cpp
     src/ConnectionItem.cpp
+    src/EditCommands.cpp
     src/RoomDialog.cpp
     src/ConnectionDialog.cpp
     src/export/ExportModel.cpp

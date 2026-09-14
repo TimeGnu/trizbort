@@ -56,6 +56,7 @@
 #include <QToolBar>
 
 #include "ConnectionDialog.h"
+#include "EditCommands.h"
 #include "MapScene.h"
 #include "MapView.h"
 #include "RoomDialog.h"
@@ -74,17 +75,19 @@ MainWindow::MainWindow(QWidget *parent)
     m_view->setScene(m_scene);
     setCentralWidget(m_view);
 
-    connect(m_scene, &MapScene::documentChanged, this, &MainWindow::onDocumentChanged);
+    m_scene->setUndoStack(&m_undo);
     connect(m_scene, &MapScene::editRoomRequested, this, &MainWindow::editRoom);
     connect(m_scene, &MapScene::editConnectionRequested, this, &MainWindow::editConnection);
     connect(m_scene, &MapScene::selectionSummary, this,
             [this](const QString &text) { statusBar()->showMessage(text); });
+    connect(&m_undo, &QUndoStack::cleanChanged, this,
+            [this](bool clean) { setWindowModified(!clean); });
 
     createActions();
 
     // Start with a fresh, empty document.
     newFile();
-    statusBar()->showMessage(tr("Ready. Double-click empty canvas actions in the Edit menu."));
+    statusBar()->showMessage(tr("Ready. Insert adds a room; C toggles connect mode."));
 }
 
 void MainWindow::createActions()
@@ -107,6 +110,13 @@ void MainWindow::createActions()
     fileMenu->addAction(tr("&Quit"), QKeySequence::Quit, this, &QWidget::close);
 
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
+    QAction *undoAct = m_undo.createUndoAction(this, tr("&Undo"));
+    undoAct->setShortcut(QKeySequence::Undo);
+    QAction *redoAct = m_undo.createRedoAction(this, tr("&Redo"));
+    redoAct->setShortcut(QKeySequence::Redo);
+    editMenu->addAction(undoAct);
+    editMenu->addAction(redoAct);
+    editMenu->addSeparator();
     auto *addRoomAct =
         editMenu->addAction(tr("Add &Room"), QKeySequence(Qt::Key_Insert), this, &MainWindow::addRoom);
     auto *deleteAct = editMenu->addAction(tr("&Delete Selection"), QKeySequence::Delete, this,
@@ -130,6 +140,9 @@ void MainWindow::createActions()
     toolBar->addAction(openAct);
     toolBar->addAction(saveAct);
     toolBar->addSeparator();
+    toolBar->addAction(undoAct);
+    toolBar->addAction(redoAct);
+    toolBar->addSeparator();
     toolBar->addAction(addRoomAct);
     toolBar->addAction(m_connectAction);
     toolBar->addAction(deleteAct);
@@ -144,7 +157,8 @@ void MainWindow::newFile()
     m_map.regions.append(Region{kNoRegion, QColor(0, 0, 255), QColor(255, 255, 255), QString(), QString()});
     m_filePath.clear();
     m_scene->setDocument(&m_map);
-    setDirty(false);
+    m_undo.clear();
+    updateTitle();
 }
 
 void MainWindow::openFile()
@@ -170,7 +184,8 @@ bool MainWindow::loadFile(const QString &path)
     m_map.reindex();
     m_filePath = path;
     m_scene->setDocument(&m_map);
-    setDirty(false);
+    m_undo.clear();
+    updateTitle();
     m_view->zoomToFit();
     statusBar()->showMessage(tr("Opened %1").arg(QFileInfo(path).fileName()));
     return true;
@@ -205,7 +220,7 @@ bool MainWindow::writeToPath(const QString &path)
         QMessageBox::warning(this, tr("Save Failed"), error);
         return false;
     }
-    setDirty(false);
+    m_undo.setClean();
     statusBar()->showMessage(tr("Saved %1").arg(QFileInfo(path).fileName()));
     return true;
 }
@@ -265,29 +280,16 @@ void MainWindow::toggleConnectMode(bool on)
                                 : tr("Select mode."));
 }
 
-void MainWindow::ensureRegionExists(const QString &name)
-{
-    if (name.isEmpty() || name == kNoRegion)
-        return;
-    if (m_map.regionByName(name))
-        return;
-    m_map.regions.append(Region{name, QColor(0, 0, 255), QColor(255, 255, 255), QString(), QString()});
-}
-
 void MainWindow::editRoom(int roomId)
 {
     const Room *room = m_map.roomById(roomId);
     if (!room)
         return;
-    RoomDialog dialog(m_map, *room, this);
+    const Room before = *room;
+    RoomDialog dialog(m_map, before, this);
     if (dialog.exec() != QDialog::Accepted)
         return;
-    const Room edited = dialog.result();
-    ensureRegionExists(edited.region);
-    if (Room *target = m_map.roomById(roomId))
-        *target = edited;
-    m_scene->refreshRoom(roomId);
-    setDirty(true);
+    m_undo.push(new EditRoomCommand(m_scene, roomId, before, dialog.result()));
 }
 
 void MainWindow::editConnection(int connId)
@@ -295,12 +297,11 @@ void MainWindow::editConnection(int connId)
     const int idx = m_map.connectionIndex(connId);
     if (idx < 0)
         return;
-    ConnectionDialog dialog(m_map.connections.at(idx), this);
+    const Connection before = m_map.connections.at(idx);
+    ConnectionDialog dialog(before, this);
     if (dialog.exec() != QDialog::Accepted)
         return;
-    m_map.connections[idx] = dialog.result();
-    m_scene->refreshConnection(connId);
-    setDirty(true);
+    m_undo.push(new EditConnectionCommand(m_scene, connId, before, dialog.result()));
 }
 
 void MainWindow::editMapProperties()
@@ -325,34 +326,25 @@ void MainWindow::editMapProperties()
 
     if (dialog.exec() != QDialog::Accepted)
         return;
-    m_map.title = title->text();
-    m_map.author = author->text();
-    m_map.description = description->toPlainText();
-    m_map.history = history->toPlainText();
-    setDirty(true);
-}
-
-void MainWindow::onDocumentChanged()
-{
-    setDirty(true);
-}
-
-void MainWindow::setDirty(bool dirty)
-{
-    m_dirty = dirty;
-    setWindowModified(dirty);
-    updateTitle();
+    EditMapInfoCommand::Info before{m_map.title, m_map.author, m_map.description, m_map.history};
+    EditMapInfoCommand::Info after{title->text(), author->text(), description->toPlainText(),
+                                   history->toPlainText()};
+    if (before.title == after.title && before.author == after.author
+        && before.description == after.description && before.history == after.history)
+        return;
+    m_undo.push(new EditMapInfoCommand(m_scene, before, after));
 }
 
 void MainWindow::updateTitle()
 {
     const QString name = m_filePath.isEmpty() ? tr("Untitled") : QFileInfo(m_filePath).fileName();
     setWindowTitle(tr("%1[*] — Trizbort (Qt)").arg(name));
+    setWindowModified(!m_undo.isClean());
 }
 
 bool MainWindow::maybeSave()
 {
-    if (!m_dirty)
+    if (m_undo.isClean())
         return true;
     const auto choice = QMessageBox::warning(
         this, tr("Unsaved Changes"),
