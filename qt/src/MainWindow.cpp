@@ -46,6 +46,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFormLayout>
+#include <QInputDialog>
 #include <QKeySequence>
 #include <QLineEdit>
 #include <QMenu>
@@ -160,6 +161,52 @@ void MainWindow::createActions()
     editMenu->addSeparator();
     editMenu->addAction(tr("&Map Properties…"), this, &MainWindow::editMapProperties);
     editMenu->addAction(tr("Map &Settings…"), this, &MainWindow::editMapSettings);
+
+    // --- Rooms menu ---
+    QMenu *roomsMenu = menuBar()->addMenu(tr("&Rooms"));
+    roomsMenu->addAction(tr("Re&name…"), QKeySequence(Qt::Key_F2), this,
+                         &MainWindow::renameSelectedRoom);
+    roomsMenu->addAction(tr("Change &Region…"), QKeySequence(Qt::SHIFT | Qt::Key_F2), this,
+                         &MainWindow::changeSelectedRegion);
+    roomsMenu->addSeparator();
+    roomsMenu->addAction(tr("Toggle &Darkness"), QKeySequence(Qt::Key_K), this, [this] {
+        applyToSelectedRooms(tr("Toggle Darkness"), [](Room &r) { r.isDark = !r.isDark; });
+    });
+    roomsMenu->addAction(tr("Force Dar&k"), QKeySequence(Qt::CTRL | Qt::Key_K), this, [this] {
+        applyToSelectedRooms(tr("Force Dark"), [](Room &r) { r.isDark = true; });
+    });
+    roomsMenu->addAction(tr("Force &Lighted"), QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_K), this,
+                         [this] {
+                             applyToSelectedRooms(tr("Force Lighted"),
+                                                  [](Room &r) { r.isDark = false; });
+                         });
+    roomsMenu->addSeparator();
+    roomsMenu->addAction(tr("Set as &Start Room"), QKeySequence(Qt::CTRL | Qt::Key_F5), this,
+                         [this] { setStartOrEndRoom(true); });
+    roomsMenu->addAction(tr("Set as &End Room"), QKeySequence(Qt::SHIFT | Qt::Key_F5), this,
+                         [this] { setStartOrEndRoom(false); });
+    roomsMenu->addSeparator();
+    QMenu *shapeMenu = roomsMenu->addMenu(tr("S&hape"));
+    shapeMenu->addAction(tr("S&quare"), QKeySequence(Qt::CTRL | Qt::Key_H), this,
+                         [this] { setSelectedRoomShape(0); });
+    shapeMenu->addAction(tr("&Rounded"), QKeySequence(Qt::CTRL | Qt::Key_R), this,
+                         [this] { setSelectedRoomShape(1); });
+    shapeMenu->addAction(tr("&Ellipse"), QKeySequence(Qt::CTRL | Qt::Key_E), this,
+                         [this] { setSelectedRoomShape(2); });
+    shapeMenu->addAction(tr("&Octagonal"), QKeySequence(Qt::CTRL | Qt::Key_8), this,
+                         [this] { setSelectedRoomShape(3); });
+    roomsMenu->addSeparator();
+    roomsMenu->addAction(tr("&Join Rooms"), QKeySequence(Qt::Key_J), this,
+                         &MainWindow::joinSelectedRooms);
+    QMenu *swapMenu = roomsMenu->addMenu(tr("S&wap (two rooms)"));
+    swapMenu->addAction(tr("Swap &Objects"), QKeySequence(Qt::Key_W), this,
+                        [this] { swapSelectedRooms(0); });
+    swapMenu->addAction(tr("Swap &Names"), QKeySequence(Qt::CTRL | Qt::Key_W), this,
+                        [this] { swapSelectedRooms(1); });
+    swapMenu->addAction(tr("Swap &Formats"), QKeySequence(Qt::SHIFT | Qt::Key_W), this,
+                        [this] { swapSelectedRooms(2); });
+    swapMenu->addAction(tr("Swap &Regions"), QKeySequence(Qt::ALT | Qt::Key_W), this,
+                        [this] { swapSelectedRooms(3); });
 
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
     viewMenu->addAction(tr("Zoom &In"), QKeySequence::ZoomIn, m_view, &MapView::zoomIn);
@@ -420,6 +467,203 @@ void MainWindow::editConnection(int connId)
     if (dialog.exec() != QDialog::Accepted)
         return;
     m_undo.push(new EditConnectionCommand(m_scene, connId, before, dialog.result()));
+}
+
+void MainWindow::applyToSelectedRooms(const QString &label, const std::function<void(Room &)> &fn)
+{
+    const QList<int> ids = m_scene->selectedRoomIds();
+    if (ids.isEmpty()) {
+        statusBar()->showMessage(tr("Select one or more rooms first."));
+        return;
+    }
+    m_undo.beginMacro(label);
+    for (int id : ids) {
+        const Room *r = m_map.roomById(id);
+        if (!r)
+            continue;
+        Room before = *r;
+        Room after = before;
+        fn(after);
+        m_undo.push(new EditRoomCommand(m_scene, id, before, after));
+    }
+    m_undo.endMacro();
+}
+
+void MainWindow::setStartOrEndRoom(bool start)
+{
+    const QList<int> sel = m_scene->selectedRoomIds();
+    if (sel.isEmpty()) {
+        statusBar()->showMessage(tr("Select a room first."));
+        return;
+    }
+    const int target = sel.first(); // start/end room is unique
+    QList<int> changed;
+    for (const Room &room : m_map.rooms) {
+        const bool cur = start ? room.isStartRoom : room.isEndRoom;
+        if (cur != (room.id == target))
+            changed.append(room.id);
+    }
+    if (changed.isEmpty())
+        return;
+    m_undo.beginMacro(start ? tr("Set Start Room") : tr("Set End Room"));
+    for (int id : changed) {
+        const Room *r = m_map.roomById(id);
+        if (!r)
+            continue;
+        Room before = *r;
+        Room after = before;
+        (start ? after.isStartRoom : after.isEndRoom) = (id == target);
+        m_undo.push(new EditRoomCommand(m_scene, id, before, after));
+    }
+    m_undo.endMacro();
+}
+
+void MainWindow::setSelectedRoomShape(int shape)
+{
+    applyToSelectedRooms(tr("Set Room Shape"), [shape](Room &r) {
+        r.ellipse = r.octagonal = r.roundedCorners = false;
+        if (shape == 1)
+            r.roundedCorners = true;
+        else if (shape == 2)
+            r.ellipse = true;
+        else if (shape == 3)
+            r.octagonal = true;
+    });
+}
+
+void MainWindow::joinSelectedRooms()
+{
+    const QList<int> sel = m_scene->selectedRoomIds();
+    if (sel.size() != 2) {
+        statusBar()->showMessage(tr("Select exactly two rooms to join."));
+        return;
+    }
+    const Room *a = m_map.roomById(sel.at(0));
+    const Room *b = m_map.roomById(sel.at(1));
+    if (!a || !b)
+        return;
+    // Skip if a connection already docks both of these rooms.
+    for (const Connection &c : m_map.connections) {
+        bool touchesA = false;
+        bool touchesB = false;
+        for (const Vertex &v : c.vertices) {
+            if (v.docked && v.roomId == a->id)
+                touchesA = true;
+            if (v.docked && v.roomId == b->id)
+                touchesB = true;
+        }
+        if (touchesA && touchesB) {
+            statusBar()->showMessage(tr("Those rooms are already connected."));
+            return;
+        }
+    }
+    m_undo.push(new AddConnectionCommand(m_scene, a->id, Map::portFacing(*a, *b), b->id,
+                                         Map::portFacing(*b, *a)));
+}
+
+void MainWindow::swapSelectedRooms(int mode)
+{
+    const QList<int> sel = m_scene->selectedRoomIds();
+    if (sel.size() != 2) {
+        statusBar()->showMessage(tr("Select exactly two rooms to swap."));
+        return;
+    }
+    const Room *ra = m_map.roomById(sel.at(0));
+    const Room *rb = m_map.roomById(sel.at(1));
+    if (!ra || !rb)
+        return;
+    const Room a = *ra;
+    const Room b = *rb;
+    Room na = a;
+    Room nb = b;
+
+    auto copyFormat = [](Room &dst, const Room &src) {
+        dst.fill = src.fill;
+        dst.secondFill = src.secondFill;
+        dst.secondFillLocation = src.secondFillLocation;
+        dst.border = src.border;
+        dst.largeText = src.largeText;
+        dst.subtitleColor = src.subtitleColor;
+        dst.smallText = src.smallText;
+        dst.borderStyle = src.borderStyle;
+        dst.ellipse = src.ellipse;
+        dst.octagonal = src.octagonal;
+        dst.roundedCorners = src.roundedCorners;
+        dst.allCornersEqual = src.allCornersEqual;
+        dst.cornerTopLeft = src.cornerTopLeft;
+        dst.cornerTopRight = src.cornerTopRight;
+        dst.cornerBottomLeft = src.cornerBottomLeft;
+        dst.cornerBottomRight = src.cornerBottomRight;
+        dst.isDark = src.isDark;
+        dst.handDrawn = src.handDrawn;
+    };
+
+    switch (mode) {
+    case 0: // objects
+        na.objectsText = b.objectsText;
+        na.objectsPosition = b.objectsPosition;
+        nb.objectsText = a.objectsText;
+        nb.objectsPosition = a.objectsPosition;
+        break;
+    case 1: // names (and subtitles)
+        na.name = b.name;
+        na.subtitle = b.subtitle;
+        nb.name = a.name;
+        nb.subtitle = a.subtitle;
+        break;
+    case 2: // formats / fills
+        copyFormat(na, b);
+        copyFormat(nb, a);
+        break;
+    case 3: // regions
+        na.region = b.region;
+        nb.region = a.region;
+        break;
+    default:
+        return;
+    }
+    m_undo.beginMacro(tr("Swap Rooms"));
+    m_undo.push(new EditRoomCommand(m_scene, a.id, a, na));
+    m_undo.push(new EditRoomCommand(m_scene, b.id, b, nb));
+    m_undo.endMacro();
+}
+
+void MainWindow::renameSelectedRoom()
+{
+    const int id = m_scene->selectedRoomId();
+    const Room *r = m_map.roomById(id);
+    if (!r) {
+        statusBar()->showMessage(tr("Select a room to rename."));
+        return;
+    }
+    bool ok = false;
+    const QString name =
+        QInputDialog::getText(this, tr("Rename Room"), tr("Name:"), QLineEdit::Normal, r->name, &ok);
+    if (!ok)
+        return;
+    Room before = *r;
+    Room after = before;
+    after.name = name;
+    m_undo.push(new EditRoomCommand(m_scene, id, before, after));
+}
+
+void MainWindow::changeSelectedRegion()
+{
+    if (m_scene->selectedRoomIds().isEmpty()) {
+        statusBar()->showMessage(tr("Select one or more rooms first."));
+        return;
+    }
+    QStringList regions;
+    for (const Region &rg : m_map.regions)
+        regions << rg.name;
+    if (regions.isEmpty())
+        regions << kNoRegion;
+    bool ok = false;
+    const QString region =
+        QInputDialog::getItem(this, tr("Change Region"), tr("Region:"), regions, 0, false, &ok);
+    if (!ok)
+        return;
+    applyToSelectedRooms(tr("Change Region"), [region](Room &r) { r.region = region; });
 }
 
 void MainWindow::editMapProperties()

@@ -293,6 +293,32 @@ int MapScene::selectedRoomId() const
     return -1;
 }
 
+QList<int> MapScene::selectedRoomIds() const
+{
+    QList<int> ids;
+    for (QGraphicsItem *item : selectedItems()) {
+        if (auto *ri = dynamic_cast<RoomItem *>(item))
+            ids.append(ri->roomId());
+    }
+    return ids;
+}
+
+QList<int> MapScene::selectedConnectionIds() const
+{
+    QList<int> ids;
+    for (QGraphicsItem *item : selectedItems()) {
+        if (auto *ci = dynamic_cast<ConnectionItem *>(item))
+            ids.append(ci->connId());
+    }
+    return ids;
+}
+
+void MapScene::selectAll()
+{
+    for (QGraphicsItem *item : items())
+        item->setSelected(true);
+}
+
 int MapScene::addRoomAt(const QPointF &scenePos)
 {
     if (!m_map)

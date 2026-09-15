@@ -41,6 +41,8 @@
 #ifndef TRIZBORT_MAINWINDOW_H
 #define TRIZBORT_MAINWINDOW_H
 
+#include <functional>
+
 #include <QMainWindow>
 #include <QUndoStack>
 
@@ -83,6 +85,15 @@ private slots:
     void editConnection(int connId);
 
 private:
+    // Apply an edit to every selected room as one undoable step.
+    void applyToSelectedRooms(const QString &label, const std::function<void(Room &)> &fn);
+    void setStartOrEndRoom(bool start);
+    void setSelectedRoomShape(int shape); // 0 square,1 rounded,2 ellipse,3 octagonal
+    void joinSelectedRooms();
+    void swapSelectedRooms(int mode);     // 0 objects,1 names,2 formats,3 regions
+    void renameSelectedRoom();
+    void changeSelectedRegion();
+
     void createActions();
     void updateTitle();
     bool maybeSave();                 // returns false to cancel the pending action

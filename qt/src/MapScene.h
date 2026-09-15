@@ -78,6 +78,11 @@ public:
     void selectRoomItem(int roomId);
     // The id of a currently-selected room (the first one), or -1.
     int selectedRoomId() const;
+    // The ids of all currently-selected rooms / connections.
+    QList<int> selectedRoomIds() const;
+    QList<int> selectedConnectionIds() const;
+    // Select every room and connection.
+    void selectAll();
 
     double gridSize() const;
     QPointF snap(const QPointF &p) const;
