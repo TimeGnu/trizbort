@@ -78,12 +78,29 @@ public:
     void selectRoomItem(int roomId);
     // The id of a currently-selected room (the first one), or -1.
     int selectedRoomId() const;
+    // The ids of all currently-selected rooms / connections.
+    QList<int> selectedRoomIds() const;
+    QList<int> selectedConnectionIds() const;
+    // Select every room and connection.
+    void selectAll();
+    // Replace the selection with the given rooms / connections by id.
+    void selectRoomsByIds(const QList<int> &ids);
+    void selectConnectionsByIds(const QList<int> &ids);
 
     double gridSize() const;
     QPointF snap(const QPointF &p) const;
 
-    // The world-space point of a room's port ("n","s","e",...); centre otherwise.
+    // The world-space point of a room's port. Supports all sixteen compass
+    // ports (n, nne, ne, ene, e, ...) mapped onto the room's outline, and is
+    // shape-aware for ellipse and octagonal rooms; centre for an unknown token.
     static QPointF portPoint(const Room &room, const QString &port);
+    // The outward "stalk" point a docked connection endpoint runs to before it
+    // reaches the room outline, mirroring Room.GetPortStalkPosition. Returns the
+    // port point itself when stalk <= 0 (no stalk).
+    static QPointF portStalkPoint(const Room &room, const QString &port, double stalk);
+    // A room's port point on its plain bounding rectangle (no shape awareness).
+    static QPointF squareCorner(double x, double y, double w, double h,
+                                const QString &port);
 
     // Editing entry points used by the window's actions.
     int addRoomAt(const QPointF &scenePos);   // returns new room id
@@ -91,11 +108,29 @@ public:
     void setConnectMode(bool on);
     bool connectMode() const { return m_connectMode; }
 
+    // Default style/flow applied to connections drawn in connect mode.
+    void setNewConnectionStyle(ConnectionStyle style) { m_newConnStyle = style; }
+    void setNewConnectionFlow(ConnectionFlow flow) { m_newConnFlow = flow; }
+    ConnectionStyle newConnectionStyle() const { return m_newConnStyle; }
+    ConnectionFlow newConnectionFlow() const { return m_newConnFlow; }
+
     // Called by RoomItem while dragging: persist the new position and reroute.
     void roomMovedTo(int roomId, const QPointF &topLeft);
     // Called by items on double-click.
     void activateRoom(int roomId);
     void activateConnection(int connId);
+
+    // Room validation. These flags are runtime-only (not persisted), mirroring
+    // the C# project validation toggles; invalid rooms get a red X overlay.
+    struct ValidationFlags {
+        bool uniqueNames = false;
+        bool description = false;
+        bool subtitle = false;
+        bool noDangling = false;
+    };
+    void setValidation(const ValidationFlags &flags);
+    ValidationFlags validation() const { return m_validation; }
+    bool roomInvalid(const Room &room) const;
 
     // Refresh a single room's visuals and the connections touching it.
     void refreshRoom(int roomId);
@@ -125,6 +160,9 @@ private:
     QList<ConnectionItem *> m_connItems;
 
     bool m_connectMode = false;
+    ConnectionStyle m_newConnStyle = ConnectionStyle::Solid;
+    ConnectionFlow m_newConnFlow = ConnectionFlow::TwoWay;
+    ValidationFlags m_validation;
     int m_connectFromRoom = -1;
     QGraphicsLineItem *m_rubberLine = nullptr;
 

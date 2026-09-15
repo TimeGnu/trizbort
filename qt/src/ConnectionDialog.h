@@ -28,6 +28,8 @@ class QCheckBox;
 
 namespace trizbort {
 
+class ColorButton;
+
 // Modal editor for a connection's properties. result() returns the edited
 // connection (id, seq and vertices preserved).
 class ConnectionDialog : public QDialog {
@@ -44,9 +46,11 @@ private:
     QComboBox *m_flow = nullptr;
     QComboBox *m_style = nullptr;
     QLineEdit *m_name = nullptr;
+    QLineEdit *m_description = nullptr;
     QLineEdit *m_startText = nullptr;
     QLineEdit *m_midText = nullptr;
     QLineEdit *m_endText = nullptr;
+    ColorButton *m_colorButton = nullptr;
     QCheckBox *m_door = nullptr;
     QCheckBox *m_lockable = nullptr;
     QCheckBox *m_openable = nullptr;

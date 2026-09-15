@@ -41,12 +41,19 @@
 #ifndef TRIZBORT_MAINWINDOW_H
 #define TRIZBORT_MAINWINDOW_H
 
+#include <functional>
+
 #include <QMainWindow>
 #include <QUndoStack>
 
 #include "MapDocument.h"
 
 class QAction;
+class QDockWidget;
+class QFileSystemWatcher;
+class QLabel;
+class QMenu;
+class QTimer;
 
 namespace trizbort {
 
@@ -73,6 +80,9 @@ private slots:
     void exportImage();
     void exportPdf();
     void importTranscript();
+    void startLiveAutomap();
+    void stopLiveAutomap();
+    void automapTick();
     void addRoom();
     void addConnectedRoom(const QString &direction);
     void deleteSelection();
@@ -83,6 +93,43 @@ private slots:
     void editConnection(int connId);
 
 private:
+    // Apply an edit to every selected room as one undoable step.
+    void applyToSelectedRooms(const QString &label, const std::function<void(Room &)> &fn);
+    void applyToSelectedConnections(const QString &label,
+                                    const std::function<void(Connection &)> &fn);
+    void reverseSelectedConnections();
+    void setStartOrEndRoom(bool start);
+    void setSelectedRoomShape(int shape); // 0 square,1 rounded,2 ellipse,3 octagonal
+    void joinSelectedRooms();
+    void swapSelectedRooms(int mode);     // 0 objects,1 names,2 formats,3 regions
+    void renameSelectedRoom();
+    void changeSelectedRegion();
+
+    // Clipboard.
+    void copySelection();
+    void paste();
+    void copyColor();
+    void pasteColor();
+
+    // Export / file helpers.
+    void exportToClipboard(const QString &format);
+    void backupMap();
+    void smartSave();
+    void setWatchedFile(const QString &path);
+    void reloadFromDisk();
+
+    // Application preferences and recent-files (persisted via QSettings).
+    void loadPreferences();
+    void savePreferences();
+    void addRecentFile(const QString &path);
+    void rebuildRecentMenu();
+    void showAppSettings();
+
+    // Selection commands. kind: 0 unconnected rooms, 1 rooms w/ objects,
+    // 2 rooms w/o objects, 3 all connections, 4 dangling connections,
+    // 5 self-looping connections.
+    void selectSpecial(int kind);
+
     void createActions();
     void updateTitle();
     bool maybeSave();                 // returns false to cancel the pending action
@@ -91,10 +138,32 @@ private:
     Map m_map;
     QString m_filePath;
     QUndoStack m_undo;
+    QFileSystemWatcher *m_watcher = nullptr;
+    qint64 m_lastSaveMs = 0; // ignore watcher events right after our own save
+
+    // Live automap: tail a transcript and re-derive the map as it grows.
+    QTimer *m_automapTimer = nullptr;
+    QString m_automapPath;
+    qint64 m_automapSize = -1;
+    Map m_automapPreMap;              // map content captured when automap started
+    QAction *m_automapStopAction = nullptr;
+    bool m_automapping = false;
 
     MapScene *m_scene = nullptr;
     MapView *m_view = nullptr;
     QAction *m_connectAction = nullptr;
+    QAction *m_gridAction = nullptr;
+    QAction *m_snapAction = nullptr;
+    QDockWidget *m_minimapDock = nullptr;
+    QLabel *m_zoomLabel = nullptr;
+    QMenu *m_recentMenu = nullptr;
+    QStringList m_recentFiles;
+    bool m_loadLastOnStart = false;
+    bool m_showFullPath = false;
+    bool m_invertWheel = false;
+
+    Room m_copiedColors;            // colour set captured by Copy Colour
+    bool m_hasCopiedColors = false;
 };
 
 } // namespace trizbort

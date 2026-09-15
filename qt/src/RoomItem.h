@@ -60,12 +60,17 @@ public:
     void syncFromModel();
 
     QRectF boundingRect() const override;
+    // The clickable/selectable outline is the room rectangle itself, even though
+    // boundingRect is padded to cover subtitle and object-list text drawn around
+    // the room.
+    QPainterPath shape() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget) override;
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 
 private:
     MapScene *m_scene;

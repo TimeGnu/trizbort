@@ -42,14 +42,24 @@ public:
 
     MapSettings resultSettings() const;
     QList<Region> resultRegions() const;
+    // Original region name -> new name, for rows whose name changed; and the
+    // names of original regions the user removed. Used to fix up rooms.
+    QHash<QString, QString> regionRenames() const;
+    QStringList removedRegionNames() const;
+
+protected:
+    void accept() override; // validates region names first
 
 private:
     QWidget *buildColorsTab();
     QWidget *buildGridLinesTab();
     QWidget *buildRoomsTab();
+    QWidget *buildFontsTab();
+    QWidget *buildAdvancedTab();
     QWidget *buildRegionsTab();
     void setButtonColor(QPushButton *button, const QColor &color);
     QColor buttonColor(const QPushButton *button) const;
+    void setupFontButton(QPushButton *button, FontSpec *spec);
 
     MapSettings m_settings;
     QList<Region> m_regions;
@@ -70,6 +80,24 @@ private:
     QDoubleSpinBox *m_objectListOffset = nullptr;
     QDoubleSpinBox *m_stalkLength = nullptr;
     QDoubleSpinBox *m_preferredDistance = nullptr;
+
+    // Fonts (edited copies, applied in resultSettings).
+    FontSpec m_roomFont;
+    FontSpec m_subtitleFont;
+    FontSpec m_objectFont;
+    FontSpec m_lineFont;
+    QPushButton *m_roomFontButton = nullptr;
+    QPushButton *m_subtitleFontButton = nullptr;
+    QPushButton *m_objectFontButton = nullptr;
+    QPushButton *m_lineFontButton = nullptr;
+
+    // Advanced.
+    QDoubleSpinBox *m_handleSize = nullptr;
+    QDoubleSpinBox *m_snapToElement = nullptr;
+    QCheckBox *m_docMargins = nullptr;
+    QDoubleSpinBox *m_hMargin = nullptr;
+    QDoubleSpinBox *m_vMargin = nullptr;
+    QCheckBox *m_wrapDashes = nullptr;
 
     QTableWidget *m_regionTable = nullptr;
 };
