@@ -521,12 +521,20 @@ void MapScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         m_rubberLine = nullptr;
 
         RoomItem *target = roomItemAt(event->scenePos());
-        if (m_map && target && target->roomId() != m_connectFromRoom) {
+        if (m_map && target) {
             const Room *from = m_map->roomById(m_connectFromRoom);
             const Room *to = m_map->roomById(target->roomId());
             if (from && to) {
-                const QString portA = Map::portFacing(*from, *to);
-                const QString portB = Map::portFacing(*to, *from);
+                QString portA;
+                QString portB;
+                if (from->id == to->id) {
+                    // Self-loop: two adjacent top ports so the stalks bulge out.
+                    portA = QStringLiteral("nw");
+                    portB = QStringLiteral("ne");
+                } else {
+                    portA = Map::portFacing(*from, *to);
+                    portB = Map::portFacing(*to, *from);
+                }
                 if (m_undo) {
                     m_undo->push(
                         new AddConnectionCommand(this, from->id, portA, to->id, portB));

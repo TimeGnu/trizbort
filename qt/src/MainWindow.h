@@ -91,6 +91,9 @@ private slots:
 private:
     // Apply an edit to every selected room as one undoable step.
     void applyToSelectedRooms(const QString &label, const std::function<void(Room &)> &fn);
+    void applyToSelectedConnections(const QString &label,
+                                    const std::function<void(Connection &)> &fn);
+    void reverseSelectedConnections();
     void setStartOrEndRoom(bool start);
     void setSelectedRoomShape(int shape); // 0 square,1 rounded,2 ellipse,3 octagonal
     void joinSelectedRooms();

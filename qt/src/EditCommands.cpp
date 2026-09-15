@@ -327,6 +327,8 @@ AddConnectionCommand::AddConnectionCommand(MapScene *scene, int fromId, const QS
     b.roomId = toId;
     b.port = portB;
     m_conn.vertices << a << b;
+    m_conn.style = scene->newConnectionStyle();
+    m_conn.flow = scene->newConnectionFlow();
     setText(QObject::tr("Add Connection"));
 }
 

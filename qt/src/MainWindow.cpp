@@ -300,6 +300,70 @@ void MainWindow::createActions()
     swapMenu->addAction(tr("Swap &Regions"), QKeySequence(Qt::ALT | Qt::Key_W), this,
                         [this] { swapSelectedRooms(3); });
 
+    // --- Connections menu ---
+    QMenu *connMenu = menuBar()->addMenu(tr("&Connections"));
+    connMenu->addAction(tr("Re&verse"), QKeySequence(Qt::Key_V), this,
+                        &MainWindow::reverseSelectedConnections);
+    QMenu *styleMenu = connMenu->addMenu(tr("&Line Style"));
+    styleMenu->addAction(tr("&Solid"), this, [this] {
+        applyToSelectedConnections(tr("Solid Line"),
+                                   [](Connection &c) { c.style = ConnectionStyle::Solid; });
+    });
+    styleMenu->addAction(tr("&Dashed"), QKeySequence(Qt::Key_T), this, [this] {
+        applyToSelectedConnections(tr("Dashed Line"),
+                                   [](Connection &c) { c.style = ConnectionStyle::Dashed; });
+    });
+    QMenu *flowMenu = connMenu->addMenu(tr("&Flow"));
+    flowMenu->addAction(tr("&Two-way"), this, [this] {
+        applyToSelectedConnections(tr("Two-way"),
+                                   [](Connection &c) { c.flow = ConnectionFlow::TwoWay; });
+    });
+    flowMenu->addAction(tr("One-&way"), QKeySequence(Qt::Key_A), this, [this] {
+        applyToSelectedConnections(tr("One-way"),
+                                   [](Connection &c) { c.flow = ConnectionFlow::OneWay; });
+    });
+    QMenu *labelMenu = connMenu->addMenu(tr("La&bel"));
+    const struct {
+        const char *label;
+        Qt::Key key;
+        const char *start;
+        const char *end;
+    } kLabels[] = {{"Up / Down", Qt::Key_U, "up", "down"},
+                   {"Down / Up", Qt::Key_D, "down", "up"},
+                   {"In / Out", Qt::Key_I, "in", "out"},
+                   {"Out / In", Qt::Key_O, "out", "in"}};
+    for (const auto &l : kLabels) {
+        const QString s = QString::fromLatin1(l.start);
+        const QString e = QString::fromLatin1(l.end);
+        labelMenu->addAction(tr(l.label), QKeySequence(l.key), this, [this, s, e] {
+            applyToSelectedConnections(tr("Set Label"), [s, e](Connection &c) {
+                c.startText = s;
+                c.endText = e;
+            });
+        });
+    }
+    connMenu->addAction(tr("&Plain"), QKeySequence(Qt::Key_P), this, [this] {
+        applyToSelectedConnections(tr("Plain Connection"), [](Connection &c) {
+            c.style = ConnectionStyle::Solid;
+            c.flow = ConnectionFlow::TwoWay;
+            c.startText.clear();
+            c.midText.clear();
+            c.endText.clear();
+        });
+    });
+    connMenu->addSeparator();
+    QMenu *newConnMenu = connMenu->addMenu(tr("&New Connection Defaults"));
+    auto *newDashed = newConnMenu->addAction(tr("Dashed"));
+    newDashed->setCheckable(true);
+    connect(newDashed, &QAction::toggled, this, [this](bool on) {
+        m_scene->setNewConnectionStyle(on ? ConnectionStyle::Dashed : ConnectionStyle::Solid);
+    });
+    auto *newOneWay = newConnMenu->addAction(tr("One-way"));
+    newOneWay->setCheckable(true);
+    connect(newOneWay, &QAction::toggled, this, [this](bool on) {
+        m_scene->setNewConnectionFlow(on ? ConnectionFlow::OneWay : ConnectionFlow::TwoWay);
+    });
+
     // --- Validation menu ---
     QMenu *validationMenu = menuBar()->addMenu(tr("&Validation"));
     auto *vUnique = validationMenu->addAction(tr("Rooms Must Have a &Unique Name"));
@@ -681,6 +745,37 @@ void MainWindow::applyToSelectedRooms(const QString &label, const std::function<
         m_undo.push(new EditRoomCommand(m_scene, id, before, after));
     }
     m_undo.endMacro();
+}
+
+void MainWindow::applyToSelectedConnections(const QString &label,
+                                            const std::function<void(Connection &)> &fn)
+{
+    const QList<int> ids = m_scene->selectedConnectionIds();
+    if (ids.isEmpty()) {
+        statusBar()->showMessage(tr("Select one or more connections first."));
+        return;
+    }
+    m_undo.beginMacro(label);
+    for (int id : ids) {
+        const int idx = m_map.connectionIndex(id);
+        if (idx < 0)
+            continue;
+        const Connection before = m_map.connections.at(idx);
+        Connection after = before;
+        fn(after);
+        m_undo.push(new EditConnectionCommand(m_scene, id, before, after));
+    }
+    m_undo.endMacro();
+}
+
+void MainWindow::reverseSelectedConnections()
+{
+    applyToSelectedConnections(tr("Reverse Connection"), [](Connection &c) {
+        std::reverse(c.vertices.begin(), c.vertices.end());
+        for (int i = 0; i < c.vertices.size(); ++i)
+            c.vertices[i].index = i;
+        std::swap(c.startText, c.endText);
+    });
 }
 
 void MainWindow::setStartOrEndRoom(bool start)

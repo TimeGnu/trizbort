@@ -108,6 +108,12 @@ public:
     void setConnectMode(bool on);
     bool connectMode() const { return m_connectMode; }
 
+    // Default style/flow applied to connections drawn in connect mode.
+    void setNewConnectionStyle(ConnectionStyle style) { m_newConnStyle = style; }
+    void setNewConnectionFlow(ConnectionFlow flow) { m_newConnFlow = flow; }
+    ConnectionStyle newConnectionStyle() const { return m_newConnStyle; }
+    ConnectionFlow newConnectionFlow() const { return m_newConnFlow; }
+
     // Called by RoomItem while dragging: persist the new position and reroute.
     void roomMovedTo(int roomId, const QPointF &topLeft);
     // Called by items on double-click.
@@ -154,6 +160,8 @@ private:
     QList<ConnectionItem *> m_connItems;
 
     bool m_connectMode = false;
+    ConnectionStyle m_newConnStyle = ConnectionStyle::Solid;
+    ConnectionFlow m_newConnFlow = ConnectionFlow::TwoWay;
     ValidationFlags m_validation;
     int m_connectFromRoom = -1;
     QGraphicsLineItem *m_rubberLine = nullptr;
