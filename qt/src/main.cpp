@@ -535,6 +535,8 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     QApplication::setApplicationName(QStringLiteral("Trizbort (Qt)"));
+    QApplication::setOrganizationName(QStringLiteral("Trizbort"));
+    QApplication::setApplicationVersion(QStringLiteral("1.8.0.0"));
 
     if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--edit-selftest"))
         return runEditSelftest();

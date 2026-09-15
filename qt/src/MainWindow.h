@@ -52,6 +52,7 @@ class QAction;
 class QDockWidget;
 class QFileSystemWatcher;
 class QLabel;
+class QMenu;
 
 namespace trizbort {
 
@@ -110,6 +111,13 @@ private:
     void setWatchedFile(const QString &path);
     void reloadFromDisk();
 
+    // Application preferences and recent-files (persisted via QSettings).
+    void loadPreferences();
+    void savePreferences();
+    void addRecentFile(const QString &path);
+    void rebuildRecentMenu();
+    void showAppSettings();
+
     // Selection commands. kind: 0 unconnected rooms, 1 rooms w/ objects,
     // 2 rooms w/o objects, 3 all connections, 4 dangling connections,
     // 5 self-looping connections.
@@ -133,6 +141,11 @@ private:
     QAction *m_snapAction = nullptr;
     QDockWidget *m_minimapDock = nullptr;
     QLabel *m_zoomLabel = nullptr;
+    QMenu *m_recentMenu = nullptr;
+    QStringList m_recentFiles;
+    bool m_loadLastOnStart = false;
+    bool m_showFullPath = false;
+    bool m_invertWheel = false;
 
     Room m_copiedColors;            // colour set captured by Copy Colour
     bool m_hasCopiedColors = false;

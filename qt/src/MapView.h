@@ -62,6 +62,8 @@ public:
     void microZoom(bool in);             // +/- 1% step
     void resetOrigin();                  // 1:1 and centre the map origin
 
+    void setInvertWheelZoom(bool invert) { m_invertWheel = invert; }
+
 protected:
     void wheelEvent(QWheelEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
@@ -70,6 +72,7 @@ protected:
 
 private:
     bool m_panning = false;
+    bool m_invertWheel = false;
     QPoint m_lastPanPoint;
 };
 

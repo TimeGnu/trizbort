@@ -99,7 +99,10 @@ void MapView::zoomToFit()
 void MapView::wheelEvent(QWheelEvent *event)
 {
     const double step = 1.15;
-    const double factor = (event->angleDelta().y() > 0) ? step : 1.0 / step;
+    bool zoomIn = event->angleDelta().y() > 0;
+    if (m_invertWheel)
+        zoomIn = !zoomIn;
+    const double factor = zoomIn ? step : 1.0 / step;
     scale(factor, factor);
     event->accept();
 }

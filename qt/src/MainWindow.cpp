@@ -44,6 +44,7 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QCheckBox>
 #include <QClipboard>
 #include <QCloseEvent>
 #include <QDateTime>
@@ -64,6 +65,7 @@
 #include <QMessageBox>
 #include <QMimeData>
 #include <QSet>
+#include <QSettings>
 #include <QPlainTextEdit>
 #include <QStatusBar>
 #include <QToolBar>
@@ -122,8 +124,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_view->verticalScrollBar(), &QScrollBar::rangeChanged, this, updateZoom);
     updateZoom();
 
-    // Start with a fresh, empty document.
+    // Restore preferences (window geometry, recent files, toggles).
+    loadPreferences();
+    m_view->setInvertWheelZoom(m_invertWheel);
+    rebuildRecentMenu();
+
+    // Start with a fresh, empty document, then optionally reopen the last map.
     newFile();
+    if (m_loadLastOnStart && !m_recentFiles.isEmpty() && QFile::exists(m_recentFiles.first()))
+        loadFile(m_recentFiles.first());
     statusBar()->showMessage(tr("Ready. Insert adds a room; C toggles connect mode."));
 }
 
@@ -136,6 +145,7 @@ void MainWindow::createActions()
     auto *openAct = fileMenu->addAction(tr("&Open…"), QKeySequence::Open, this, &MainWindow::openFile);
     auto *saveAct = fileMenu->addAction(tr("&Save"), QKeySequence::Save, this, [this] { save(); });
     fileMenu->addAction(tr("Save &As…"), QKeySequence::SaveAs, this, [this] { saveAs(); });
+    m_recentMenu = fileMenu->addMenu(tr("Recent &Maps"));
     fileMenu->addSeparator();
 
     fileMenu->addAction(tr("Bac&kup"), QKeySequence(Qt::CTRL | Qt::Key_B), this,
@@ -315,6 +325,8 @@ void MainWindow::createActions()
         MapStatisticsDialog dlg(m_map, this);
         dlg.exec();
     });
+    toolsMenu->addSeparator();
+    toolsMenu->addAction(tr("&Application Settings…"), this, &MainWindow::showAppSettings);
 
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
     viewMenu->addAction(tr("Zoom &In"), QKeySequence::ZoomIn, m_view, &MapView::zoomIn);
@@ -414,6 +426,7 @@ bool MainWindow::loadFile(const QString &path)
     updateTitle();
     m_view->zoomToFit();
     setWatchedFile(path);
+    addRecentFile(path);
     statusBar()->showMessage(tr("Opened %1").arg(QFileInfo(path).fileName()));
 
     // Warn if the map was written by a newer format than this build produces.
@@ -475,6 +488,7 @@ bool MainWindow::writeToPath(const QString &path)
     m_undo.setClean();
     m_lastSaveMs = QDateTime::currentMSecsSinceEpoch();
     setWatchedFile(path);
+    addRecentFile(path);
     statusBar()->showMessage(tr("Saved %1").arg(QFileInfo(path).fileName()));
     return true;
 }
@@ -1151,6 +1165,102 @@ void MainWindow::reloadFromDisk()
         tr("Reloaded %1 after an external change.").arg(QFileInfo(path).fileName()));
 }
 
+void MainWindow::loadPreferences()
+{
+    QSettings s;
+    m_recentFiles = s.value(QStringLiteral("recentFiles")).toStringList();
+    m_loadLastOnStart = s.value(QStringLiteral("loadLastOnStart"), false).toBool();
+    m_showFullPath = s.value(QStringLiteral("showFullPathInTitle"), false).toBool();
+    m_invertWheel = s.value(QStringLiteral("invertWheelZoom"), false).toBool();
+    const QByteArray geometry = s.value(QStringLiteral("windowGeometry")).toByteArray();
+    if (!geometry.isEmpty())
+        restoreGeometry(geometry);
+}
+
+void MainWindow::savePreferences()
+{
+    QSettings s;
+    s.setValue(QStringLiteral("recentFiles"), m_recentFiles);
+    s.setValue(QStringLiteral("loadLastOnStart"), m_loadLastOnStart);
+    s.setValue(QStringLiteral("showFullPathInTitle"), m_showFullPath);
+    s.setValue(QStringLiteral("invertWheelZoom"), m_invertWheel);
+    s.setValue(QStringLiteral("windowGeometry"), saveGeometry());
+}
+
+void MainWindow::addRecentFile(const QString &path)
+{
+    if (path.isEmpty())
+        return;
+    const QString abs = QFileInfo(path).absoluteFilePath();
+    m_recentFiles.removeAll(abs);
+    m_recentFiles.prepend(abs);
+    while (m_recentFiles.size() > 8)
+        m_recentFiles.removeLast();
+    rebuildRecentMenu();
+    savePreferences();
+}
+
+void MainWindow::rebuildRecentMenu()
+{
+    if (!m_recentMenu)
+        return;
+    m_recentMenu->clear();
+    // Prune entries whose files have gone away.
+    for (int i = m_recentFiles.size() - 1; i >= 0; --i)
+        if (!QFile::exists(m_recentFiles.at(i)))
+            m_recentFiles.removeAt(i);
+    if (m_recentFiles.isEmpty()) {
+        QAction *none = m_recentMenu->addAction(tr("(no recent maps)"));
+        none->setEnabled(false);
+        return;
+    }
+    int n = 1;
+    for (const QString &path : m_recentFiles) {
+        const QString label = QStringLiteral("&%1  %2").arg(n++).arg(QFileInfo(path).fileName());
+        m_recentMenu->addAction(label, this, [this, path] {
+            if (maybeSave())
+                loadFile(path);
+        });
+    }
+    m_recentMenu->addSeparator();
+    m_recentMenu->addAction(tr("&Clear List"), this, [this] {
+        m_recentFiles.clear();
+        rebuildRecentMenu();
+        savePreferences();
+    });
+}
+
+void MainWindow::showAppSettings()
+{
+    QDialog dialog(this);
+    dialog.setWindowTitle(tr("Application Settings"));
+    auto *form = new QFormLayout(&dialog);
+
+    auto *invert = new QCheckBox(tr("Invert mouse-wheel zoom direction"), &dialog);
+    invert->setChecked(m_invertWheel);
+    form->addRow(invert);
+    auto *loadLast = new QCheckBox(tr("Open the last map on start-up"), &dialog);
+    loadLast->setChecked(m_loadLastOnStart);
+    form->addRow(loadLast);
+    auto *fullPath = new QCheckBox(tr("Show the full path in the title bar"), &dialog);
+    fullPath->setChecked(m_showFullPath);
+    form->addRow(fullPath);
+
+    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
+    connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    form->addRow(buttons);
+
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+    m_invertWheel = invert->isChecked();
+    m_loadLastOnStart = loadLast->isChecked();
+    m_showFullPath = fullPath->isChecked();
+    m_view->setInvertWheelZoom(m_invertWheel);
+    updateTitle();
+    savePreferences();
+}
+
 void MainWindow::editMapProperties()
 {
     QDialog dialog(this);
@@ -1193,7 +1303,11 @@ void MainWindow::editMapSettings()
 
 void MainWindow::updateTitle()
 {
-    const QString name = m_filePath.isEmpty() ? tr("Untitled") : QFileInfo(m_filePath).fileName();
+    QString name;
+    if (m_filePath.isEmpty())
+        name = tr("Untitled");
+    else
+        name = m_showFullPath ? m_filePath : QFileInfo(m_filePath).fileName();
     setWindowTitle(tr("%1[*] — Trizbort (Qt)").arg(name));
     setWindowModified(!m_undo.isClean());
     // Keep the grid/snap toggles in sync with the current document's settings.
@@ -1218,10 +1332,12 @@ bool MainWindow::maybeSave()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (maybeSave())
+    if (maybeSave()) {
+        savePreferences();
         event->accept();
-    else
+    } else {
         event->ignore();
+    }
 }
 
 } // namespace trizbort
