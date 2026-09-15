@@ -40,9 +40,14 @@
 
 #include "RoomItem.h"
 
+#include <algorithm>
+#include <cmath>
+#include <random>
+
 #include <QFont>
 #include <QFontMetricsF>
 #include <QGraphicsSceneMouseEvent>
+#include <QHash>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPolygonF>
@@ -54,6 +59,45 @@
 namespace trizbort {
 
 namespace {
+
+// Append a hand-drawn (jittered) edge from a to b to a path whose current point
+// is already a, matching Drawing.AddLine: the edge is split into a handful of
+// sub-segments whose interior points wander by +/-1px, giving the sketchy look.
+void addHandDrawnEdge(QPainterPath &path, const QPointF &a, const QPointF &b, std::mt19937 &rng)
+{
+    auto nextInt = [&rng](int lo, int hiExclusive) {
+        if (hiExclusive <= lo)
+            return lo;
+        return std::uniform_int_distribution<int>(lo, hiExclusive - 1)(rng);
+    };
+    const double dx = b.x() - a.x();
+    const double dy = b.y() - a.y();
+    const double dist = std::hypot(dx, dy);
+    int lo = std::max(3, static_cast<int>(dist / 15.0));
+    int hi = std::max(6, static_cast<int>(dist / 8.0));
+    if (hi <= lo)
+        hi = lo + 1;
+    const int lines = nextInt(lo, hi) - 1;
+    for (int line = 0; line < lines; ++line) {
+        QPointF next;
+        if (line == 0)
+            next = a;
+        else if (line == lines - 1)
+            next = b;
+        else {
+            const double f = static_cast<double>(line) / (lines - 1);
+            next = QPointF(a.x() + dx * f + nextInt(-1, 2), a.y() + dy * f + nextInt(-1, 2));
+        }
+        path.lineTo(next);
+    }
+}
+
+// A per-room deterministic RNG, seeded from the room name so the sketch is
+// stable across repaints (as the C# renderer seeds Random(Name.GetHashCode)).
+std::mt19937 handDrawnRng(const Room &room)
+{
+    return std::mt19937(static_cast<unsigned>(qHash(room.name)) ^ 0x9e3779b9u);
+}
 
 // The text colour a region contributes for room names (invalid if unknown).
 QColor regionTextColor(const Map &map, const QString &region)
@@ -93,12 +137,19 @@ QPainterPath buildRoomPath(const Room &room, const QRectF &r)
     if (room.octagonal) {
         const double cx = r.width() * 0.25;
         const double cy = r.height() * 0.25;
-        QPolygonF poly;
-        poly << QPointF(r.left() + cx, r.top()) << QPointF(r.right() - cx, r.top())
-             << QPointF(r.right(), r.top() + cy) << QPointF(r.right(), r.bottom() - cy)
-             << QPointF(r.right() - cx, r.bottom()) << QPointF(r.left() + cx, r.bottom())
-             << QPointF(r.left(), r.bottom() - cy) << QPointF(r.left(), r.top() + cy);
-        path.addPolygon(poly);
+        QVector<QPointF> v{
+            QPointF(r.left() + cx, r.top()),    QPointF(r.right() - cx, r.top()),
+            QPointF(r.right(), r.top() + cy),   QPointF(r.right(), r.bottom() - cy),
+            QPointF(r.right() - cx, r.bottom()), QPointF(r.left() + cx, r.bottom()),
+            QPointF(r.left(), r.bottom() - cy), QPointF(r.left(), r.top() + cy)};
+        if (room.handDrawn) {
+            std::mt19937 rng = handDrawnRng(room);
+            path.moveTo(v.first());
+            for (int i = 0; i < v.size(); ++i)
+                addHandDrawnEdge(path, v.at(i), v.at((i + 1) % v.size()), rng);
+        } else {
+            path.addPolygon(QPolygonF(v));
+        }
         path.closeSubpath();
         return path;
     }
@@ -121,6 +172,20 @@ QPainterPath buildRoomPath(const Room &room, const QRectF &r)
         path.lineTo(r.left(), r.top() + tl);
         if (tl > 0.0)
             path.arcTo(r.left(), r.top(), 2 * tl, 2 * tl, 180, -90);
+        path.closeSubpath();
+        return path;
+    }
+    if (room.handDrawn) {
+        std::mt19937 rng = handDrawnRng(room);
+        const QPointF tl = r.topLeft();
+        const QPointF tr = r.topRight();
+        const QPointF br = r.bottomRight();
+        const QPointF bl = r.bottomLeft();
+        path.moveTo(tl);
+        addHandDrawnEdge(path, tl, tr, rng);
+        addHandDrawnEdge(path, tr, br, rng);
+        addHandDrawnEdge(path, br, bl, rng);
+        addHandDrawnEdge(path, bl, tl, rng);
         path.closeSubpath();
         return path;
     }
