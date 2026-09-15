@@ -53,6 +53,7 @@ class QDockWidget;
 class QFileSystemWatcher;
 class QLabel;
 class QMenu;
+class QTimer;
 
 namespace trizbort {
 
@@ -79,6 +80,9 @@ private slots:
     void exportImage();
     void exportPdf();
     void importTranscript();
+    void startLiveAutomap();
+    void stopLiveAutomap();
+    void automapTick();
     void addRoom();
     void addConnectedRoom(const QString &direction);
     void deleteSelection();
@@ -136,6 +140,14 @@ private:
     QUndoStack m_undo;
     QFileSystemWatcher *m_watcher = nullptr;
     qint64 m_lastSaveMs = 0; // ignore watcher events right after our own save
+
+    // Live automap: tail a transcript and re-derive the map as it grows.
+    QTimer *m_automapTimer = nullptr;
+    QString m_automapPath;
+    qint64 m_automapSize = -1;
+    Map m_automapPreMap;              // map content captured when automap started
+    QAction *m_automapStopAction = nullptr;
+    bool m_automapping = false;
 
     MapScene *m_scene = nullptr;
     MapView *m_view = nullptr;

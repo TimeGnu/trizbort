@@ -66,6 +66,7 @@
 #include <QMimeData>
 #include <QSet>
 #include <QSettings>
+#include <QTimer>
 #include <QPlainTextEdit>
 #include <QStatusBar>
 #include <QToolBar>
@@ -364,6 +365,16 @@ void MainWindow::createActions()
         m_scene->setNewConnectionFlow(on ? ConnectionFlow::OneWay : ConnectionFlow::TwoWay);
     });
 
+    // --- Automap menu ---
+    QMenu *automapTopMenu = menuBar()->addMenu(tr("&Automap"));
+    automapTopMenu->addAction(tr("&Start Live Automap…"), this, &MainWindow::startLiveAutomap);
+    m_automapStopAction =
+        automapTopMenu->addAction(tr("S&top Automapping"), this, &MainWindow::stopLiveAutomap);
+    m_automapStopAction->setEnabled(false);
+    automapTopMenu->addSeparator();
+    automapTopMenu->addAction(tr("&Import Transcript (one-shot)…"), this,
+                              &MainWindow::importTranscript);
+
     // --- Validation menu ---
     QMenu *validationMenu = menuBar()->addMenu(tr("&Validation"));
     auto *vUnique = validationMenu->addAction(tr("Rooms Must Have a &Unique Name"));
@@ -454,6 +465,13 @@ void MainWindow::newFile()
 {
     if (!maybeSave())
         return;
+    if (m_automapping) {
+        if (m_automapTimer)
+            m_automapTimer->stop();
+        m_automapping = false;
+        if (m_automapStopAction)
+            m_automapStopAction->setEnabled(false);
+    }
     m_map.clear();
     // A fresh document has the default palette and a single NoRegion region.
     m_map.regions.append(Region{kNoRegion, QColor(0, 0, 255), QColor(255, 255, 255), QString(), QString()});
@@ -467,6 +485,13 @@ void MainWindow::openFile()
 {
     if (!maybeSave())
         return;
+    if (m_automapping) {
+        if (m_automapTimer)
+            m_automapTimer->stop();
+        m_automapping = false;
+        if (m_automapStopAction)
+            m_automapStopAction->setEnabled(false);
+    }
     const QString path = QFileDialog::getOpenFileName(
         this, tr("Open Map"), QString(), tr("Trizbort maps (*.trizbort);;All files (*)"));
     if (path.isEmpty())
@@ -664,6 +689,93 @@ void MainWindow::importTranscript()
                                  .arg(QFileInfo(path).fileName())
                                  .arg(added)
                                  .arg(mapper.connectionsAdded()));
+}
+
+void MainWindow::startLiveAutomap()
+{
+    if (m_automapping) {
+        statusBar()->showMessage(tr("Automapping is already running."));
+        return;
+    }
+    const QString path = QFileDialog::getOpenFileName(
+        this, tr("Live Automap — Choose Transcript"), QString(),
+        tr("Transcripts (*.txt *.log *.scr);;All files (*)"));
+    if (path.isEmpty())
+        return;
+
+    // Snapshot the current map: each poll re-derives from this snapshot plus the
+    // whole transcript so far, so re-running as the file grows is idempotent.
+    m_automapPreMap = m_map;
+    m_automapPath = path;
+    m_automapSize = -1;
+    m_automapping = true;
+    if (m_automapStopAction)
+        m_automapStopAction->setEnabled(true);
+
+    if (!m_automapTimer) {
+        m_automapTimer = new QTimer(this);
+        m_automapTimer->setInterval(400);
+        connect(m_automapTimer, &QTimer::timeout, this, &MainWindow::automapTick);
+    }
+    automapTick(); // process whatever is already there
+    m_automapTimer->start();
+    statusBar()->showMessage(
+        tr("Live automap: following %1 — play your game, then Stop.").arg(QFileInfo(path).fileName()));
+}
+
+void MainWindow::automapTick()
+{
+    if (!m_automapping)
+        return;
+    QFile file(m_automapPath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+    const qint64 size = file.size();
+    if (size == m_automapSize)
+        return; // nothing appended since last poll
+    m_automapSize = size;
+    const QString text = QString::fromUtf8(file.readAll());
+
+    // Re-derive from the pre-automap snapshot so the growing transcript maps
+    // consistently rather than duplicating rooms.
+    Map working = m_automapPreMap;
+    AutomapSettings settings;
+    settings.preferredDistanceBetweenRooms = m_map.settings.preferredDistanceBetweenRooms;
+    settings.gridSize = m_map.settings.gridSize;
+    TranscriptAutomapper mapper(settings);
+    const int added = mapper.run(working, text);
+
+    m_map.rooms = working.rooms;
+    m_map.connections = working.connections;
+    m_map.regions = working.regions;
+    m_map.reindex();
+    m_scene->setDocument(&m_map);
+    setWindowModified(true);
+    statusBar()->showMessage(tr("Live automap: %1 rooms, %2 connections so far…")
+                                 .arg(m_map.rooms.size())
+                                 .arg(m_map.connections.size()));
+    Q_UNUSED(added);
+}
+
+void MainWindow::stopLiveAutomap()
+{
+    if (!m_automapping)
+        return;
+    if (m_automapTimer)
+        m_automapTimer->stop();
+    m_automapping = false;
+    if (m_automapStopAction)
+        m_automapStopAction->setEnabled(false);
+
+    // Record the whole automap session as a single undoable step.
+    ReplaceContentCommand::Content before{m_automapPreMap.rooms, m_automapPreMap.connections,
+                                          m_automapPreMap.regions};
+    ReplaceContentCommand::Content after{m_map.rooms, m_map.connections, m_map.regions};
+    m_undo.push(new ReplaceContentCommand(m_scene, before, after, tr("Live Automap")));
+    m_view->zoomToFit();
+    statusBar()->showMessage(tr("Stopped automapping: %1 rooms, %2 connections.")
+                                 .arg(m_map.rooms.size())
+                                 .arg(m_map.connections.size()));
 }
 
 void MainWindow::addRoom()
