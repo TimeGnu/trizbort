@@ -69,6 +69,7 @@
 #include "MapScene.h"
 #include "MapStatisticsDialog.h"
 #include "MapView.h"
+#include "QuickFindDialog.h"
 #include "RoomDialog.h"
 #include "SettingsDialog.h"
 #include "TranscriptAutomapper.h"
@@ -159,6 +160,17 @@ void MainWindow::createActions()
                         [this] { m_scene->selectAll(); });
     editMenu->addAction(tr("Select &None"), QKeySequence(Qt::Key_Escape), this,
                         [this] { m_scene->clearSelection(); });
+    editMenu->addAction(tr("&Find Room…"), QKeySequence::Find, this, [this] {
+        QuickFindDialog dlg(m_map, this);
+        if (dlg.exec() != QDialog::Accepted)
+            return;
+        const int id = dlg.selectedRoomId();
+        if (id < 0)
+            return;
+        m_scene->selectRoomItem(id);
+        if (const Room *r = m_map.roomById(id))
+            m_view->centerOn(r->x + r->w / 2.0, r->y + r->h / 2.0);
+    });
     QMenu *selectMenu = editMenu->addMenu(tr("Se&lect"));
     selectMenu->addAction(tr("Unconnected Rooms"), this, [this] { selectSpecial(0); });
     selectMenu->addAction(tr("Rooms With Objects"), this, [this] { selectSpecial(1); });
@@ -282,7 +294,7 @@ void MainWindow::createActions()
                         &MapView::resetZoom);
     viewMenu->addAction(tr("Reset &Origin"), QKeySequence(Qt::Key_Home), m_view,
                         &MapView::resetOrigin);
-    viewMenu->addAction(tr("&Fit to Window"), QKeySequence(Qt::CTRL | Qt::Key_F), m_view,
+    viewMenu->addAction(tr("&Fit to Window"), QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_F), m_view,
                         &MapView::zoomToFit);
     viewMenu->addSeparator();
 
