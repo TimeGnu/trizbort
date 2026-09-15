@@ -26,9 +26,11 @@ class QLineEdit;
 class QPlainTextEdit;
 class QComboBox;
 class QCheckBox;
-class QPushButton;
+class QSpinBox;
 
 namespace trizbort {
+
+class ColorButton;
 
 // Modal editor for a room's properties. Constructed from a copy of the room;
 // result() returns the edited room (id, seq and geometry preserved).
@@ -41,27 +43,31 @@ public:
     Room result() const;
 
 private:
-    void pickFill();
-    void pickBorder();
-    void updateColorButtons();
-
     Room m_room;
 
     QLineEdit *m_name = nullptr;
     QLineEdit *m_subtitle = nullptr;
     QComboBox *m_region = nullptr;
+    QComboBox *m_reference = nullptr;
     QPlainTextEdit *m_description = nullptr;
     QPlainTextEdit *m_objects = nullptr;
+    QComboBox *m_objectsPosition = nullptr;
     QCheckBox *m_dark = nullptr;
     QCheckBox *m_start = nullptr;
     QCheckBox *m_end = nullptr;
     QComboBox *m_shape = nullptr;
     QComboBox *m_border = nullptr;
-    QPushButton *m_fillButton = nullptr;
-    QPushButton *m_borderColorButton = nullptr;
+    QSpinBox *m_cornerRadius = nullptr;
+    QComboBox *m_secondFillLocation = nullptr;
 
-    QColor m_fill;    // invalid => default
-    QColor m_borderColor;
+    ColorButton *m_fillButton = nullptr;
+    ColorButton *m_borderColorButton = nullptr;
+    ColorButton *m_secondFillButton = nullptr;
+    ColorButton *m_nameColorButton = nullptr;
+    ColorButton *m_subtitleColorButton = nullptr;
+    ColorButton *m_objectColorButton = nullptr;
+
+    QList<int> m_roomIds; // parallels m_reference entries (after the "(none)" item)
 };
 
 } // namespace trizbort
