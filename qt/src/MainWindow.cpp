@@ -53,7 +53,9 @@
 #include <QFormLayout>
 #include <QInputDialog>
 #include <QKeySequence>
+#include <QLabel>
 #include <QLineEdit>
+#include <QScrollBar>
 #include <QHash>
 #include <QMenu>
 #include <QMenuBar>
@@ -106,6 +108,17 @@ MainWindow::MainWindow(QWidget *parent)
             [this](bool clean) { setWindowModified(!clean); });
 
     createActions();
+
+    // A permanent zoom-percentage indicator in the status bar, kept current as
+    // the view is zoomed (a scale change alters the scrollbar range).
+    m_zoomLabel = new QLabel(this);
+    statusBar()->addPermanentWidget(m_zoomLabel);
+    auto updateZoom = [this] {
+        m_zoomLabel->setText(tr("%1%").arg(qRound(m_view->transform().m11() * 100.0)));
+    };
+    connect(m_view->horizontalScrollBar(), &QScrollBar::rangeChanged, this, updateZoom);
+    connect(m_view->verticalScrollBar(), &QScrollBar::rangeChanged, this, updateZoom);
+    updateZoom();
 
     // Start with a fresh, empty document.
     newFile();

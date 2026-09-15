@@ -44,7 +44,9 @@
 #include <cmath>
 
 #include <QFontMetricsF>
+#include <QGraphicsSceneContextMenuEvent>
 #include <QGraphicsSceneMouseEvent>
+#include <QMenu>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPainterPathStroker>
@@ -193,6 +195,14 @@ void ConnectionItem::updateRoute()
         if (i == 0 && haveStalk)     // first endpoint: the stalk follows it
             m_points.append(sp);
     }
+
+    // Hover tooltip: name, a door marker, and description.
+    QString tip = c.name.isEmpty() ? QObject::tr("Connection") : c.name;
+    if (c.hasDoor)
+        tip += QObject::tr(" (Door)");
+    if (!c.description.trimmed().isEmpty())
+        tip += QLatin1Char('\n') + c.description.trimmed();
+    setToolTip(tip);
     update();
 }
 
@@ -326,6 +336,24 @@ void ConnectionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, 
 void ConnectionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     m_scene->activateConnection(m_connId);
+    event->accept();
+}
+
+void ConnectionItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+    if (!isSelected()) {
+        if (scene())
+            scene()->clearSelection();
+        setSelected(true);
+    }
+    QMenu menu;
+    QAction *editAct = menu.addAction(QObject::tr("Edit…"));
+    QAction *deleteAct = menu.addAction(QObject::tr("Delete"));
+    QAction *chosen = menu.exec(event->screenPos());
+    if (chosen == editAct)
+        m_scene->activateConnection(m_connId);
+    else if (chosen == deleteAct)
+        m_scene->deleteSelection();
     event->accept();
 }
 

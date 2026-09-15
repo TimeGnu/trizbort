@@ -46,7 +46,9 @@
 
 #include <QFont>
 #include <QFontMetricsF>
+#include <QGraphicsSceneContextMenuEvent>
 #include <QGraphicsSceneMouseEvent>
+#include <QMenu>
 #include <QHash>
 #include <QPainter>
 #include <QPainterPath>
@@ -375,6 +377,19 @@ void RoomItem::syncFromModel()
     prepareGeometryChange();
     setPos(room->x, room->y);
     m_applyingModel = false;
+
+    // Hover tooltip: name, subtitle, description and object list.
+    QString tip = room->name.isEmpty() ? QObject::tr("(unnamed room)") : room->name;
+    if (!room->subtitle.isEmpty())
+        tip += QLatin1Char('\n') + room->subtitle;
+    if (!room->description.trimmed().isEmpty())
+        tip += QStringLiteral("\n\n") + room->description.trimmed();
+    QString objs = room->objectsText;
+    objs.remove(QRegularExpression(QStringLiteral("\\[[^\\]\\[]*\\]")));
+    objs = objs.trimmed();
+    if (!objs.isEmpty())
+        tip += QObject::tr("\n\nObjects:\n") + objs;
+    setToolTip(tip);
     update();
 }
 
@@ -516,6 +531,24 @@ QVariant RoomItem::itemChange(GraphicsItemChange change, const QVariant &value)
 void RoomItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     m_scene->activateRoom(m_roomId);
+    event->accept();
+}
+
+void RoomItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+    if (!isSelected()) {
+        if (scene())
+            scene()->clearSelection();
+        setSelected(true);
+    }
+    QMenu menu;
+    QAction *editAct = menu.addAction(QObject::tr("Edit…"));
+    QAction *deleteAct = menu.addAction(QObject::tr("Delete"));
+    QAction *chosen = menu.exec(event->screenPos());
+    if (chosen == editAct)
+        m_scene->activateRoom(m_roomId);
+    else if (chosen == deleteAct)
+        m_scene->deleteSelection();
     event->accept();
 }
 

@@ -50,6 +50,7 @@
 
 class QAction;
 class QDockWidget;
+class QLabel;
 
 namespace trizbort {
 
@@ -121,6 +122,7 @@ private:
     QAction *m_gridAction = nullptr;
     QAction *m_snapAction = nullptr;
     QDockWidget *m_minimapDock = nullptr;
+    QLabel *m_zoomLabel = nullptr;
 
     Room m_copiedColors;            // colour set captured by Copy Colour
     bool m_hasCopiedColors = false;
