@@ -50,6 +50,7 @@
 
 class QAction;
 class QDockWidget;
+class QFileSystemWatcher;
 class QLabel;
 
 namespace trizbort {
@@ -102,6 +103,13 @@ private:
     void copyColor();
     void pasteColor();
 
+    // Export / file helpers.
+    void exportToClipboard(const QString &format);
+    void backupMap();
+    void smartSave();
+    void setWatchedFile(const QString &path);
+    void reloadFromDisk();
+
     // Selection commands. kind: 0 unconnected rooms, 1 rooms w/ objects,
     // 2 rooms w/o objects, 3 all connections, 4 dangling connections,
     // 5 self-looping connections.
@@ -115,6 +123,8 @@ private:
     Map m_map;
     QString m_filePath;
     QUndoStack m_undo;
+    QFileSystemWatcher *m_watcher = nullptr;
+    qint64 m_lastSaveMs = 0; // ignore watcher events right after our own save
 
     MapScene *m_scene = nullptr;
     MapView *m_view = nullptr;

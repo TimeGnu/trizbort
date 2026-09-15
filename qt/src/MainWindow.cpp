@@ -46,10 +46,12 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QCloseEvent>
+#include <QDateTime>
 #include <QDialogButtonBox>
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QFileSystemWatcher>
 #include <QFormLayout>
 #include <QInputDialog>
 #include <QKeySequence>
@@ -136,6 +138,12 @@ void MainWindow::createActions()
     fileMenu->addAction(tr("Save &As…"), QKeySequence::SaveAs, this, [this] { saveAs(); });
     fileMenu->addSeparator();
 
+    fileMenu->addAction(tr("Bac&kup"), QKeySequence(Qt::CTRL | Qt::Key_B), this,
+                        &MainWindow::backupMap);
+    fileMenu->addAction(tr("S&mart Save"), QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S), this,
+                        &MainWindow::smartSave);
+    fileMenu->addSeparator();
+
     QMenu *exportMenu = fileMenu->addMenu(tr("&Export"));
     for (const ExportFormat &fmt : exportFormats()) {
         const QString key = fmt.key;
@@ -143,7 +151,14 @@ void MainWindow::createActions()
     }
     exportMenu->addSeparator();
     exportMenu->addAction(tr("PDF…"), this, &MainWindow::exportPdf);
-    exportMenu->addAction(tr("PNG image…"), this, &MainWindow::exportImage);
+    exportMenu->addAction(tr("Image (PNG/JPEG/BMP)…"), this, &MainWindow::exportImage);
+
+    QMenu *clipboardMenu = fileMenu->addMenu(tr("Export to &Clipboard"));
+    for (const ExportFormat &fmt : exportFormats()) {
+        const QString key = fmt.key;
+        clipboardMenu->addAction(fmt.label, this, [this, key] { exportToClipboard(key); });
+    }
+
     fileMenu->addSeparator();
     fileMenu->addAction(tr("&Import Transcript…"), this, &MainWindow::importTranscript);
     fileMenu->addSeparator();
@@ -398,7 +413,33 @@ bool MainWindow::loadFile(const QString &path)
     m_undo.clear();
     updateTitle();
     m_view->zoomToFit();
+    setWatchedFile(path);
     statusBar()->showMessage(tr("Opened %1").arg(QFileInfo(path).fileName()));
+
+    // Warn if the map was written by a newer format than this build produces.
+    auto parts = [](const QString &v) {
+        QList<int> p;
+        for (const QString &s : v.split(QLatin1Char('.')))
+            p << s.toInt();
+        while (p.size() < 4)
+            p << 0;
+        return p;
+    };
+    if (!m_map.version.isEmpty()) {
+        const QList<int> loadedV = parts(m_map.version);
+        const QList<int> curV = parts(QStringLiteral("1.8.0.0"));
+        for (int i = 0; i < 4; ++i) {
+            if (loadedV[i] > curV[i]) {
+                QMessageBox::information(
+                    this, tr("Newer File Format"),
+                    tr("This map was created by a newer version of Trizbort. Some information "
+                       "may be lost if you edit and save it."));
+                break;
+            }
+            if (loadedV[i] < curV[i])
+                break;
+        }
+    }
     return true;
 }
 
@@ -432,6 +473,8 @@ bool MainWindow::writeToPath(const QString &path)
         return false;
     }
     m_undo.setClean();
+    m_lastSaveMs = QDateTime::currentMSecsSinceEpoch();
+    setWatchedFile(path);
     statusBar()->showMessage(tr("Saved %1").arg(QFileInfo(path).fileName()));
     return true;
 }
@@ -476,10 +519,16 @@ void MainWindow::exportImage()
     const QString suggested =
         (m_filePath.isEmpty() ? QStringLiteral("map") : QFileInfo(m_filePath).completeBaseName())
         + QStringLiteral(".png");
-    QString path = QFileDialog::getSaveFileName(this, tr("Export PNG"), suggested,
-                                                tr("PNG image (*.png);;All files (*)"));
+    QString path = QFileDialog::getSaveFileName(
+        this, tr("Export Image"), suggested,
+        tr("PNG image (*.png);;JPEG image (*.jpg *.jpeg);;Bitmap (*.bmp);;All files (*)"));
     if (path.isEmpty())
         return;
+    // Default to PNG if the user gave no recognised image extension.
+    const QString suffix = QFileInfo(path).suffix().toLower();
+    if (suffix != QLatin1String("png") && suffix != QLatin1String("jpg") &&
+        suffix != QLatin1String("jpeg") && suffix != QLatin1String("bmp"))
+        path += QStringLiteral(".png");
     QString error;
     if (!renderMapToImage(m_map, path, &error))
         QMessageBox::warning(this, tr("Export Failed"), error);
@@ -1014,6 +1063,92 @@ void MainWindow::selectSpecial(int kind)
     }
     m_scene->selectConnectionsByIds(ids);
     statusBar()->showMessage(tr("Selected %1 connections.").arg(ids.size()));
+}
+
+void MainWindow::exportToClipboard(const QString &format)
+{
+    auto exporter =
+        makeExporter(format, m_map, m_filePath.isEmpty() ? QStringLiteral("map") : m_filePath);
+    if (!exporter)
+        return;
+    QApplication::clipboard()->setText(exporter->exportToString());
+    statusBar()->showMessage(tr("Copied the %1 export to the clipboard.").arg(format));
+}
+
+void MainWindow::backupMap()
+{
+    if (m_filePath.isEmpty()) {
+        statusBar()->showMessage(tr("Save the map before backing it up."));
+        return;
+    }
+    const QFileInfo fi(m_filePath);
+    for (int n = 1; n <= 9999; ++n) {
+        const QString candidate = QStringLiteral("%1/%2 (%3).%4")
+                                      .arg(fi.absolutePath(), fi.completeBaseName())
+                                      .arg(n)
+                                      .arg(fi.suffix());
+        if (QFile::exists(candidate))
+            continue;
+        if (QFile::copy(m_filePath, candidate))
+            statusBar()->showMessage(tr("Backed up to %1").arg(QFileInfo(candidate).fileName()));
+        else
+            QMessageBox::warning(this, tr("Backup Failed"), tr("Could not write %1").arg(candidate));
+        return;
+    }
+}
+
+void MainWindow::smartSave()
+{
+    if (m_filePath.isEmpty()) {
+        if (!saveAs())
+            return;
+    } else if (!save()) {
+        return;
+    }
+    const QFileInfo fi(m_filePath);
+    const QString base = fi.absolutePath() + QLatin1Char('/') + fi.completeBaseName();
+    QString error;
+    bool ok = renderMapToPdf(m_map, base + QStringLiteral(".pdf"), &error);
+    ok = renderMapToImage(m_map, base + QStringLiteral(".png"), &error) && ok;
+    statusBar()->showMessage(ok ? tr("Smart-saved the map, a PDF and a PNG.")
+                                : tr("Smart save error: %1").arg(error));
+}
+
+void MainWindow::setWatchedFile(const QString &path)
+{
+    if (!m_watcher) {
+        m_watcher = new QFileSystemWatcher(this);
+        connect(m_watcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &p) {
+            // Ignore the change our own save just made.
+            if (QDateTime::currentMSecsSinceEpoch() - m_lastSaveMs < 1500) {
+                if (m_watcher && QFile::exists(p) && !m_watcher->files().contains(p))
+                    m_watcher->addPath(p);
+                return;
+            }
+            if (m_watcher && QFile::exists(p) && !m_watcher->files().contains(p))
+                m_watcher->addPath(p);
+            reloadFromDisk();
+        });
+    }
+    if (!m_watcher->files().isEmpty())
+        m_watcher->removePaths(m_watcher->files());
+    if (!path.isEmpty() && QFile::exists(path))
+        m_watcher->addPath(path);
+}
+
+void MainWindow::reloadFromDisk()
+{
+    if (m_filePath.isEmpty() || !QFile::exists(m_filePath))
+        return;
+    if (!m_undo.isClean()) {
+        statusBar()->showMessage(
+            tr("The file changed on disk; unsaved changes were kept (not reloaded)."));
+        return;
+    }
+    const QString path = m_filePath;
+    loadFile(path);
+    statusBar()->showMessage(
+        tr("Reloaded %1 after an external change.").arg(QFileInfo(path).fileName()));
 }
 
 void MainWindow::editMapProperties()
