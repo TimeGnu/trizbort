@@ -63,6 +63,113 @@ QColor regionTextColor(const Map &map, const QString &region)
     return QColor();
 }
 
+// The Qt pen style for a stored border token, or Qt::NoPen for "None".
+Qt::PenStyle penStyleForBorder(const QString &style)
+{
+    if (style == QLatin1String("None"))
+        return Qt::NoPen;
+    if (style == QLatin1String("Dot"))
+        return Qt::DotLine;
+    if (style == QLatin1String("Dash") || style == QLatin1String("Dashed") ||
+        style == QLatin1String("Custom"))
+        return Qt::DashLine;
+    if (style == QLatin1String("DashDot"))
+        return Qt::DashDotLine;
+    if (style == QLatin1String("DashDotDot"))
+        return Qt::DashDotDotLine;
+    return Qt::SolidLine;
+}
+
+// Build the outline path for a room's shape within the given rectangle: ellipse,
+// octagon (independent per-axis quarter chamfers), rounded (per-corner radii) or
+// plain rectangle. Mirrors Room.createRoomPath / the octagon quarter-points.
+QPainterPath buildRoomPath(const Room &room, const QRectF &r)
+{
+    QPainterPath path;
+    if (room.ellipse) {
+        path.addEllipse(r);
+        return path;
+    }
+    if (room.octagonal) {
+        const double cx = r.width() * 0.25;
+        const double cy = r.height() * 0.25;
+        QPolygonF poly;
+        poly << QPointF(r.left() + cx, r.top()) << QPointF(r.right() - cx, r.top())
+             << QPointF(r.right(), r.top() + cy) << QPointF(r.right(), r.bottom() - cy)
+             << QPointF(r.right() - cx, r.bottom()) << QPointF(r.left() + cx, r.bottom())
+             << QPointF(r.left(), r.bottom() - cy) << QPointF(r.left(), r.top() + cy);
+        path.addPolygon(poly);
+        path.closeSubpath();
+        return path;
+    }
+    if (room.roundedCorners) {
+        const double maxR = qMin(r.width(), r.height()) / 2.0;
+        const double tl = qBound(0.0, room.cornerTopLeft, maxR);
+        const double tr = qBound(0.0, room.cornerTopRight, maxR);
+        const double br = qBound(0.0, room.cornerBottomRight, maxR);
+        const double bl = qBound(0.0, room.cornerBottomLeft, maxR);
+        path.moveTo(r.left() + tl, r.top());
+        path.lineTo(r.right() - tr, r.top());
+        if (tr > 0.0)
+            path.arcTo(r.right() - 2 * tr, r.top(), 2 * tr, 2 * tr, 90, -90);
+        path.lineTo(r.right(), r.bottom() - br);
+        if (br > 0.0)
+            path.arcTo(r.right() - 2 * br, r.bottom() - 2 * br, 2 * br, 2 * br, 0, -90);
+        path.lineTo(r.left() + bl, r.bottom());
+        if (bl > 0.0)
+            path.arcTo(r.left(), r.bottom() - 2 * bl, 2 * bl, 2 * bl, 270, -90);
+        path.lineTo(r.left(), r.top() + tl);
+        if (tl > 0.0)
+            path.arcTo(r.left(), r.top(), 2 * tl, 2 * tl, 180, -90);
+        path.closeSubpath();
+        return path;
+    }
+    path.addRect(r);
+    return path;
+}
+
+// Build the closed sub-region filled by a room's second fill, matching the eight
+// SecondFillLocation layouts in Room.Draw (half-and-half splits and corners).
+QPainterPath buildSecondFillPath(const Room &room, const QRectF &r)
+{
+    const double w = r.width();
+    const double h = r.height();
+    const QPointF tl(r.left(), r.top());
+    const QPointF tr(r.right(), r.top());
+    const QPointF bl(r.left(), r.bottom());
+    const QPointF br(r.right(), r.bottom());
+    const QPointF tc(r.left() + w / 2.0, r.top());
+    const QPointF rc(r.right(), r.top() + h / 2.0);
+    const QPointF bc(r.left() + w / 2.0, r.bottom());
+    const QPointF lc(r.left(), r.top() + h / 2.0);
+
+    QPolygonF poly;
+    const QString loc = room.secondFillLocation;
+    if (loc == QLatin1String("Bottom"))
+        poly << lc << rc << br << bl;
+    else if (loc == QLatin1String("Top"))
+        poly << lc << rc << tr << tl;
+    else if (loc == QLatin1String("Left"))
+        poly << tc << tl << bl << bc;
+    else if (loc == QLatin1String("Right"))
+        poly << tc << tr << br << bc;
+    else if (loc == QLatin1String("BottomRight"))
+        poly << bl << tr << br;
+    else if (loc == QLatin1String("BottomLeft"))
+        poly << tl << bl << br;
+    else if (loc == QLatin1String("TopRight"))
+        poly << tl << tr << br;
+    else if (loc == QLatin1String("TopLeft"))
+        poly << tl << tr << bl;
+    else
+        poly << lc << rc << br << bl; // default: Bottom
+
+    QPainterPath path;
+    path.addPolygon(poly);
+    path.closeSubpath();
+    return path;
+}
+
 // Draw a room's name, subtitle and object list, matching the C# Room.Draw
 // text layout: the name is centred in the room using the room font and region
 // (or room-specific) text colour; the subtitle sits just below it; the object
@@ -199,6 +306,7 @@ void RoomItem::syncFromModel()
     m_applyingModel = true;
     m_w = room->w;
     m_h = room->h;
+    setZValue(room->zOrder); // honour per-room stacking order (connections are at -1)
     prepareGeometryChange();
     setPos(room->x, room->y);
     m_applyingModel = false;
@@ -228,6 +336,7 @@ void RoomItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
         return;
 
     const QRectF rect(0, 0, m_w, m_h);
+    const bool isReference = room->referenceRoom >= 0;
 
     QColor fill = room->fill.isValid() ? room->fill : map->regionFill(room->region);
     if (!fill.isValid())
@@ -236,69 +345,86 @@ void RoomItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
     if (!border.isValid())
         border = QColor(Qt::black);
 
-    QPen pen(border);
-    pen.setWidthF(2.0);
-    if (room->borderStyle == QLatin1String("None"))
-        pen.setStyle(Qt::NoPen);
-    else if (room->borderStyle.startsWith(QLatin1String("Dash")))
-        pen.setStyle(Qt::DashLine);
-    else if (room->borderStyle == QLatin1String("Dot"))
-        pen.setStyle(Qt::DotLine);
-
-    // Build the outline for the room's shape.
-    QPainterPath path;
-    if (room->ellipse) {
-        path.addEllipse(rect);
-    } else if (room->octagonal) {
-        const double c = qMin(m_w, m_h) * 0.25;
-        QPolygonF poly;
-        poly << QPointF(c, 0) << QPointF(m_w - c, 0) << QPointF(m_w, c)
-             << QPointF(m_w, m_h - c) << QPointF(m_w - c, m_h) << QPointF(c, m_h)
-             << QPointF(0, m_h - c) << QPointF(0, c);
-        path.addPolygon(poly);
-        path.closeSubpath();
-    } else if (room->roundedCorners) {
-        path.addRoundedRect(rect, 8, 8);
-    } else {
-        path.addRect(rect);
-    }
-
+    const QPainterPath path = buildRoomPath(*room, rect);
     painter->setRenderHint(QPainter::Antialiasing, true);
-    painter->setPen(pen);
-    painter->setBrush(fill);
-    painter->drawPath(path);
 
-    // Dark rooms get a diagonal corner stripe, as in Trizbort.
-    if (room->isDark) {
-        painter->save();
-        painter->setClipPath(path);
-        const double s = qMin(m_w, m_h) * 0.35;
-        QPolygonF tri;
-        tri << QPointF(m_w - s, 0) << QPointF(m_w, 0) << QPointF(m_w, s);
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(QColor(0, 0, 0, 60));
-        painter->drawPolygon(tri);
-        painter->restore();
+    // Start / end / reference rooms get an inflated outline that follows the
+    // room's shape (green/red from the palette; light blue for a reference).
+    if (room->isStartRoom || room->isEndRoom || isReference) {
+        const QPainterPath halo = buildRoomPath(*room, rect.adjusted(-5, -5, 5, 5));
+        QColor haloColor = isReference
+                               ? QColor(173, 216, 230)
+                               : (room->isStartRoom ? map->settings.colors[ColorStartRoom]
+                                                    : map->settings.colors[ColorEndRoom]);
+        if (!haloColor.isValid())
+            haloColor = room->isStartRoom ? QColor(Qt::green) : QColor(Qt::red);
+        painter->setPen(QPen(haloColor, 2.0));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawPath(halo);
     }
 
-    // Start/end room markers.
-    if (room->isStartRoom || room->isEndRoom) {
+    // The room outline, fill, second fill and darkness stripe are only drawn
+    // when the border style isn't "None" (matching Room.Draw, where a None
+    // border suppresses the whole shape and leaves only the text).
+    if (room->borderStyle != QLatin1String("None")) {
+        // Fill the interior.
         painter->setPen(Qt::NoPen);
-        painter->setBrush(room->isStartRoom ? map->settings.colors[ColorStartRoom]
-                                            : map->settings.colors[ColorEndRoom]);
-        painter->drawEllipse(QPointF(6, 6), 3, 3);
+        painter->setBrush(fill);
+        painter->drawPath(path);
+
+        // Second fill: a coloured sub-region, clipped to the room shape.
+        if (room->secondFill.isValid()) {
+            painter->save();
+            painter->setClipPath(path);
+            painter->setPen(Qt::NoPen);
+            painter->setBrush(room->secondFill);
+            painter->drawPath(buildSecondFillPath(*room, rect));
+            painter->restore();
+        }
+
+        // Darkness stripe: a corner triangle drawn in the border colour, sized
+        // from the darkness-stripe setting and adjusted per shape.
+        if (room->isDark) {
+            double dx = map->settings.darknessStripeSize;
+            double dy = map->settings.darknessStripeSize;
+            if (room->ellipse) {
+                dx = 2.0 * m_w / 5.0;
+                dy = 2.0 * m_h / 5.0;
+            } else if (room->octagonal) {
+                dx = m_w * 7.0 / 20.0;
+                dy = m_h * 7.0 / 20.0;
+            } else if (room->roundedCorners &&
+                       room->cornerTopRight > 2.0 * map->settings.darknessStripeSize) {
+                dx = dy = room->cornerTopRight / 2.0;
+            }
+            painter->save();
+            painter->setClipPath(path);
+            painter->setPen(QPen(border, map->settings.lineWidth > 0 ? map->settings.lineWidth : 2.0));
+            painter->setBrush(Qt::NoBrush);
+            QPolygonF tri;
+            tri << QPointF(m_w, 0) << QPointF(m_w - dx, 0) << QPointF(m_w, dy);
+            painter->drawPolygon(tri);
+            painter->restore();
+        }
+
+        // The border on top. Reference rooms always use a dotted border.
+        QPen pen(border);
+        pen.setWidthF(map->settings.lineWidth > 0 ? map->settings.lineWidth : 2.0);
+        pen.setCapStyle(Qt::RoundCap);
+        pen.setStyle(isReference ? Qt::DotLine : penStyleForBorder(room->borderStyle));
+        painter->setPen(pen);
+        painter->setBrush(Qt::NoBrush);
+        painter->drawPath(path);
     }
 
     drawRoomText(painter, *map, *room, rect);
 
-    // Selection highlight.
+    // Selection highlight: a gold outline following the room shape.
     if (isSelected()) {
-        QPen sel(QColor(30, 120, 220));
-        sel.setWidthF(1.5);
-        sel.setStyle(Qt::DashLine);
-        painter->setPen(sel);
+        const QPainterPath sel = buildRoomPath(*room, rect.adjusted(-5, -5, 5, 5));
+        painter->setPen(QPen(QColor(255, 215, 0), 2.0));
         painter->setBrush(Qt::NoBrush);
-        painter->drawRect(rect.adjusted(-2, -2, 2, 2));
+        painter->drawPath(sel);
     }
 }
 
