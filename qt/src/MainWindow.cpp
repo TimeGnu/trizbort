@@ -1297,8 +1297,39 @@ void MainWindow::editMapSettings()
     SettingsDialog dialog(m_map.settings, m_map.regions, this);
     if (dialog.exec() != QDialog::Accepted)
         return;
+
+    const QHash<QString, QString> renames = dialog.regionRenames();
+    const QStringList removedList = dialog.removedRegionNames();
+    const QSet<QString> removed(removedList.begin(), removedList.end());
+
+    m_undo.beginMacro(tr("Map Settings"));
     m_undo.push(new EditSettingsCommand(m_scene, m_map.settings, m_map.regions,
                                         dialog.resultSettings(), dialog.resultRegions()));
+
+    // Propagate a region rename to the rooms that used it, and reassign rooms
+    // whose region was deleted back to the default region.
+    if (!renames.isEmpty() || !removed.isEmpty()) {
+        QList<int> ids;
+        for (const Room &room : m_map.rooms)
+            ids.append(room.id);
+        for (int id : ids) {
+            const Room *r = m_map.roomById(id);
+            if (!r)
+                continue;
+            QString newRegion = r->region;
+            if (renames.contains(r->region))
+                newRegion = renames.value(r->region);
+            else if (removed.contains(r->region))
+                newRegion = kNoRegion;
+            if (newRegion != r->region) {
+                Room before = *r;
+                Room after = before;
+                after.region = newRegion;
+                m_undo.push(new EditRoomCommand(m_scene, id, before, after));
+            }
+        }
+    }
+    m_undo.endMacro();
 }
 
 void MainWindow::updateTitle()
