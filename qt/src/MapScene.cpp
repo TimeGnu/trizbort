@@ -68,6 +68,10 @@ double MapScene::gridSize() const
 
 QPointF MapScene::snap(const QPointF &p) const
 {
+    // Honour the document's snap-to-grid setting; when off, leave the point as
+    // given (previously it always snapped, ignoring the flag).
+    if (m_map && !m_map->settings.snapToGrid)
+        return p;
     const double g = gridSize();
     return QPointF(std::round(p.x() / g) * g, std::round(p.y() / g) * g);
 }

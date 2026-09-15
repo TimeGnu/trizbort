@@ -243,10 +243,42 @@ void MainWindow::createActions()
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
     viewMenu->addAction(tr("Zoom &In"), QKeySequence::ZoomIn, m_view, &MapView::zoomIn);
     viewMenu->addAction(tr("Zoom &Out"), QKeySequence::ZoomOut, m_view, &MapView::zoomOut);
+    viewMenu->addAction(tr("Zoom In &1%"), QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Equal), this,
+                        [this] { m_view->microZoom(true); });
+    viewMenu->addAction(tr("Zoom Out 1&%"), QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Minus), this,
+                        [this] { m_view->microZoom(false); });
+    QMenu *zoomMenu = viewMenu->addMenu(tr("&Zoom To"));
+    zoomMenu->addAction(tr("50%"), this, [this] { m_view->setZoomPercent(50); });
+    zoomMenu->addAction(tr("100%"), this, [this] { m_view->setZoomPercent(100); });
+    zoomMenu->addAction(tr("200%"), this, [this] { m_view->setZoomPercent(200); });
     viewMenu->addAction(tr("&Reset Zoom"), QKeySequence(Qt::CTRL | Qt::Key_0), m_view,
                         &MapView::resetZoom);
+    viewMenu->addAction(tr("Reset &Origin"), QKeySequence(Qt::Key_Home), m_view,
+                        &MapView::resetOrigin);
     viewMenu->addAction(tr("&Fit to Window"), QKeySequence(Qt::CTRL | Qt::Key_F), m_view,
                         &MapView::zoomToFit);
+    viewMenu->addSeparator();
+
+    m_gridAction = viewMenu->addAction(tr("Show &Grid"));
+    QAction *gridAct = m_gridAction;
+    gridAct->setCheckable(true);
+    gridAct->setChecked(m_map.settings.gridVisible);
+    connect(gridAct, &QAction::triggered, this, [this](bool on) {
+        MapSettings ns = m_map.settings;
+        ns.gridVisible = on;
+        m_undo.push(new EditSettingsCommand(m_scene, m_map.settings, m_map.regions, ns,
+                                            m_map.regions));
+    });
+    m_snapAction = viewMenu->addAction(tr("&Snap to Grid"));
+    QAction *snapAct = m_snapAction;
+    snapAct->setCheckable(true);
+    snapAct->setChecked(m_map.settings.snapToGrid);
+    connect(snapAct, &QAction::triggered, this, [this](bool on) {
+        MapSettings ns = m_map.settings;
+        ns.snapToGrid = on;
+        m_undo.push(new EditSettingsCommand(m_scene, m_map.settings, m_map.regions, ns,
+                                            m_map.regions));
+    });
 
     toolBar->addAction(newAct);
     toolBar->addAction(openAct);
@@ -962,6 +994,11 @@ void MainWindow::updateTitle()
     const QString name = m_filePath.isEmpty() ? tr("Untitled") : QFileInfo(m_filePath).fileName();
     setWindowTitle(tr("%1[*] — Trizbort (Qt)").arg(name));
     setWindowModified(!m_undo.isClean());
+    // Keep the grid/snap toggles in sync with the current document's settings.
+    if (m_gridAction)
+        m_gridAction->setChecked(m_map.settings.gridVisible);
+    if (m_snapAction)
+        m_snapAction->setChecked(m_map.settings.snapToGrid);
 }
 
 bool MainWindow::maybeSave()

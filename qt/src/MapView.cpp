@@ -71,6 +71,25 @@ void MapView::zoomIn() { scale(1.15, 1.15); }
 void MapView::zoomOut() { scale(1.0 / 1.15, 1.0 / 1.15); }
 void MapView::resetZoom() { resetTransform(); }
 
+void MapView::setZoomPercent(double percent)
+{
+    resetTransform();
+    const double f = percent / 100.0;
+    scale(f, f);
+}
+
+void MapView::microZoom(bool in)
+{
+    const double f = in ? 1.01 : 1.0 / 1.01;
+    scale(f, f);
+}
+
+void MapView::resetOrigin()
+{
+    resetTransform();
+    centerOn(0, 0);
+}
+
 void MapView::zoomToFit()
 {
     if (scene())

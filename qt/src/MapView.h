@@ -58,6 +58,9 @@ public:
     void zoomOut();
     void resetZoom();
     void zoomToFit();
+    void setZoomPercent(double percent); // absolute zoom, 100 == 1:1
+    void microZoom(bool in);             // +/- 1% step
+    void resetOrigin();                  // 1:1 and centre the map origin
 
 protected:
     void wheelEvent(QWheelEvent *event) override;

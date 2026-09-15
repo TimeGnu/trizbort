@@ -117,6 +117,8 @@ private:
     MapScene *m_scene = nullptr;
     MapView *m_view = nullptr;
     QAction *m_connectAction = nullptr;
+    QAction *m_gridAction = nullptr;
+    QAction *m_snapAction = nullptr;
 
     Room m_copiedColors;            // colour set captured by Copy Colour
     bool m_hasCopiedColors = false;
