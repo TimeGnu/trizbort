@@ -47,6 +47,7 @@
 #include <QClipboard>
 #include <QCloseEvent>
 #include <QDialogButtonBox>
+#include <QDockWidget>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFormLayout>
@@ -69,6 +70,7 @@
 #include "MapScene.h"
 #include "MapStatisticsDialog.h"
 #include "MapView.h"
+#include "MinimapView.h"
 #include "QuickFindDialog.h"
 #include "RoomDialog.h"
 #include "SettingsDialog.h"
@@ -87,6 +89,13 @@ MainWindow::MainWindow(QWidget *parent)
     m_view = new MapView(this);
     m_view->setScene(m_scene);
     setCentralWidget(m_view);
+
+    // Minimap overview in a dockable panel (hidden until the user shows it).
+    m_minimapDock = new QDockWidget(tr("Mini Map"), this);
+    m_minimapDock->setWidget(new MinimapView(m_scene, m_view, m_minimapDock));
+    m_minimapDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::RightDockWidgetArea, m_minimapDock);
+    m_minimapDock->hide();
 
     m_scene->setUndoStack(&m_undo);
     connect(m_scene, &MapScene::editRoomRequested, this, &MainWindow::editRoom);
@@ -318,6 +327,12 @@ void MainWindow::createActions()
         m_undo.push(new EditSettingsCommand(m_scene, m_map.settings, m_map.regions, ns,
                                             m_map.regions));
     });
+    viewMenu->addSeparator();
+    if (m_minimapDock) {
+        QAction *mm = m_minimapDock->toggleViewAction();
+        mm->setText(tr("Mini &Map"));
+        viewMenu->addAction(mm);
+    }
 
     toolBar->addAction(newAct);
     toolBar->addAction(openAct);

@@ -49,6 +49,7 @@
 #include "MapDocument.h"
 
 class QAction;
+class QDockWidget;
 
 namespace trizbort {
 
@@ -119,6 +120,7 @@ private:
     QAction *m_connectAction = nullptr;
     QAction *m_gridAction = nullptr;
     QAction *m_snapAction = nullptr;
+    QDockWidget *m_minimapDock = nullptr;
 
     Room m_copiedColors;            // colour set captured by Copy Colour
     bool m_hasCopiedColors = false;
