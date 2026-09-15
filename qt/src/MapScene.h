@@ -83,6 +83,9 @@ public:
     QList<int> selectedConnectionIds() const;
     // Select every room and connection.
     void selectAll();
+    // Replace the selection with the given rooms / connections by id.
+    void selectRoomsByIds(const QList<int> &ids);
+    void selectConnectionsByIds(const QList<int> &ids);
 
     double gridSize() const;
     QPointF snap(const QPointF &p) const;

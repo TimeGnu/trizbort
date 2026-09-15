@@ -53,6 +53,8 @@ namespace trizbort {
 class TrizbortReader {
 public:
     static bool load(const QString &path, Map &out, QString *errorMessage = nullptr);
+    // Parse a .trizbort document held in a string (used by clipboard paste).
+    static bool loadFromString(const QString &xml, Map &out, QString *errorMessage = nullptr);
 };
 
 // Parses a Trizbort color string ("#RRGGBB", a named color, or ""). An empty

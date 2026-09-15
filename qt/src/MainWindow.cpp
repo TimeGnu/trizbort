@@ -40,7 +40,11 @@
 
 #include "MainWindow.h"
 
+#include <algorithm>
+
 #include <QAction>
+#include <QApplication>
+#include <QClipboard>
 #include <QCloseEvent>
 #include <QDialogButtonBox>
 #include <QFileDialog>
@@ -49,9 +53,12 @@
 #include <QInputDialog>
 #include <QKeySequence>
 #include <QLineEdit>
+#include <QHash>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QMimeData>
+#include <QSet>
 #include <QPlainTextEdit>
 #include <QStatusBar>
 #include <QToolBar>
@@ -134,6 +141,31 @@ void MainWindow::createActions()
     m_connectAction->setCheckable(true);
     m_connectAction->setShortcut(QKeySequence(Qt::Key_C));
     connect(m_connectAction, &QAction::toggled, this, &MainWindow::toggleConnectMode);
+
+    editMenu->addSeparator();
+    editMenu->addAction(tr("Cu&t"), QKeySequence::Cut, this, [this] {
+        copySelection();
+        deleteSelection();
+    });
+    editMenu->addAction(tr("&Copy"), QKeySequence::Copy, this, &MainWindow::copySelection);
+    editMenu->addAction(tr("&Paste"), QKeySequence::Paste, this, &MainWindow::paste);
+    editMenu->addAction(tr("Copy Colo&ur"), QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_C), this,
+                        &MainWindow::copyColor);
+    editMenu->addAction(tr("Paste Colou&r"), QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_V), this,
+                        &MainWindow::pasteColor);
+    editMenu->addSeparator();
+    editMenu->addAction(tr("Select &All"), QKeySequence::SelectAll, this,
+                        [this] { m_scene->selectAll(); });
+    editMenu->addAction(tr("Select &None"), QKeySequence(Qt::Key_Escape), this,
+                        [this] { m_scene->clearSelection(); });
+    QMenu *selectMenu = editMenu->addMenu(tr("Se&lect"));
+    selectMenu->addAction(tr("Unconnected Rooms"), this, [this] { selectSpecial(0); });
+    selectMenu->addAction(tr("Rooms With Objects"), this, [this] { selectSpecial(1); });
+    selectMenu->addAction(tr("Rooms Without Objects"), this, [this] { selectSpecial(2); });
+    selectMenu->addSeparator();
+    selectMenu->addAction(tr("All Connections"), this, [this] { selectSpecial(3); });
+    selectMenu->addAction(tr("Dangling Connections"), this, [this] { selectSpecial(4); });
+    selectMenu->addAction(tr("Self-Looping Connections"), this, [this] { selectSpecial(5); });
 
     // Automap: create a connected room in a compass direction from the selection.
     QMenu *automapMenu = editMenu->addMenu(tr("Add Connec&ted Room"));
@@ -664,6 +696,225 @@ void MainWindow::changeSelectedRegion()
     if (!ok)
         return;
     applyToSelectedRooms(tr("Change Region"), [region](Room &r) { r.region = region; });
+}
+
+namespace {
+const char *const kTrizbortMime = "application/x-trizbort";
+}
+
+void MainWindow::copySelection()
+{
+    const QList<int> roomIds = m_scene->selectedRoomIds();
+    const QList<int> connIds = m_scene->selectedConnectionIds();
+    if (roomIds.isEmpty() && connIds.isEmpty()) {
+        statusBar()->showMessage(tr("Nothing selected to copy."));
+        return;
+    }
+    const QSet<int> roomSet(roomIds.begin(), roomIds.end());
+    const QSet<int> connSet(connIds.begin(), connIds.end());
+
+    Map temp;
+    QSet<QString> regionsUsed;
+    for (int id : roomIds) {
+        if (const Room *r = m_map.roomById(id)) {
+            temp.rooms.append(*r);
+            regionsUsed.insert(r->region);
+        }
+    }
+    // Copy connections explicitly selected, plus those whose docked endpoints are
+    // all within the copied room set (a connection internal to the selection).
+    for (const Connection &c : m_map.connections) {
+        bool anyDock = false;
+        bool allInside = true;
+        for (const Vertex &v : c.vertices) {
+            if (v.docked) {
+                anyDock = true;
+                if (!roomSet.contains(v.roomId))
+                    allInside = false;
+            }
+        }
+        if (connSet.contains(c.id) || (anyDock && allInside))
+            temp.connections.append(c);
+    }
+    for (const Region &rg : m_map.regions) {
+        if (regionsUsed.contains(rg.name))
+            temp.regions.append(rg);
+    }
+
+    const QString xml = TrizbortWriter::toString(temp);
+    auto *mime = new QMimeData;
+    mime->setData(QString::fromLatin1(kTrizbortMime), xml.toUtf8());
+    mime->setText(xml);
+    QApplication::clipboard()->setMimeData(mime);
+    statusBar()->showMessage(
+        tr("Copied %1 rooms, %2 connections.").arg(temp.rooms.size()).arg(temp.connections.size()));
+}
+
+void MainWindow::paste()
+{
+    const QMimeData *mime = QApplication::clipboard()->mimeData();
+    QString xml;
+    if (mime && mime->hasFormat(QString::fromLatin1(kTrizbortMime)))
+        xml = QString::fromUtf8(mime->data(QString::fromLatin1(kTrizbortMime)));
+    else if (mime && mime->hasText())
+        xml = mime->text();
+    if (xml.isEmpty()) {
+        statusBar()->showMessage(tr("Nothing to paste."));
+        return;
+    }
+    Map temp;
+    if (!TrizbortReader::loadFromString(xml, temp, nullptr) ||
+        (temp.rooms.isEmpty() && temp.connections.isEmpty())) {
+        statusBar()->showMessage(tr("The clipboard does not contain map elements."));
+        return;
+    }
+
+    ReplaceContentCommand::Content oldContent{m_map.rooms, m_map.connections, m_map.regions};
+    ReplaceContentCommand::Content newContent = oldContent;
+
+    int maxRoomId = 0;
+    int maxConnId = 0;
+    int maxSeq = 0;
+    for (const Room &r : m_map.rooms) {
+        maxRoomId = std::max(maxRoomId, r.id);
+        maxSeq = std::max(maxSeq, r.seq);
+    }
+    for (const Connection &c : m_map.connections) {
+        maxConnId = std::max(maxConnId, c.id);
+        maxSeq = std::max(maxSeq, c.seq);
+    }
+
+    const double off = m_map.settings.gridSize > 1.0 ? m_map.settings.gridSize : 32.0;
+    QHash<int, int> roomIdMap;
+    QList<int> pastedRoomIds;
+    for (Room r : temp.rooms) {
+        const int newId = ++maxRoomId;
+        roomIdMap.insert(r.id, newId);
+        r.id = newId;
+        r.seq = ++maxSeq;
+        r.x += off;
+        r.y += off;
+        newContent.rooms.append(r);
+        pastedRoomIds.append(newId);
+    }
+    for (Connection c : temp.connections) {
+        bool ok = true;
+        for (Vertex &v : c.vertices) {
+            if (v.docked) {
+                if (roomIdMap.contains(v.roomId))
+                    v.roomId = roomIdMap.value(v.roomId);
+                else
+                    ok = false; // endpoint outside the paste set
+            } else {
+                v.point += QPointF(off, off);
+            }
+        }
+        if (!ok)
+            continue;
+        c.id = ++maxConnId;
+        c.seq = ++maxSeq;
+        newContent.connections.append(c);
+    }
+    for (const Region &rg : temp.regions) {
+        bool exists = false;
+        for (const Region &e : newContent.regions) {
+            if (e.name == rg.name) {
+                exists = true;
+                break;
+            }
+        }
+        if (!exists)
+            newContent.regions.append(rg);
+    }
+
+    m_undo.push(new ReplaceContentCommand(m_scene, oldContent, newContent, tr("Paste")));
+    m_scene->selectRoomsByIds(pastedRoomIds);
+    statusBar()->showMessage(tr("Pasted %1 rooms.").arg(pastedRoomIds.size()));
+}
+
+void MainWindow::copyColor()
+{
+    const int id = m_scene->selectedRoomId();
+    const Room *r = m_map.roomById(id);
+    if (!r) {
+        statusBar()->showMessage(tr("Select a room to copy its colours."));
+        return;
+    }
+    m_copiedColors = *r;
+    m_hasCopiedColors = true;
+    statusBar()->showMessage(tr("Copied colours. Select rooms and use Paste Colour (Ctrl+Alt+V)."));
+}
+
+void MainWindow::pasteColor()
+{
+    if (!m_hasCopiedColors) {
+        statusBar()->showMessage(tr("Copy a room's colours first (Ctrl+Alt+C)."));
+        return;
+    }
+    const Room src = m_copiedColors;
+    applyToSelectedRooms(tr("Paste Colour"), [src](Room &r) {
+        r.fill = src.fill;
+        r.secondFill = src.secondFill;
+        r.secondFillLocation = src.secondFillLocation;
+        r.border = src.border;
+        r.largeText = src.largeText;
+        r.subtitleColor = src.subtitleColor;
+        r.smallText = src.smallText;
+    });
+}
+
+void MainWindow::selectSpecial(int kind)
+{
+    if (kind <= 2) {
+        QSet<int> connectedRooms;
+        for (const Connection &c : m_map.connections)
+            for (const Vertex &v : c.vertices)
+                if (v.docked)
+                    connectedRooms.insert(v.roomId);
+        QList<int> ids;
+        for (const Room &r : m_map.rooms) {
+            const bool hasObjects = !r.objectsText.trimmed().isEmpty();
+            bool sel = false;
+            if (kind == 0)
+                sel = !connectedRooms.contains(r.id);
+            else if (kind == 1)
+                sel = hasObjects;
+            else
+                sel = !hasObjects;
+            if (sel)
+                ids.append(r.id);
+        }
+        m_scene->selectRoomsByIds(ids);
+        statusBar()->showMessage(tr("Selected %1 rooms.").arg(ids.size()));
+        return;
+    }
+    QList<int> ids;
+    for (const Connection &c : m_map.connections) {
+        bool sel = false;
+        if (kind == 3) {
+            sel = true;
+        } else if (kind == 4) {
+            for (const Vertex &v : c.vertices)
+                if (!v.docked) {
+                    sel = true;
+                    break;
+                }
+        } else {
+            QSet<int> rooms;
+            int dockCount = 0;
+            for (const Vertex &v : c.vertices) {
+                if (v.docked) {
+                    rooms.insert(v.roomId);
+                    ++dockCount;
+                }
+            }
+            sel = (dockCount >= 2 && rooms.size() == 1);
+        }
+        if (sel)
+            ids.append(c.id);
+    }
+    m_scene->selectConnectionsByIds(ids);
+    statusBar()->showMessage(tr("Selected %1 connections.").arg(ids.size()));
 }
 
 void MainWindow::editMapProperties()

@@ -94,6 +94,17 @@ private:
     void renameSelectedRoom();
     void changeSelectedRegion();
 
+    // Clipboard.
+    void copySelection();
+    void paste();
+    void copyColor();
+    void pasteColor();
+
+    // Selection commands. kind: 0 unconnected rooms, 1 rooms w/ objects,
+    // 2 rooms w/o objects, 3 all connections, 4 dangling connections,
+    // 5 self-looping connections.
+    void selectSpecial(int kind);
+
     void createActions();
     void updateTitle();
     bool maybeSave();                 // returns false to cancel the pending action
@@ -106,6 +117,9 @@ private:
     MapScene *m_scene = nullptr;
     MapView *m_view = nullptr;
     QAction *m_connectAction = nullptr;
+
+    Room m_copiedColors;            // colour set captured by Copy Colour
+    bool m_hasCopiedColors = false;
 };
 
 } // namespace trizbort

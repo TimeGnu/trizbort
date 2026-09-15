@@ -319,6 +319,24 @@ void MapScene::selectAll()
         item->setSelected(true);
 }
 
+void MapScene::selectRoomsByIds(const QList<int> &ids)
+{
+    clearSelection();
+    for (int id : ids) {
+        if (RoomItem *item = m_roomItems.value(id, nullptr))
+            item->setSelected(true);
+    }
+}
+
+void MapScene::selectConnectionsByIds(const QList<int> &ids)
+{
+    clearSelection();
+    for (ConnectionItem *item : m_connItems) {
+        if (ids.contains(item->connId()))
+            item->setSelected(true);
+    }
+}
+
 int MapScene::addRoomAt(const QPointF &scenePos)
 {
     if (!m_map)
