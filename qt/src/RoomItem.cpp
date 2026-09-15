@@ -484,6 +484,14 @@ void RoomItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
 
     drawRoomText(painter, *map, *room, rect);
 
+    // Validation: a red X across rooms that fail the active validation rules.
+    if (m_scene->roomInvalid(*room)) {
+        painter->setPen(QPen(QColor(Qt::red), 2.0));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawLine(rect.topLeft(), rect.bottomRight());
+        painter->drawLine(rect.topRight(), rect.bottomLeft());
+    }
+
     // Selection highlight: a gold outline following the room shape.
     if (isSelected()) {
         const QPainterPath sel = buildRoomPath(*room, rect.adjusted(-5, -5, 5, 5));

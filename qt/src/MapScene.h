@@ -114,6 +114,18 @@ public:
     void activateRoom(int roomId);
     void activateConnection(int connId);
 
+    // Room validation. These flags are runtime-only (not persisted), mirroring
+    // the C# project validation toggles; invalid rooms get a red X overlay.
+    struct ValidationFlags {
+        bool uniqueNames = false;
+        bool description = false;
+        bool subtitle = false;
+        bool noDangling = false;
+    };
+    void setValidation(const ValidationFlags &flags);
+    ValidationFlags validation() const { return m_validation; }
+    bool roomInvalid(const Room &room) const;
+
     // Refresh a single room's visuals and the connections touching it.
     void refreshRoom(int roomId);
     // Re-route and repaint one connection after its properties changed.
@@ -142,6 +154,7 @@ private:
     QList<ConnectionItem *> m_connItems;
 
     bool m_connectMode = false;
+    ValidationFlags m_validation;
     int m_connectFromRoom = -1;
     QGraphicsLineItem *m_rubberLine = nullptr;
 

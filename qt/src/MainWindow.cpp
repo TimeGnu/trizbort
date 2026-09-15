@@ -240,6 +240,25 @@ void MainWindow::createActions()
     swapMenu->addAction(tr("Swap &Regions"), QKeySequence(Qt::ALT | Qt::Key_W), this,
                         [this] { swapSelectedRooms(3); });
 
+    // --- Validation menu ---
+    QMenu *validationMenu = menuBar()->addMenu(tr("&Validation"));
+    auto *vUnique = validationMenu->addAction(tr("Rooms Must Have a &Unique Name"));
+    auto *vDesc = validationMenu->addAction(tr("Rooms Must Have a &Description"));
+    auto *vSub = validationMenu->addAction(tr("Rooms Must Have a &Subtitle"));
+    auto *vDang = validationMenu->addAction(tr("Rooms Must Not Have a Dan&gling Connection"));
+    for (QAction *a : {vUnique, vDesc, vSub, vDang})
+        a->setCheckable(true);
+    auto applyValidation = [this, vUnique, vDesc, vSub, vDang] {
+        MapScene::ValidationFlags f;
+        f.uniqueNames = vUnique->isChecked();
+        f.description = vDesc->isChecked();
+        f.subtitle = vSub->isChecked();
+        f.noDangling = vDang->isChecked();
+        m_scene->setValidation(f);
+    };
+    for (QAction *a : {vUnique, vDesc, vSub, vDang})
+        connect(a, &QAction::triggered, this, applyValidation);
+
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
     viewMenu->addAction(tr("Zoom &In"), QKeySequence::ZoomIn, m_view, &MapView::zoomIn);
     viewMenu->addAction(tr("Zoom &Out"), QKeySequence::ZoomOut, m_view, &MapView::zoomOut);

@@ -249,6 +249,45 @@ void MapScene::refreshConnectionsFor(int roomId)
     }
 }
 
+void MapScene::setValidation(const ValidationFlags &flags)
+{
+    m_validation = flags;
+    update(); // repaint so the red-X overlays appear/disappear
+}
+
+bool MapScene::roomInvalid(const Room &room) const
+{
+    if (!m_map)
+        return false;
+    if (m_validation.description && room.description.trimmed().isEmpty())
+        return true;
+    if (m_validation.subtitle && room.subtitle.trimmed().isEmpty())
+        return true;
+    if (m_validation.uniqueNames) {
+        int count = 0;
+        for (const Room &r : m_map->rooms)
+            if (r.name == room.name)
+                ++count;
+        if (count > 1)
+            return true;
+    }
+    if (m_validation.noDangling) {
+        for (const Connection &c : m_map->connections) {
+            bool touchesThis = false;
+            bool hasDangling = false;
+            for (const Vertex &v : c.vertices) {
+                if (v.docked && v.roomId == room.id)
+                    touchesThis = true;
+                if (!v.docked)
+                    hasDangling = true;
+            }
+            if (touchesThis && hasDangling)
+                return true;
+        }
+    }
+    return false;
+}
+
 void MapScene::refreshRoom(int roomId)
 {
     if (RoomItem *item = m_roomItems.value(roomId, nullptr))
