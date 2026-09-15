@@ -40,6 +40,7 @@
 
 #include "MapScene.h"
 
+#include <algorithm>
 #include <cmath>
 
 #include <QGraphicsLineItem>
@@ -117,7 +118,16 @@ void MapScene::rebuild()
     }
     rebuildConnections();
 
-    QRectF bounds = itemsBoundingRect().adjusted(-400, -400, 400, 400);
+    // Give comfortable, balanced scrolling room around the content in BOTH
+    // axes. A map that is much wider than it is tall (or vice versa) would
+    // otherwise get almost no vertical (resp. horizontal) scroll range once
+    // fitted to the window: the scrollbar thumb then fills its whole track and
+    // the smallest drag snaps from one end to the other. Sizing the margin from
+    // the larger content dimension keeps the scroll range proportionate in both
+    // directions, so the thumb stays a sensible size and drags smoothly.
+    const QRectF content = itemsBoundingRect();
+    const double margin = std::max(600.0, std::max(content.width(), content.height()));
+    QRectF bounds = content.adjusted(-margin, -margin, margin, margin);
     if (bounds.width() < 1200 || bounds.height() < 900)
         bounds = bounds.united(QRectF(bounds.center() - QPointF(600, 450), QSizeF(1200, 900)));
     setSceneRect(bounds);

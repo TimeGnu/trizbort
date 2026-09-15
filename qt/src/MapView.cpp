@@ -55,6 +55,16 @@ MapView::MapView(QWidget *parent)
     setDragMode(QGraphicsView::RubberBandDrag);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     setResizeAnchor(QGraphicsView::AnchorViewCenter);
+
+    // Connections are long, thin items whose bounding rectangle is a large,
+    // mostly-empty diagonal band anchored at the scene origin (see
+    // ConnectionItem::boundingRect). Qt's default MinimalViewportUpdate mode
+    // scrolls by blitting the existing pixels and repainting only the newly
+    // exposed strip, driven by the scene's item index; that interacts poorly
+    // with such items and can leave connection lines unpainted until a
+    // transform change (a zoom step) forces a full redraw. Repainting the whole
+    // viewport on every scroll keeps the lines present and the scrolling smooth.
+    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 }
 
 void MapView::zoomIn() { scale(1.15, 1.15); }
