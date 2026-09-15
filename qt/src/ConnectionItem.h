@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2026  Jason Self <j@jxself.org>
  *
  *  This file is free software: you may copy, redistribute and/or modify it
@@ -38,60 +38,39 @@
  *     THE SOFTWARE.
  */
 
-using CommandLine;
+#ifndef TRIZBORT_CONNECTIONITEM_H
+#define TRIZBORT_CONNECTIONITEM_H
 
-namespace Trizbort.Domain.Application;
+#include <QGraphicsItem>
+#include <QVector>
 
-public class CommandLineOptions
-{
-  [Value(0)]
-  public string Executable { get; set; }
+namespace trizbort {
 
-  [Value(1)]
-  public string FileName { get; set; }
+class MapScene;
 
-  [Option('a', "loadlastproject", HelpText = "Load the last opened project.")]
-  public bool LoadLastProject { get; set; }
+// A connection drawn as a polyline between its endpoints. Recomputes its route
+// from the document whenever an attached room moves or the model changes.
+class ConnectionItem : public QGraphicsItem {
+public:
+    ConnectionItem(MapScene *scene, int connId);
 
-  [Option('m',"automap", HelpText = "Start automap with given transcript.")]
-  public string Transcript { get; set; }
+    int connId() const { return m_connId; }
+    void updateRoute();      // recompute geometry from the model
 
-  [Option('q',"quicksave", HelpText="Quick save the map to the current Trizbort file.")]
-  public string QuickSave { get; set; }
+    QRectF boundingRect() const override;
+    QPainterPath shape() const override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+               QWidget *widget) override;
 
-  [Option('s', "smartsave", HelpText = "SmartSave the loaded file")]
-  public bool SmartSave { get; set; }
+protected:
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
-  [Option('n', "name", HelpText = "Name the current map.")]
-  public string Name { get; set; }
+private:
+    MapScene *m_scene;
+    int m_connId;
+    QVector<QPointF> m_points;
+};
 
-  [Option('x', "exit", HelpText = "Exit Trizbort.")]
-  public bool Exit { get; set; }
+} // namespace trizbort
 
-  [Option("inform6", HelpText = "Export to I6.")]
-  public string I6 { get; set; }
-
-  [Option("inform7", HelpText = "Export to I7.")]
-  public string I7 { get; set; }
-
-  [Option("tads", HelpText = "Export to Tads.")]
-  public string Tads { get; set; }
-
-  [Option("alan", HelpText = "Export to Alan.")]
-  public string Alan { get; set; }
-
-  [Option("hugo", HelpText = "Export to Hugo.")]
-  public string Hugo { get; set; }
-
-  [Option("zil", HelpText = "Export to Zil.")]
-  public string Zil { get; set; }
-
-  [Option("quest", HelpText = "Export to Quest.")]
-  public string Quest { get; set; }
-
-  [Option("quest rooms", HelpText = "Export to Quest section.")]
-  public string QuestRooms { get; set; }
-
-  [Option("adventuron", HelpText = "Export to Adventuron.")]
-  public string Adventuron { get; set; }
-}
+#endif // TRIZBORT_CONNECTIONITEM_H

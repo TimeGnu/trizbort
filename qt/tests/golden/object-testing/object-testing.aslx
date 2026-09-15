@@ -1,0 +1,71 @@
+<asl version="550">
+
+  <include ref="English.aslx"/>
+  <include ref="Core.aslx"/>
+  <game name="object-testing">
+    <gameid>2cc2e8fa-90f7-44db-b5d5-0742ecb87207</gameid>
+    <version>1.0</version>
+    <firstpublished>2026</firstpublished>
+    <author>A Trizbort User</author>
+    <description></description>
+  </game>
+
+  <object name="TestRoom">
+    <inherit name="editor_room" />
+    <alias>Test Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="cave">
+      <inherit name="eastdirection" />
+    </exit>
+    <object name="MrJones">
+      <inherit name="editor_object" />
+      <inherit name="male" />
+      <alias>Mr Jones</alias>
+    </object>
+    <object name="Hat">
+      <inherit name="editor_object" />
+      <alias>Hat</alias>
+    </object>
+    <object name="Hatband">
+      <inherit name="editor_object" />
+      <alias>Hatband</alias>
+    </object>
+    <object name="fishbowl">
+      <inherit name="editor_object" />
+      <alias>fishbowl</alias>
+    </object>
+    <object name="goldfish">
+      <inherit name="editor_object" />
+      <alias>goldfish</alias>
+    </object>
+    <object name="MrsJones">
+      <inherit name="editor_object" />
+      <inherit name="female" />
+      <alias>Mrs Jones</alias>
+    </object>
+    <object name="rabbit">
+      <inherit name="editor_object" />
+      <alias>rabbit</alias>
+    </object>
+  </object>
+
+  <object name="cave">
+    <inherit name="editor_room" />
+    <alias>cave</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="TestRoom">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+
+</asl>
+

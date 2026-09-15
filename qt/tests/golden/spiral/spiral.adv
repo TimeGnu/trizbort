@@ -1,0 +1,87 @@
+
+start_at = mountainside
+
+locations {
+   mountainside           : location "" header = "Mountainside";
+   foot_of_the_mountain_s : location "" header = "Foot of the Mountain S";
+   foot_of_the_mountain_w : location "" header = "Foot of the Mountain W";
+   foot_of_the_mountain_e : location "fsdfds" header = "Foot of the Mountain E";
+   on_the_cloud           : location "" header = "On the Cloud";
+   platform               : location "" header = "Platform";
+   machine_room_west      : location "" header = "Machine Room: West";
+   fall_to_carriage       : location "" header = "Fall to Carriage";
+   fall_to_carriage_2     : location "" header = "Fall to Carriage";
+   fall_to_carriage_3     : location "" header = "Fall to Carriage";
+   machine_room_central   : location "" header = "Machine Room: Central";
+   machine_room_east      : location "" header = "Machine Room: East";
+   beneath_the_pipe       : location "" header = "Beneath the Pipe";
+   church_isle            : location "" header = "Church Isle";
+   fall_to_carriage_4     : location "" header = "Fall to Carriage";
+   over_the_gap           : location "" header = "Over the Gap";
+   scrap_room             : location "" header = "Scrap Room";
+   coast                  : location "" header = "Coast";
+   cave                   : location "" header = "Cave";
+   attic                  : location "" header = "Attic";
+   tomb                   : location "" header = "Tomb";
+   carriage               : location "" header = "Carriage";
+   underground_line       : location "Made in Twine, Men Don't Play With Dolls is an intimate and painful look into the beginnings of a lifelong struggle with addiction. Memories like these are not easily escaped." header = "Underground Line";
+   hospital_room          : location "" header = "Hospital Room";
+   reths_den              : location "" header = "Reth's Den";
+   underground_line_2     : location "" header = "Underground Line";
+   summit                 : location "" header = "Summit";
+   vat                    : location "" header = "Vat";
+   train_wreck            : location "" header = "Train Wreck";
+}
+
+
+connections {
+   from, direction, to = [
+      mountainside, south_oneway, foot_of_the_mountain_s,
+      foot_of_the_mountain_s, north_oneway, mountainside,
+      foot_of_the_mountain_s, east_oneway, foot_of_the_mountain_e,
+      foot_of_the_mountain_s, west_oneway, foot_of_the_mountain_w,
+      foot_of_the_mountain_s, southeast_oneway, church_isle,
+      foot_of_the_mountain_w, east_oneway, foot_of_the_mountain_s,
+      foot_of_the_mountain_w, west_oneway, coast,
+      foot_of_the_mountain_e, west_oneway, foot_of_the_mountain_s,
+      foot_of_the_mountain_e, enter_oneway, on_the_cloud,
+      on_the_cloud, leave_oneway, foot_of_the_mountain_e,
+      platform, east_oneway, machine_room_west,
+      machine_room_west, north_oneway, over_the_gap,
+      machine_room_west, east_oneway, machine_room_central,
+      machine_room_west, west_oneway, platform,
+      machine_room_west, up_oneway, beneath_the_pipe,
+      machine_room_central, east_oneway, machine_room_east,
+      machine_room_central, west_oneway, machine_room_west,
+      machine_room_east, west_oneway, machine_room_central,
+      machine_room_east, down_oneway, hospital_room,
+      beneath_the_pipe, up_oneway, fall_to_carriage_4,
+      beneath_the_pipe, down_oneway, machine_room_west,
+      church_isle, northwest_oneway, foot_of_the_mountain_s,
+      fall_to_carriage_4, down_oneway, beneath_the_pipe,
+      over_the_gap, north_oneway, scrap_room,
+      over_the_gap, south_oneway, machine_room_west,
+      scrap_room, south_oneway, over_the_gap,
+      scrap_room, east_oneway, reths_den,
+      coast, east_oneway, foot_of_the_mountain_w,
+      coast, up_oneway, cave,
+      cave, south_oneway, attic,
+      cave, west_oneway, tomb,
+      cave, down_oneway, coast,
+      attic, north_oneway, cave,
+      tomb, east_oneway, cave,
+      carriage, northeast_oneway, mountainside,
+      carriage, southeast_oneway, machine_room_west,
+      underground_line, south_oneway, tomb,
+      hospital_room, south_oneway, machine_room_east,
+      reths_den, west_oneway, scrap_room,
+      underground_line_2, south_oneway, reths_den,
+      underground_line_2, east_oneway, vat,
+      underground_line_2, west_oneway, summit,
+      underground_line_2, enter_oneway, train_wreck,
+      summit, down_oneway, underground_line_2,
+      train_wreck, leave_oneway, underground_line_2,
+   ]
+}
+
+

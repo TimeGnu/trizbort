@@ -1,0 +1,255 @@
+
+start_at = road
+
+locations {
+   road                          : location "" header = "Road";
+   pond                          : location "" header = "Pond";
+   muddy_swamp                   : location "" header = "Muddy Swamp";
+   empty_florida_highway         : location "" header = "Empty Florida Highway";
+   blacktop_highway              : location "" header = "Blacktop Highway";
+   bamboo_forest                 : location "" header = "Bamboo Forest";
+   swamp_forest                  : location "" header = "Swamp Forest";
+   dry_everglades                : location "" header = "Dry Everglades*";
+   dark_grove                    : location "" header = "Dark Grove*";
+   creepy_highway                : location "" header = "Creepy Highway";
+   mangrove_forest               : location "" header = "Mangrove Forest";
+   desolate_highway              : location "" header = "Desolate Highway";
+   scrub_forest                  : location "" header = "Scrub Forest";
+   pine_flatwood                 : location "" header = "Pine Flatwood*";
+   rotting_wooden_walkway        : location "" header = "Rotting Wooden Walkway";
+   concrete_building             : location "" header = "Concrete Building";
+   sandy_grass                   : location "" header = "Sandy Grass";
+   gazebo                        : location "" header = "Gazebo";
+   dusty_clearing                : location "" header = "Dusty Clearing";
+   gate                          : location "" header = "Gate";
+   garden                        : location "" header = "Garden";
+   concrete_ruins                : location "" header = "Concrete Ruins";
+   rose_bush                     : location "" header = "Rose Bush";
+   garden_2                      : location "" header = "Garden";
+   dark_concrete_building        : location "" header = "Dark Concrete Building";
+   concrete_slab                 : location "" header = "Concrete Slab";
+   gravel_road                   : location "" header = "Gravel Road";
+   bush_thicket                  : location "" header = "Bush Thicket";
+   oak_swamp                     : location "" header = "Oak Swamp";
+   palmetto_flat                 : location "" header = "Palmetto Flat";
+   dusty_hill                    : location "" header = "Dusty Hill*";
+   front_porch                   : location "" header = "Front Porch";
+   living_room                   : location "" header = "Living Room";
+   kitchen                       : location "" header = "Kitchen";
+   south_bank_of_a_bayou         : location "" header = "South Bank of a Bayou*";
+   meadow                        : location "" header = "Meadow*";
+   swamp_clearing_e_to_grass_field : location "" header = "Swamp Clearing (E to gras";
+   palmetto_clearing             : location "" header = "Palmetto Clearing";
+   palmetto_field                : location "" header = "Palmetto Field";
+   in_front_of_a_straw_hut       : location "" header = "In Front of a Straw Hut";
+   straw_hut                     : location "" header = "Straw Hut";
+   pine_forest                   : location "" header = "Pine Forest";
+   pine_forest_2                 : location "" header = "Pine Forest";
+   pine_forest_3                 : location "" header = "Pine Forest";
+   pine_forest_4                 : location "" header = "Pine Forest";
+   pine_forest_5                 : location "" header = "Pine Forest";
+   pine_forest_6                 : location "" header = "Pine Forest";
+   pine_forest_7                 : location "" header = "Pine Forest";
+   pine_forest_8                 : location "" header = "Pine Forest";
+   pine_forest_9                 : location "" header = "Pine Forest";
+   in_front_of_shack             : location "" header = "In Front of Shack";
+   in_shack                      : location "" header = "In Shack";
+   altar                         : location "" header = "Altar";
+   graveyard                     : location "" header = "Graveyard";
+   gas_station_parking_lot       : location "" header = "Gas Station Parking Lot";
+   alley_north_of_gas_station    : location "" header = "Alley North of Gas Statio";
+   south_of_the_gas_station      : location "" header = "South of the Gas Station";
+   gas_station_dumpster          : location "" header = "Gas Station Dumpster";
+   inside_gas_station            : location "" header = "Inside Gas Station";
+   gas_station_office            : location "" header = "Gas Station Office";
+   shrine                        : location "" header = "Shrine";
+   grass_field                   : location "" header = "Grass Field";
+   clover_field                  : location "" header = "Clover Field";
+   muck_field                    : location "" header = "Muck Field";
+   sunflower_field               : location "" header = "Sunflower Field";
+   flower_field                  : location "" header = "Flower Field";
+   in_front_of_an_outhouse       : location "" header = "In Front of an Outhouse";
+   outhouse                      : location "" header = "Outhouse";
+   swamp1_from_various_locations : location "" header = "Swamp-1 (from various loc";
+   swamp2_from_various_locations : location "" header = "Swamp-2 (from various loc";
+   swamp3                        : location "" header = "Swamp-3";
+}
+
+
+connections {
+   from, direction, to = [
+      road, south_oneway, muddy_swamp,
+      pond, east_oneway, swamp_forest,
+      muddy_swamp, north_oneway, road,
+      muddy_swamp, south_oneway, rotting_wooden_walkway,
+      muddy_swamp, east_oneway, concrete_building,
+      muddy_swamp, west_oneway, mangrove_forest,
+      empty_florida_highway, north_oneway, swamp_forest,
+      empty_florida_highway, south_oneway, concrete_building,
+      empty_florida_highway, east_oneway, gravel_road,
+      blacktop_highway, south_oneway, mangrove_forest,
+      blacktop_highway, west_oneway, creepy_highway,
+      bamboo_forest, north_oneway, dark_grove,
+      bamboo_forest, west_oneway, dry_everglades,
+      swamp_forest, north_oneway, pine_forest,
+      swamp_forest, south_oneway, empty_florida_highway,
+      swamp_forest, east_oneway, oak_swamp,
+      swamp_forest, west_oneway, pond,
+      dry_everglades, north_oneway, front_porch,
+      dry_everglades, south_oneway, creepy_highway,
+      dry_everglades, east_oneway, bamboo_forest,
+      dry_everglades, west_oneway, palmetto_flat,
+      dark_grove, north_oneway, south_bank_of_a_bayou,
+      dark_grove, south_oneway, bamboo_forest,
+      creepy_highway, north_oneway, dry_everglades,
+      creepy_highway, south_oneway, scrub_forest,
+      creepy_highway, east_oneway, blacktop_highway,
+      creepy_highway, west_oneway, desolate_highway,
+      mangrove_forest, north_oneway, blacktop_highway,
+      mangrove_forest, east_oneway, muddy_swamp,
+      mangrove_forest, west_oneway, scrub_forest,
+      desolate_highway, north_oneway, palmetto_flat,
+      desolate_highway, south_oneway, pine_flatwood,
+      desolate_highway, east_oneway, creepy_highway,
+      scrub_forest, north_oneway, creepy_highway,
+      scrub_forest, east_oneway, mangrove_forest,
+      scrub_forest, west_oneway, pine_flatwood,
+      pine_flatwood, north_oneway, desolate_highway,
+      pine_flatwood, east_oneway, scrub_forest,
+      rotting_wooden_walkway, north_oneway, muddy_swamp,
+      rotting_wooden_walkway, south_oneway, sandy_grass,
+      concrete_building, north_oneway, empty_florida_highway,
+      concrete_building, south_oneway, dark_concrete_building,
+      concrete_building, east_oneway, concrete_slab,
+      concrete_building, west_oneway, muddy_swamp,
+      sandy_grass, north_oneway, rotting_wooden_walkway,
+      sandy_grass, south_oneway, dusty_clearing,
+      sandy_grass, east_oneway, dusty_clearing,
+      sandy_grass, west_oneway, gazebo,
+      gazebo, east_oneway, sandy_grass,
+      dusty_clearing, north_oneway, sandy_grass,
+      dusty_clearing, east_oneway, gate,
+      gate, east_oneway, garden,
+      gate, west_oneway, dusty_clearing,
+      garden, north_oneway, garden_2,
+      garden, east_oneway, concrete_ruins,
+      garden, west_oneway, gate,
+      concrete_ruins, north_oneway, rose_bush,
+      concrete_ruins, west_oneway, garden,
+      rose_bush, south_oneway, concrete_ruins,
+      rose_bush, west_oneway, garden_2,
+      garden_2, south_oneway, garden,
+      garden_2, east_oneway, rose_bush,
+      dark_concrete_building, north_oneway, concrete_building,
+      concrete_slab, north_oneway, gravel_road,
+      concrete_slab, south_oneway, graveyard,
+      concrete_slab, east_oneway, bush_thicket,
+      concrete_slab, west_oneway, concrete_building,
+      gravel_road, north_oneway, oak_swamp,
+      gravel_road, south_oneway, bush_thicket,
+      gravel_road, east_oneway, gas_station_parking_lot,
+      gravel_road, west_oneway, empty_florida_highway,
+      bush_thicket, north_oneway, gravel_road,
+      bush_thicket, east_oneway, meadow,
+      bush_thicket, west_oneway, concrete_slab,
+      oak_swamp, north_oneway, swamp_clearing_e_to_grass_field,
+      oak_swamp, south_oneway, gravel_road,
+      oak_swamp, west_oneway, swamp_forest,
+      palmetto_flat, north_oneway, dusty_hill,
+      palmetto_flat, south_oneway, desolate_highway,
+      palmetto_flat, east_oneway, dry_everglades,
+      dusty_hill, north_oneway, south_bank_of_a_bayou,
+      dusty_hill, south_oneway, palmetto_flat,
+      front_porch, north_oneway, living_room,
+      front_porch, south_oneway, dry_everglades,
+      living_room, north_oneway, kitchen,
+      living_room, south_oneway, front_porch,
+      kitchen, north_oneway, south_bank_of_a_bayou,
+      kitchen, south_oneway, living_room,
+      south_bank_of_a_bayou, south_oneway, kitchen,
+      south_bank_of_a_bayou, east_oneway, dark_grove,
+      south_bank_of_a_bayou, west_oneway, dusty_hill,
+      meadow, north_oneway, gravel_road,
+      meadow, south_oneway, palmetto_clearing,
+      swamp_clearing_e_to_grass_field, south_oneway, oak_swamp,
+      palmetto_clearing, north_oneway, meadow,
+      palmetto_clearing, south_oneway, palmetto_field,
+      palmetto_field, north_oneway, palmetto_clearing,
+      palmetto_field, south_oneway, in_front_of_a_straw_hut,
+      in_front_of_a_straw_hut, north_oneway, palmetto_field,
+      in_front_of_a_straw_hut, south_oneway, straw_hut,
+      straw_hut, north_oneway, in_front_of_a_straw_hut,
+      pine_forest, north_oneway, pine_forest_2,
+      pine_forest, south_oneway, swamp_forest,
+      pine_forest, east_oneway, pine_forest_6,
+      pine_forest_2, north_oneway, pine_forest_3,
+      pine_forest_2, south_oneway, pine_forest,
+      pine_forest_2, east_oneway, pine_forest_5,
+      pine_forest_3, south_oneway, pine_forest_2,
+      pine_forest_3, east_oneway, pine_forest_4,
+      pine_forest_4, south_oneway, pine_forest_5,
+      pine_forest_4, east_oneway, pine_forest_9,
+      pine_forest_4, west_oneway, pine_forest_3,
+      pine_forest_5, north_oneway, pine_forest_4,
+      pine_forest_5, south_oneway, pine_forest_6,
+      pine_forest_5, east_oneway, pine_forest_8,
+      pine_forest_5, west_oneway, pine_forest_2,
+      pine_forest_6, north_oneway, pine_forest_5,
+      pine_forest_6, east_oneway, pine_forest_7,
+      pine_forest_6, west_oneway, pine_forest,
+      pine_forest_7, north_oneway, pine_forest_8,
+      pine_forest_7, west_oneway, pine_forest_6,
+      pine_forest_8, north_oneway, pine_forest_9,
+      pine_forest_8, south_oneway, pine_forest_7,
+      pine_forest_8, west_oneway, pine_forest_5,
+      pine_forest_9, south_oneway, pine_forest_8,
+      pine_forest_9, east_oneway, in_front_of_shack,
+      pine_forest_9, west_oneway, pine_forest_4,
+      in_front_of_shack, north_oneway, in_shack,
+      in_front_of_shack, west_oneway, pine_forest_9,
+      in_shack, north_oneway, altar,
+      in_shack, south_oneway, in_front_of_shack,
+      altar, south_oneway, in_shack,
+      altar, west_oneway, shrine,
+      graveyard, north_oneway, concrete_slab,
+      gas_station_parking_lot, north_oneway, alley_north_of_gas_station,
+      gas_station_parking_lot, south_oneway, south_of_the_gas_station,
+      gas_station_parking_lot, east_oneway, inside_gas_station,
+      gas_station_parking_lot, west_oneway, gravel_road,
+      alley_north_of_gas_station, east_oneway, gas_station_dumpster,
+      alley_north_of_gas_station, west_oneway, gas_station_parking_lot,
+      south_of_the_gas_station, east_oneway, gas_station_dumpster,
+      south_of_the_gas_station, west_oneway, gas_station_parking_lot,
+      gas_station_dumpster, north_oneway, alley_north_of_gas_station,
+      gas_station_dumpster, south_oneway, south_of_the_gas_station,
+      inside_gas_station, north_oneway, gas_station_office,
+      inside_gas_station, west_oneway, gas_station_parking_lot,
+      gas_station_office, south_oneway, inside_gas_station,
+      shrine, east_oneway, altar,
+      grass_field, north_oneway, clover_field,
+      grass_field, south_oneway, sunflower_field,
+      grass_field, west_oneway, flower_field,
+      clover_field, south_oneway, muck_field,
+      clover_field, east_oneway, flower_field,
+      clover_field, west_oneway, grass_field,
+      muck_field, north_oneway, in_front_of_an_outhouse,
+      muck_field, south_oneway, flower_field,
+      muck_field, east_oneway, muck_field,
+      muck_field, west_oneway, clover_field,
+      sunflower_field, north_oneway, grass_field,
+      sunflower_field, south_oneway, flower_field,
+      sunflower_field, east_oneway, flower_field,
+      sunflower_field, west_oneway, sunflower_field,
+      flower_field, south_oneway, clover_field,
+      flower_field, east_oneway, muck_field,
+      flower_field, west_oneway, sunflower_field,
+      in_front_of_an_outhouse, north_oneway, outhouse,
+      in_front_of_an_outhouse, south_oneway, muck_field,
+      outhouse, south_oneway, in_front_of_an_outhouse,
+      swamp1_from_various_locations, south_oneway, swamp2_from_various_locations,
+      swamp2_from_various_locations, south_oneway, swamp3,
+      swamp3, south_oneway, pond,
+   ]
+}
+
+

@@ -1,0 +1,1265 @@
+<asl version="550">
+
+  <include ref="English.aslx"/>
+  <include ref="Core.aslx"/>
+  <game name="Zork_770614">
+    <gameid>14eba1d6-4fa4-4861-9af9-da0fd895d2e3</gameid>
+    <version>1.0</version>
+    <firstpublished>2026</firstpublished>
+    <author>A Trizbort User</author>
+    <description></description>
+  </game>
+
+  <object name="WestofHouse">
+    <inherit name="editor_room" />
+    <alias>West of House</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="NorthofHouse">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="SouthofHouse">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="west" to="Forest2">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="SouthofHouse">
+    <inherit name="editor_room" />
+    <alias>South of House</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Forest1">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="BehindHouse">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="WestofHouse">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="BehindHouse">
+    <inherit name="editor_room" />
+    <alias>Behind House</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="NorthofHouse">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="SouthofHouse">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Clearing">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Kitchen">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="Smallwindow">
+      <inherit name="editor_object" />
+      <alias>Small window</alias>
+    </object>
+  </object>
+
+  <object name="NorthofHouse">
+    <inherit name="editor_room" />
+    <alias>North of House</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Forest3">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="BehindHouse">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="WestofHouse">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Clearing">
+    <inherit name="editor_room" />
+    <alias>Clearing</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Forest1">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="west" to="Forest3">
+      <inherit name="westdirection" />
+    </exit>
+    <exit alias="southwest" to="BehindHouse">
+      <inherit name="southwestdirection" />
+    </exit>
+    <object name="Pileofleaves">
+      <inherit name="editor_object" />
+      <alias>Pile of leaves</alias>
+    </object>
+  </object>
+
+  <object name="Kitchen">
+    <inherit name="editor_room" />
+    <alias>Kitchen</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="BehindHouse">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="LivingRoom">
+      <inherit name="westdirection" />
+    </exit>
+    <exit alias="up" to="Attic">
+      <inherit name="updirection" />
+    </exit>
+    <object name="Bottle">
+      <inherit name="editor_object" />
+      <alias>Bottle</alias>
+    </object>
+    <object name="Sack">
+      <inherit name="editor_object" />
+      <alias>Sack</alias>
+    </object>
+  </object>
+
+  <object name="LivingRoom">
+    <inherit name="editor_room" />
+    <alias>Living Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Kitchen">
+      <inherit name="eastdirection" />
+    </exit>
+    <object name="Tropgycase">
+      <inherit name="editor_object" />
+      <alias>Tropgy case</alias>
+    </object>
+    <object name="Lantern">
+      <inherit name="editor_object" />
+      <alias>Lantern</alias>
+    </object>
+    <object name="Rug">
+      <inherit name="editor_object" />
+      <alias>Rug</alias>
+    </object>
+  </object>
+
+  <object name="Attic">
+    <inherit name="editor_room" />
+    <alias>Attic</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="down" to="Kitchen">
+      <inherit name="downdirection" />
+    </exit>
+    <object name="Rope">
+      <inherit name="editor_object" />
+      <alias>Rope</alias>
+    </object>
+    <object name="Knife">
+      <inherit name="editor_object" />
+      <alias>Knife</alias>
+    </object>
+  </object>
+
+  <object name="Forest1">
+    <inherit name="editor_room" />
+    <alias>Forest 1</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="SouthofHouse">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="Clearing">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Forest2">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Forest2">
+    <inherit name="editor_room" />
+    <alias>Forest 2</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Forest3">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="Forest3">
+    <inherit name="editor_room" />
+    <alias>Forest 3</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="Clearing">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Clearing">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="NorthofHouse">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Cellar">
+    <inherit name="editor_room" />
+    <alias>Cellar</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="WestofChasm">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="TrollRoom">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="WestofChasm">
+    <inherit name="editor_room" />
+    <alias>West of Chasm</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="NorthSouthCrawlway">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Gallery">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="west" to="Cellar">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="Gallery">
+    <inherit name="editor_room" />
+    <alias>Gallery</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="WestofChasm">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Studio">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="Painting">
+      <inherit name="editor_object" />
+      <alias>Painting</alias>
+    </object>
+  </object>
+
+  <object name="Studio">
+    <inherit name="editor_room" />
+    <alias>Studio</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="NorthSouthCrawlway">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="northwest" to="Gallery">
+      <inherit name="northwestdirection" />
+    </exit>
+    <object name="Chimney">
+      <inherit name="editor_object" />
+      <alias>Chimney</alias>
+    </object>
+  </object>
+
+  <object name="NorthSouthCrawlway">
+    <inherit name="editor_room" />
+    <alias>North-South Crawlway</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="WestofChasm">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Studio">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="TrollRoom">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="TrollRoom">
+    <inherit name="editor_room" />
+    <alias>Troll Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="EastWestPassage">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="NorthSouthCrawlway">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="Cellar">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="Troll">
+      <inherit name="editor_object" />
+      <alias>Troll</alias>
+    </object>
+  </object>
+
+  <object name="EastWestPassage">
+    <inherit name="editor_room" />
+    <alias>East-West Passage</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="DeepRavine">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="RoundRoom">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="TrollRoom">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="CyclopsRoom">
+    <inherit name="editor_room" />
+    <alias>Cyclops Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="up" to="TreasureRoom">
+      <inherit name="updirection" />
+    </exit>
+    <object name="Cyclop">
+      <inherit name="editor_object" />
+      <alias>Cyclop</alias>
+    </object>
+  </object>
+
+  <object name="StrangePassage">
+    <inherit name="editor_room" />
+    <alias>Strange Passage</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+  </object>
+
+  <object name="TreasureRoom">
+    <inherit name="editor_room" />
+    <alias>Treasure Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="down" to="CyclopsRoom">
+      <inherit name="downdirection" />
+    </exit>
+    <object name="Thief">
+      <inherit name="editor_object" />
+      <alias>Thief</alias>
+    </object>
+    <object name="Chalice">
+      <inherit name="editor_object" />
+      <alias>Chalice</alias>
+    </object>
+  </object>
+
+  <object name="DomeRoom">
+    <inherit name="editor_room" />
+    <alias>Dome Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="RockyCrawl">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="down" to="TorchRoom">
+      <inherit name="downdirection" />
+    </exit>
+    <object name="Railing">
+      <inherit name="editor_object" />
+      <alias>Railing</alias>
+    </object>
+  </object>
+
+  <object name="RockyCrawl">
+    <inherit name="editor_room" />
+    <alias>Rocky Crawl</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="DomeRoom">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="DeepRavine">
+      <inherit name="westdirection" />
+    </exit>
+    <exit alias="northwest" to="EgyptianRoom">
+      <inherit name="northwestdirection" />
+    </exit>
+  </object>
+
+  <object name="DeepRavine">
+    <inherit name="editor_room" />
+    <alias>Deep Ravine</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="EastWestPassage">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Chasm">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="RockyCrawl">
+      <inherit name="westdirection" />
+    </exit>
+    <exit alias="down" to="ReservoirSouth">
+      <inherit name="downdirection" />
+    </exit>
+  </object>
+
+  <object name="Chasm">
+    <inherit name="editor_room" />
+    <alias>Chasm</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="DeepRavine">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="NorthSouthPassage">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="NorthSouthPassage">
+    <inherit name="editor_room" />
+    <alias>North-South Passage</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="Chasm">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="RoundRoom">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="northeast" to="LoudRoom">
+      <inherit name="northeastdirection" />
+    </exit>
+  </object>
+
+  <object name="LoudRoom">
+    <inherit name="editor_room" />
+    <alias>Loud Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="AncientChasm">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="NorthSouthPassage">
+      <inherit name="westdirection" />
+    </exit>
+    <exit alias="up" to="DampCave">
+      <inherit name="updirection" />
+    </exit>
+    <object name="PlatinumBar">
+      <inherit name="editor_object" />
+      <alias>Platinum Bar</alias>
+    </object>
+  </object>
+
+  <object name="RoundRoom">
+    <inherit name="editor_room" />
+    <alias>Round Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+  </object>
+
+  <object name="EgyptianRoom">
+    <inherit name="editor_room" />
+    <alias>Egyptian Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="RockyCrawl">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="GlacierRoom">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="GoldCoffin">
+      <inherit name="editor_object" />
+      <alias>Gold Coffin</alias>
+    </object>
+  </object>
+
+  <object name="GlacierRoom">
+    <inherit name="editor_room" />
+    <alias>Glacier Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="StreamView">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="EgyptianRoom">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="RubyRoom">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="Ice">
+      <inherit name="editor_object" />
+      <alias>Ice</alias>
+    </object>
+  </object>
+
+  <object name="StreamView">
+    <inherit name="editor_room" />
+    <alias>Stream View</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="GlacierRoom">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="ReservoirSouth">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="ReservoirSouth">
+    <inherit name="editor_room" />
+    <alias>Reservoir South</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="ReservoirNorth">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="DeepRavine">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="west" to="StreamView">
+      <inherit name="westdirection" />
+    </exit>
+    <exit alias="up" to="DeepCanyon">
+      <inherit name="updirection" />
+    </exit>
+    <object name="Rope2">
+      <inherit name="editor_object" />
+      <alias>Rope</alias>
+    </object>
+    <object name="TrunkwithJewels">
+      <inherit name="editor_object" />
+      <alias>Trunk with Jewels</alias>
+    </object>
+  </object>
+
+  <object name="DeepCanyon">
+    <inherit name="editor_room" />
+    <alias>Deep Canyon</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Dam">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="southeast" to="ReservoirSouth">
+      <inherit name="southeastdirection" />
+    </exit>
+  </object>
+
+  <object name="TorchRoom">
+    <inherit name="editor_room" />
+    <alias>Torch Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <object name="Torch">
+      <inherit name="editor_object" />
+      <alias>Torch</alias>
+    </object>
+  </object>
+
+  <object name="Dam">
+    <inherit name="editor_room" />
+    <alias>Dam</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="DamLobby">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="DeepCanyon">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="DampCave">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="DampCave">
+    <inherit name="editor_room" />
+    <alias> Damp Cave</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="LoudRoom">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="Dam">
+      <inherit name="eastdirection" />
+    </exit>
+    <object name="SmallCrack">
+      <inherit name="editor_object" />
+      <alias>Small Crack</alias>
+    </object>
+  </object>
+
+  <object name="DamLobby">
+    <inherit name="editor_room" />
+    <alias>Dam Lobby</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="MaintenanceRoom">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Dam">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="MaintenanceRoom">
+      <inherit name="eastdirection" />
+    </exit>
+    <object name="Matchbook">
+      <inherit name="editor_object" />
+      <alias>Matchbook</alias>
+    </object>
+    <object name="Guidebooks">
+      <inherit name="editor_object" />
+      <alias>Guidebooks</alias>
+    </object>
+  </object>
+
+  <object name="MaintenanceRoom">
+    <inherit name="editor_room" />
+    <alias>Maintenance Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="DamLobby">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="west" to="DamLobby">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="Tubeoftoothpaste">
+      <inherit name="editor_object" />
+      <alias>Tube of toothpaste</alias>
+    </object>
+    <object name="Wrench">
+      <inherit name="editor_object" />
+      <alias>Wrench</alias>
+    </object>
+    <object name="Screwdriver">
+      <inherit name="editor_object" />
+      <alias>Screwdriver</alias>
+    </object>
+  </object>
+
+  <object name="AncientChasm">
+    <inherit name="editor_room" />
+    <alias>Ancient Chasm</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="DeadEnd2">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="LoudRoom">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="west" to="DeadEnd">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="ReservoirNorth">
+    <inherit name="editor_room" />
+    <alias>Reservoir North</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="AtlantisRoom">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="ReservoirSouth">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="AtlantisRoom">
+    <inherit name="editor_room" />
+    <alias>Atlantis Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="southeast" to="ReservoirNorth">
+      <inherit name="southeastdirection" />
+    </exit>
+    <exit alias="up" to="Cave">
+      <inherit name="updirection" />
+    </exit>
+    <object name="Trident">
+      <inherit name="editor_object" />
+      <alias>Trident</alias>
+    </object>
+  </object>
+
+  <object name="Cave">
+    <inherit name="editor_room" />
+    <alias>Cave</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="MirrorRoom">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="down" to="AtlantisRoom">
+      <inherit name="downdirection" />
+    </exit>
+  </object>
+
+  <object name="MirrorRoom">
+    <inherit name="editor_room" />
+    <alias>Mirror Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="SteepCrawlway">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="Cave">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="ColdPassage">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="ColdPassage">
+    <inherit name="editor_room" />
+    <alias>Cold Passage</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="SteepCrawlway">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="MirrorRoom">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="SlideRoom">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="SteepCrawlway">
+    <inherit name="editor_room" />
+    <alias>Steep Crawlway</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="MirrorRoom">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="southwest" to="ColdPassage">
+      <inherit name="southwestdirection" />
+    </exit>
+  </object>
+
+  <object name="SlideRoom">
+    <inherit name="editor_room" />
+    <alias>Slide Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="ColdPassage">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="down" to="Cellar">
+      <inherit name="downdirection" />
+    </exit>
+  </object>
+
+  <object name="EntrancetoHades">
+    <inherit name="editor_room" />
+    <alias>*Entrance to Hades</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="LandoftheLivingDead">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="up" to="Cave2">
+      <inherit name="updirection" />
+    </exit>
+    <object name="EvilSpirits">
+      <inherit name="editor_object" />
+      <alias>Evil Spirits</alias>
+    </object>
+  </object>
+
+  <object name="NarrowCrawlway">
+    <inherit name="editor_room" />
+    <alias>Narrow Crawlway</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="GrailRoom">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="Cave2">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="southwest" to="MirrorRoom2">
+      <inherit name="southwestdirection" />
+    </exit>
+  </object>
+
+  <object name="GrailRoom">
+    <inherit name="editor_room" />
+    <alias>Grail Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="NarrowCrawlway">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="RoundRoom2">
+      <inherit name="westdirection" />
+    </exit>
+    <exit alias="up" to="Temple">
+      <inherit name="updirection" />
+    </exit>
+    <object name="Grail">
+      <inherit name="editor_object" />
+      <alias>Grail</alias>
+    </object>
+  </object>
+
+  <object name="RoundRoom2">
+    <inherit name="editor_room" />
+    <alias>Round Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="DeepCanyon2">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="south" to="WindingPassage">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="east" to="GrailRoom">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="EastWestPassage2">
+      <inherit name="westdirection" />
+    </exit>
+    <exit alias="northeast" to="Maze">
+      <inherit name="northeastdirection" />
+    </exit>
+    <exit alias="southwest" to="EngravingsCave">
+      <inherit name="southwestdirection" />
+    </exit>
+    <exit alias="northwest" to="NorthSouthPassage2">
+      <inherit name="northwestdirection" />
+    </exit>
+  </object>
+
+  <object name="EastWestPassage2">
+    <inherit name="editor_room" />
+    <alias>East-West Passage</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="RoundRoom2">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="NorthSouthPassage2">
+    <inherit name="editor_room" />
+    <alias>North-South Passage</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="southeast" to="RoundRoom2">
+      <inherit name="southeastdirection" />
+    </exit>
+  </object>
+
+  <object name="WindingPassage">
+    <inherit name="editor_room" />
+    <alias>Winding Passage</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="RoundRoom2">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="MirrorRoom2">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="MirrorRoom2">
+    <inherit name="editor_room" />
+    <alias>Mirror Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="NarrowCrawlway">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="Cave2">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="WindingPassage">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="Mirror">
+      <inherit name="editor_object" />
+      <alias>Mirror</alias>
+    </object>
+  </object>
+
+  <object name="Cave2">
+    <inherit name="editor_room" />
+    <alias>Cave</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="NarrowCrawlway">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="west" to="MirrorRoom2">
+      <inherit name="westdirection" />
+    </exit>
+    <exit alias="down" to="EntrancetoHades">
+      <inherit name="downdirection" />
+    </exit>
+  </object>
+
+  <object name="DeepCanyon2">
+    <inherit name="editor_room" />
+    <alias>Deep Canyon</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="RoundRoom2">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+  <object name="Maze">
+    <inherit name="editor_room" />
+    <alias>Maze</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="southwest" to="RoundRoom2">
+      <inherit name="southwestdirection" />
+    </exit>
+  </object>
+
+  <object name="EngravingsCave">
+    <inherit name="editor_room" />
+    <alias>Engravings Cave</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="RoundRoom2">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="southeast" to="RiddleRoom">
+      <inherit name="southeastdirection" />
+    </exit>
+    <object name="Engravings">
+      <inherit name="editor_object" />
+      <alias>Engravings</alias>
+    </object>
+  </object>
+
+  <object name="RiddleRoom">
+    <inherit name="editor_room" />
+    <alias>Riddle Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="PearlRoom">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="down" to="EngravingsCave">
+      <inherit name="downdirection" />
+    </exit>
+  </object>
+
+  <object name="PearlRoom">
+    <inherit name="editor_room" />
+    <alias>Pearl Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="RiddleRoom">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="PearlNecklace">
+      <inherit name="editor_object" />
+      <alias>Pearl Necklace</alias>
+    </object>
+  </object>
+
+  <object name="Temple">
+    <inherit name="editor_room" />
+    <alias>Temple</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="Altar">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="west" to="GrailRoom">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="Brassbell">
+      <inherit name="editor_object" />
+      <alias>Brass bell</alias>
+    </object>
+  </object>
+
+  <object name="Altar">
+    <inherit name="editor_room" />
+    <alias>Altar</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="Temple">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="BlackBook">
+      <inherit name="editor_object" />
+      <alias>Black Book</alias>
+    </object>
+    <object name="Candles">
+      <inherit name="editor_object" />
+      <alias>Candles</alias>
+    </object>
+  </object>
+
+  <object name="DeadEnd">
+    <inherit name="editor_room" />
+    <alias>Dead End</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="east" to="AncientChasm">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+
+  <object name="DeadEnd2">
+    <inherit name="editor_room" />
+    <alias>Dead End</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="southwest" to="AncientChasm">
+      <inherit name="southwestdirection" />
+    </exit>
+  </object>
+
+  <object name="LandoftheLivingDead">
+    <inherit name="editor_room" />
+    <alias>Land of the Living Dead</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="EntrancetoHades">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="RubyRoom">
+    <inherit name="editor_room" />
+    <alias>Ruby Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="GlacierRoom">
+      <inherit name="southdirection" />
+    </exit>
+    <object name="Ruby">
+      <inherit name="editor_object" />
+      <alias>Ruby</alias>
+    </object>
+  </object>
+
+
+</asl>
+

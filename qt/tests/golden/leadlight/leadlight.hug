@@ -1,0 +1,575 @@
+#include "verblib.g" ! grammar must come first
+
+#include "hugolib.h"
+
+routine init
+{
+	cls
+	verbosity = 2
+	counter = -1
+	STATUSTYPE = 1 !1 = score / turns, 2 = time, 3 = moves: score:
+	player = you
+	Font(BOLD_ON)
+	"Leadlight Gamma Map"
+	Font(BOLD_OFF)
+	"Map of Wade Clarke's 2010 game Leadlight (and its Inform port Leadlight Gamma). Orange=dorm grey=library purple=indoor yellow=inner sanctum red=inner inner sanctum, by Andrew Schultz"
+	location = LinvilleStudentLibrary
+	MovePlayer(location)
+}
+
+property region
+room LinvilleStudentLibrary
+{
+	region Library
+
+	s_to AmongsttheLibraryStacks
+	e_to IntheLibraryFoyer
+	w_to LibraryToilet
+
+}
+
+object CharlotteJeffs
+{
+	in LinvilleStudentLibrary
+}
+
+room LibraryToilet
+{
+	region Library
+
+	e_to LinvilleStudentLibrary
+
+}
+
+room AmongsttheLibraryStacks
+{
+	region Library
+
+	n_to LinvilleStudentLibrary
+
+}
+
+room IntheLibraryFoyer
+{
+	region Library
+
+	e_to IntheQuadrangle
+	w_to LinvilleStudentLibrary
+
+}
+
+object NarelleParker
+{
+	in IntheLibraryFoyer
+}
+
+room IntheQuadrangle
+{
+	region Outside
+
+	n_to OntheSchoolSteps
+	s_to OntheRoseGardenLawn
+	e_to IntheDormitoryCourtyard
+	w_to IntheLibraryFoyer
+
+}
+
+room OntheRoseGardenLawn
+{
+	region Outside
+
+	n_to IntheQuadrangle
+
+}
+
+object AlexisKarpa
+{
+	in OntheRoseGardenLawn
+}
+
+room IntheDormitoryCourtyard
+{
+	region Outside
+
+	s_to IntheGymEntry
+	e_to IntheDormitoryEntryway
+	w_to IntheQuadrangle
+
+}
+
+room IntheGymEntry
+{
+	region School
+
+	n_to IntheDormitoryCourtyard
+	s_to OntheGymCourtNorth
+
+}
+
+room OntheGymCourtNorth
+{
+	region School
+
+	n_to IntheGymEntry
+	s_to OntheGymCourtSouth
+	u_to IntheUpstairsChangingRoom
+
+}
+
+room OntheGymCourtSouth
+{
+	region School
+
+	n_to OntheGymCourtNorth
+
+	is not light
+}
+
+room IntheDormitoryEntryway
+{
+	region Dorms
+
+	n_to Room106
+	s_to Room101
+	e_to HalfwayAlongtheDormHall
+	w_to IntheDormitoryCourtyard
+
+}
+
+object MsPalmerDianeFallon
+{
+	in IntheDormitoryEntryway
+}
+
+room Room106
+{
+	region Dorms
+
+	s_to IntheDormitoryEntryway
+
+}
+
+room Room101
+{
+	region Dorms
+
+	n_to IntheDormitoryEntryway
+
+}
+
+object SherylBourke
+{
+	in Room101
+}
+
+room HalfwayAlongtheDormHall
+{
+	region Dorms
+
+	n_to Room105
+	s_to Room102
+	e_to AttheDormHallsEastEnd
+	w_to IntheDormitoryEntryway
+
+}
+
+room Room105
+{
+	region Dorms
+
+	s_to HalfwayAlongtheDormHall
+
+}
+
+room Room102
+{
+	region Dorms
+
+	n_to HalfwayAlongtheDormHall
+
+}
+
+object Louise
+{
+	in Room102
+}
+
+room AttheDormHallsEastEnd
+{
+	region Dorms
+
+	n_to Room104
+	s_to Room103
+	w_to HalfwayAlongtheDormHall
+
+}
+
+room Room104
+{
+	region Dorms
+
+	s_to AttheDormHallsEastEnd
+
+}
+
+room Room103
+{
+	region Dorms
+
+	n_to AttheDormHallsEastEnd
+
+}
+
+room OntheSchoolSteps
+{
+	region Outside
+
+	n_to IntheSchoolFoyer
+	s_to IntheQuadrangle
+	e_to OntheTrellisedPatio
+	w_to BytheSchoolFountain
+
+}
+
+room IntheSchoolFoyer
+{
+	region School
+
+	n_to IntheMarbleStateroom
+	s_to OntheSchoolSteps
+	e_to IntheSickBay
+	w_to IntheReceptionistsOffice
+
+}
+
+room OntheTrellisedPatio
+{
+	region Outside
+
+	w_to OntheSchoolSteps
+
+}
+
+object Gardener
+{
+	in OntheTrellisedPatio
+}
+
+room BytheSchoolFountain
+{
+	region Outside
+
+	n_to IntheArtCottage
+	s_to InStaffCottageB
+	e_to OntheSchoolSteps
+
+}
+
+object MysteryGirl
+{
+	in BytheSchoolFountain
+}
+
+room IntheArtCottage
+{
+	region School
+
+	s_to BytheSchoolFountain
+
+}
+
+object MrRhodes
+{
+	in IntheArtCottage
+}
+
+room InStaffCottageB
+{
+	region School
+
+	n_to BytheSchoolFountain
+
+}
+
+object FileMissArden
+{
+	in InStaffCottageB
+}
+
+room IntheReceptionistsOffice
+{
+	region School
+
+	e_to IntheSchoolFoyer
+
+}
+
+room IntheSickBay
+{
+	region School
+
+	w_to IntheSchoolFoyer
+
+}
+
+object UnnamedGirl
+{
+	in IntheSickBay
+}
+
+room IntheMarbleStateroom
+{
+	region School
+
+	n_to IntheSouthHall
+	s_to IntheSchoolFoyer
+
+}
+
+object MaureenSallis
+{
+	in IntheMarbleStateroom
+}
+
+room IntheSouthHall
+{
+	region School
+
+	n_to IntheGrandHall
+	s_to IntheMarbleStateroom
+	e_to IntheSittingRoom
+
+}
+
+room IntheSittingRoom
+{
+	region School
+
+	n_to IntheEasternHallway
+	w_to IntheSouthHall
+
+}
+
+object LucindaParker
+{
+	in IntheSittingRoom
+}
+
+room IntheEasternHallway
+{
+	region School
+
+	n_to IntheWaitingRoom
+	s_to IntheSittingRoom
+	e_to IntheDanceRoom
+	w_to IntheGrandHall
+
+}
+
+object MiaFellini
+{
+	in IntheEasternHallway
+}
+
+room IntheDanceRoom
+{
+	region School
+
+	w_to IntheEasternHallway
+
+}
+
+object TheDancer
+{
+	in IntheDanceRoom
+}
+
+room IntheWaitingRoom
+{
+	region School
+
+	n_to IntheStaffLibrary
+	s_to IntheEasternHallway
+	w_to InScienceLab1C
+
+}
+
+room InScienceLab1C
+{
+	region School
+
+	s_to IntheGrandHall
+	e_to IntheWaitingRoom
+
+}
+
+room IntheGrandHall
+{
+	region School
+
+	n_to InScienceLab1C
+	s_to IntheSouthHall
+	e_to IntheEasternHallway
+	w_to IntheSchoolChapel
+
+}
+
+object MadisonJones
+{
+	in IntheGrandHall
+}
+
+object KateSeung
+{
+	in IntheGrandHall
+}
+
+room IntheSchoolChapel
+{
+	region School
+
+	e_to IntheGrandHall
+
+}
+
+room IntheStaffLibrary
+{
+	region Hidden
+
+	n_to IntheLeatherStudy
+	s_to IntheWaitingRoom
+
+}
+
+room IntheLeatherStudy
+{
+	region Hidden
+
+	s_to IntheStaffLibrary
+	e_to IntheStrangeGallery
+	w_to InaCurtainedHallway
+	u_to OntheBalcony
+
+}
+
+room IntheStrangeGallery
+{
+	region Hidden
+
+	w_to IntheLeatherStudy
+
+}
+
+room OntheBalcony
+{
+	region Hidden
+
+	d_to IntheLeatherStudy
+
+}
+
+object Witch
+{
+	in OntheBalcony
+}
+
+room InaCurtainedHallway
+{
+	region Hidden
+
+	e_to IntheLeatherStudy
+	w_to InaCurtainedHallway2
+
+}
+
+room InaCurtainedHallway2
+{
+	region Hidden
+
+	e_to InaCurtainedHallway
+	w_to AttheOpulentCorner
+
+}
+
+room AttheOpulentCorner
+{
+	region Hidden
+
+	n_to BeforetheLeadlightDoor
+	e_to InaCurtainedHallway2
+
+}
+
+object EveJoshi
+{
+	in AttheOpulentCorner
+}
+
+room BeforetheLeadlightDoor
+{
+	region Hidden
+
+	n_to room2
+	s_to AttheOpulentCorner
+
+}
+
+room room2
+{
+	region Endgame
+
+	n_to IntheFoundersRoom
+	s_to BeforetheLeadlightDoor
+
+	is not light
+}
+
+room IntheFoundersRoom
+{
+	region Endgame
+
+	s_to room2
+	e_to IntheSecretPlace
+
+}
+
+object Founder
+{
+	in IntheFoundersRoom
+}
+
+room IntheSecretPlace
+{
+	region Endgame
+
+	w_to IntheFoundersRoom
+
+}
+
+object Shadow
+{
+	in IntheSecretPlace
+}
+
+object Founder2
+{
+	in IntheSecretPlace
+}
+
+room IntheUpstairsChangingRoom
+{
+	region School
+
+	d_to OntheGymCourtNorth
+
+}
+
+object IsabelleGreen
+{
+	in IntheUpstairsChangingRoom
+}
+
+player_character you "you"
+{
+}
+

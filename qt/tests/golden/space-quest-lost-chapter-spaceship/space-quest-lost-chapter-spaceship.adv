@@ -1,0 +1,206 @@
+
+start_at = engine_room
+
+locations {
+   engine_room      : location "" header = "Engine Room";
+   hallway          : location "" header = "Hallway";
+   entry            : location "" header = "Entry";
+   pilot_room       : location "" header = "Pilot Room";
+   wires_left       : location "" header = "Wires Left";
+   elevator_2       : location "" header = "Elevator";
+   l2_room          : location "" header = "L2 room";
+   from_pod         : location "" header = "From Pod";
+   l3_hall          : location "" header = "L3 hall";
+   elevator_3       : location "" header = "Elevator";
+   l3_hall_2        : location "" header = "L3 hall";
+   lookout          : location "" header = "Lookout";
+   bar              : location "" header = "Bar";
+   bar_listen       : location "" header = "Bar LISTEN";
+   bar_2            : location "" header = "Bar";
+   l4_hall          : location "" header = "L4 Hall";
+   guards           : location "" header = "Guards";
+   l4_hall_2        : location "" header = "L4 Hall";
+   elevator_4       : location "" header = "Elevator";
+   guards_2         : location "" header = "Guards";
+   elevator_5       : location "" header = "Elevator";
+   l5_hall          : location "" header = "L5 hall";
+   guards_3         : location "" header = "Guards";
+   guards_4         : location "" header = "Guards";
+   l6_hall          : location "" header = "L6 hall";
+   science_room     : location "" header = "Science Room";
+   l6_hall_2        : location "" header = "L6 hall";
+   l6_hall_3        : location "" header = "L6 hall";
+   elevator_6       : location "" header = "Elevator";
+   science          : location "" header = "Science";
+   science_2        : location "" header = "Science";
+   l7_hall          : location "" header = "L7 hall";
+   l7_hall_2        : location "" header = "L7 hall";
+   elevator_7       : location "" header = "Elevator";
+   elevator_8       : location "" header = "Elevator";
+   hall_l10         : location "" header = "Hall L10";
+   hall_l10_2       : location "" header = "Hall L10";
+   wait_listen      : location "" header = "WAIT & LISTEN";
+   elevator_9       : location "" header = "Elevator";
+   elevator_10      : location "" header = "Elevator";
+   elevator_11      : location "" header = "Elevator";
+   hall_l11         : location "" header = "Hall L11";
+   hall_l11_2       : location "" header = "Hall L11";
+   science_room_2   : location "" header = "Science room";
+   bomb_room        : location "" header = "Bomb Room";
+   docking_bay      : location "" header = "Docking Bay";
+   controls_l12     : location "" header = "Controls L12";
+   elevator_12      : location "" header = "Elevator";
+   wires_right      : location "" header = "Wires Right";
+   lever_room       : location "" header = "Lever room";
+   hall             : location "" header = "Hall";
+   fight_2_aliens   : location "" header = "Fight 2 Aliens";
+   hall_2           : location "" header = "Hall";
+   hall_3           : location "" header = "Hall";
+   suit_helmet      : location "" header = "SUIT HELMET";
+   gun_compart_ment : location "" header = "Gun Compart ment";
+   guards_5         : location "" header = "Guards";
+   l1_hall          : location "" header = "L1 hall";
+   l1_hall_2        : location "" header = "L1 hall";
+   elevator_13      : location "" header = "Elevator";
+   l1_hall_3        : location "" header = "L1 hall";
+   science_3        : location "" header = "Science";
+   science_4        : location "" header = "Science";
+   guards_6         : location "" header = "Guards";
+   guards_7         : location "" header = "Guards";
+   guards_8         : location "" header = "Guards";
+   guards_9         : location "" header = "Guards";
+   guards_10        : location "" header = "Guards";
+   guards_11        : location "" header = "Guards";
+   guards_l8        : location "" header = "Guards L8";
+   guards_l9        : location "" header = "Guards L9";
+   guards_12        : location "" header = "Guards";
+   guards_13        : location "" header = "Guards";
+}
+
+
+connections {
+   from, direction, to = [
+      engine_room, south_oneway, hallway,
+      hallway, north_oneway, engine_room,
+      hallway, west_oneway, entry,
+      entry, north_oneway, wires_left,
+      entry, east_oneway, hallway,
+      entry, west_oneway, pilot_room,
+      pilot_room, south_oneway, entry,
+      pilot_room, southwest_oneway, hall,
+      wires_left, south_oneway, entry,
+      wires_left, east_oneway, wires_right,
+      elevator_2, south_oneway, l2_room,
+      l2_room, north_oneway, elevator_2,
+      l2_room, east_oneway, from_pod,
+      from_pod, west_oneway, l2_room,
+      l3_hall, north_oneway, elevator_3,
+      l3_hall, east_oneway, l3_hall_2,
+      l3_hall, west_oneway, guards_9,
+      elevator_3, south_oneway, l3_hall,
+      l3_hall_2, north_oneway, lookout,
+      l3_hall_2, east_oneway, guards_8,
+      l3_hall_2, west_oneway, l3_hall,
+      lookout, south_oneway, l3_hall_2,
+      bar, east_oneway, bar_listen,
+      bar_listen, south_oneway, l4_hall,
+      bar_listen, east_oneway, bar_2,
+      bar_listen, west_oneway, bar,
+      bar_2, west_oneway, bar_listen,
+      l4_hall, north_oneway, bar_listen,
+      l4_hall, east_oneway, guards,
+      l4_hall, west_oneway, l4_hall_2,
+      guards, west_oneway, l4_hall,
+      l4_hall_2, north_oneway, elevator_4,
+      l4_hall_2, east_oneway, l4_hall,
+      l4_hall_2, west_oneway, guards_2,
+      elevator_4, south_oneway, l4_hall_2,
+      guards_2, east_oneway, l4_hall_2,
+      elevator_5, south_oneway, l5_hall,
+      l5_hall, north_oneway, elevator_5,
+      l5_hall, east_oneway, guards_4,
+      l5_hall, west_oneway, guards_3,
+      guards_3, east_oneway, l5_hall,
+      guards_4, west_oneway, l5_hall,
+      l6_hall, north_oneway, science_room,
+      l6_hall, east_oneway, l6_hall_2,
+      l6_hall, west_oneway, guards_6,
+      science_room, south_oneway, l6_hall,
+      l6_hall_2, north_oneway, elevator_6,
+      l6_hall_2, east_oneway, l6_hall_3,
+      l6_hall_2, west_oneway, l6_hall,
+      l6_hall_3, north_oneway, elevator_6,
+      l6_hall_3, east_oneway, guards_7,
+      l6_hall_3, west_oneway, l6_hall_2,
+      elevator_6, south_oneway, l6_hall_2,
+      elevator_6, east_oneway, l6_hall_3,
+      science, east_oneway, science_2,
+      science_2, south_oneway, l7_hall,
+      science_2, west_oneway, science,
+      l7_hall, north_oneway, science_2,
+      l7_hall, east_oneway, l7_hall_2,
+      l7_hall, west_oneway, guards_10,
+      l7_hall_2, north_oneway, elevator_7,
+      l7_hall_2, east_oneway, guards_11,
+      l7_hall_2, west_oneway, l7_hall,
+      elevator_7, south_oneway, l7_hall_2,
+      elevator_8, south_oneway, hall_l10,
+      hall_l10, north_oneway, elevator_8,
+      hall_l10, east_oneway, hall_l10_2,
+      hall_l10_2, north_oneway, wait_listen,
+      hall_l10_2, east_oneway, guards_12,
+      hall_l10_2, west_oneway, hall_l10,
+      wait_listen, south_oneway, hall_l10_2,
+      elevator_9, south_oneway, guards_l8,
+      elevator_10, south_oneway, guards_l9,
+      elevator_11, south_oneway, hall_l11,
+      hall_l11, north_oneway, elevator_11,
+      hall_l11, east_oneway, hall_l11_2,
+      hall_l11_2, north_oneway, science_room_2,
+      hall_l11_2, east_oneway, guards_13,
+      hall_l11_2, west_oneway, hall_l11,
+      science_room_2, south_oneway, hall_l11_2,
+      science_room_2, west_oneway, bomb_room,
+      bomb_room, east_oneway, science_room_2,
+      docking_bay, east_oneway, controls_l12,
+      controls_l12, north_oneway, elevator_12,
+      controls_l12, west_oneway, docking_bay,
+      elevator_12, south_oneway, controls_l12,
+      wires_right, west_oneway, wires_left,
+      lever_room, north_oneway, engine_room,
+      hall, east_oneway, fight_2_aliens,
+      hall, northwest_oneway, pilot_room,
+      fight_2_aliens, east_oneway, hall_2,
+      fight_2_aliens, west_oneway, hall,
+      hall_2, south_oneway, hall_3,
+      hall_2, west_oneway, fight_2_aliens,
+      hall_3, north_oneway, hall_2,
+      hall_3, east_oneway, suit_helmet,
+      suit_helmet, west_oneway, hall_3,
+      gun_compart_ment, north_oneway, pilot_room,
+      guards_5, south_oneway, l1_hall,
+      l1_hall, east_oneway, l1_hall_2,
+      l1_hall, west_oneway, guards_5,
+      l1_hall_2, north_oneway, elevator_13,
+      l1_hall_2, east_oneway, l1_hall_3,
+      l1_hall_2, west_oneway, l1_hall,
+      elevator_13, south_oneway, l1_hall_2,
+      l1_hall_3, north_oneway, science_3,
+      l1_hall_3, west_oneway, l1_hall_2,
+      science_3, south_oneway, l1_hall_3,
+      science_3, west_oneway, science_4,
+      science_4, east_oneway, science_3,
+      guards_6, east_oneway, l6_hall,
+      guards_7, west_oneway, l6_hall_3,
+      guards_8, west_oneway, l3_hall_2,
+      guards_9, east_oneway, l3_hall,
+      guards_10, east_oneway, l7_hall,
+      guards_11, west_oneway, l7_hall_2,
+      guards_l8, north_oneway, elevator_9,
+      guards_l9, north_oneway, elevator_10,
+      guards_12, west_oneway, hall_l10_2,
+      guards_13, west_oneway, hall_l11_2,
+   ]
+}
+
+

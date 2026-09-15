@@ -1,0 +1,537 @@
+Constant Story "space-quest-lost-chapter-spaceship";
+Constant Headline "^By A Trizbort User^^^";
+
+Include "Parser";
+Include "VerbLib";
+
+Class Elevator;
+Class Importantitem;
+Class Later;
+Class Lethal;
+Class ThroughWay;
+Class Useless;
+
+ThroughWay  EngineRoom "Engine Room"
+  with  description
+            "",
+        s_to Hallway,
+   has  light;
+
+ThroughWay  Hallway "Hallway"
+  with  description
+            "",
+        n_to EngineRoom,
+        w_to Entry,
+   has  light;
+
+ThroughWay  Entry "Entry"
+  with  description
+            "",
+        n_to WiresLeft,
+        e_to Hallway,
+        w_to PilotRoom,
+   has  light;
+
+ThroughWay  PilotRoom "Pilot Room"
+  with  description
+            "",
+        s_to Entry,
+        sw_to Hall,
+   has  light;
+
+Importantitem  WiresLeft "Wires Left"
+  with  description
+            "",
+        s_to Entry,
+        e_to WiresRight,
+   has  light;
+
+Elevator  Elevator2 "Elevator"
+  with  description
+            "",
+        s_to L2room,
+   has  light;
+
+ThroughWay  L2room "L2 room"
+  with  description
+            "",
+        n_to Elevator2,
+        e_to FromPod,
+   has  light;
+
+ThroughWay  FromPod "From Pod"
+  with  description
+            "",
+        w_to L2room,
+   has  light;
+
+Object ->  GETNEWHAIR "GET NEW HAIR"
+  with  name 'GET' 'NEW' 'HAIR',
+        description "GET NEW HAIR";
+
+ThroughWay  L3hall "L3 hall"
+  with  description
+            "",
+        n_to Elevator3,
+        e_to L3hall2,
+        w_to Guards9,
+   has  light;
+
+Elevator  Elevator3 "Elevator"
+  with  description
+            "",
+        s_to L3hall,
+   has  light;
+
+ThroughWay  L3hall2 "L3 hall"
+  with  description
+            "",
+        n_to Lookout,
+        e_to Guards8,
+        w_to L3hall,
+   has  light;
+
+Importantitem  Lookout "Lookout"
+  with  description
+            "",
+        s_to L3hall2,
+   has  light;
+
+Importantitem  Bar "Bar"
+  with  description
+            "",
+        e_to BarLISTEN,
+   has  light;
+
+Object ->  OrderFrost "Order Frost"
+  with  name 'Order' 'Frost',
+        description "Order Frost/";
+
+Object ->  Tormeenian "Tormeenian"
+  with  name 'Tormeenian',
+        description "Tormeenian";
+
+ThroughWay  BarLISTEN "Bar LISTEN"
+  with  description
+            "",
+        s_to L4Hall,
+        e_to Bar2,
+        w_to Bar,
+   has  light;
+
+Importantitem  Bar2 "Bar"
+  with  description
+            "",
+        w_to BarLISTEN,
+   has  light;
+
+Object ->  tradestone "trade stone"
+  with  name 'trade' 'stone',
+        description "trade stone";
+
+Object ->  forclearance "for clearance"
+  with  name 'for' 'clearance',
+        description "for clearance";
+
+ThroughWay  L4Hall "L4 Hall"
+  with  description
+            "",
+        n_to BarLISTEN,
+        e_to Guards,
+        w_to L4Hall2,
+   has  light;
+
+Useless  Guards "Guards"
+  with  description
+            "",
+        w_to L4Hall,
+   has  light;
+
+ThroughWay  L4Hall2 "L4 Hall"
+  with  description
+            "",
+        n_to Elevator4,
+        e_to L4Hall,
+        w_to Guards2,
+   has  light;
+
+Elevator  Elevator4 "Elevator"
+  with  description
+            "",
+        s_to L4Hall2,
+   has  light;
+
+Useless  Guards2 "Guards"
+  with  description
+            "",
+        e_to L4Hall2,
+   has  light;
+
+Elevator  Elevator5 "Elevator"
+  with  description
+            "",
+        s_to L5hall,
+   has  light;
+
+Useless  L5hall "L5 hall"
+  with  description
+            "",
+        n_to Elevator5,
+        e_to Guards4,
+        w_to Guards3,
+   has  light;
+
+Useless  Guards3 "Guards"
+  with  description
+            "",
+        e_to L5hall,
+   has  light;
+
+Useless  Guards4 "Guards"
+  with  description
+            "",
+        w_to L5hall,
+   has  light;
+
+Useless  L6hall "L6 hall"
+  with  description
+            "",
+        n_to ScienceRoom,
+        e_to L6hall2,
+        w_to Guards6,
+   has  light;
+
+Useless  ScienceRoom "Science Room"
+  with  description
+            "",
+        s_to L6hall,
+   has  light;
+
+Useless  L6hall2 "L6 hall"
+  with  description
+            "",
+        n_to Elevator6,
+        e_to L6hall3,
+        w_to L6hall,
+   has  light;
+
+Useless  L6hall3 "L6 hall"
+  with  description
+            "",
+        n_to Elevator6,
+        e_to Guards7,
+        w_to L6hall2,
+   has  light;
+
+Elevator  Elevator6 "Elevator"
+  with  description
+            "",
+        s_to L6hall2,
+        e_to L6hall3,
+   has  light;
+
+Useless  Science "Science"
+  with  description
+            "",
+        e_to Science2,
+   has  light;
+
+Useless  Science2 "Science"
+  with  description
+            "",
+        s_to L7hall,
+        w_to Science,
+   has  light;
+
+Useless  L7hall "L7 hall"
+  with  description
+            "",
+        n_to Science2,
+        e_to L7hall2,
+        w_to Guards10,
+   has  light;
+
+Useless  L7hall2 "L7 hall"
+  with  description
+            "",
+        n_to Elevator7,
+        e_to Guards11,
+        w_to L7hall,
+   has  light;
+
+Elevator  Elevator7 "Elevator"
+  with  description
+            "",
+        s_to L7hall2,
+   has  light;
+
+Elevator  Elevator8 "Elevator"
+  with  description
+            "",
+        s_to HallL10,
+   has  light;
+
+ThroughWay  HallL10 "Hall L10"
+  with  description
+            "",
+        n_to Elevator8,
+        e_to HallL102,
+   has  light;
+
+ThroughWay  HallL102 "Hall L10"
+  with  description
+            "",
+        n_to WAITLISTEN,
+        e_to Guards12,
+        w_to HallL10,
+   has  light;
+
+Importantitem  WAITLISTEN "WAIT & LISTEN"
+  with  description
+            "",
+        s_to HallL102,
+   has  light;
+
+Elevator  Elevator9 "Elevator"
+  with  description
+            "",
+        s_to GuardsL8,
+   has  light;
+
+Elevator  Elevator10 "Elevator"
+  with  description
+            "",
+        s_to GuardsL9,
+   has  light;
+
+Elevator  Elevator11 "Elevator"
+  with  description
+            "",
+        s_to HallL11,
+   has  light;
+
+ThroughWay  HallL11 "Hall L11"
+  with  description
+            "",
+        n_to Elevator11,
+        e_to HallL112,
+   has  light;
+
+ThroughWay  HallL112 "Hall L11"
+  with  description
+            "",
+        n_to Scienceroom2,
+        e_to Guards13,
+        w_to HallL11,
+   has  light;
+
+ThroughWay  Scienceroom2 "Science room"
+  with  description
+            "",
+        s_to HallL112,
+        w_to BombRoom,
+   has  light;
+
+Importantitem  BombRoom "Bomb Room"
+  with  description
+            "",
+        e_to Scienceroom2,
+   has  light;
+
+Importantitem  DockingBay "Docking Bay"
+  with  description
+            "",
+        e_to ControlsL12,
+   has  light;
+
+Object ->  LISTEN "LISTEN"
+  with  name 'LISTEN',
+        description "LISTEN";
+
+ThroughWay  ControlsL12 "Controls L12"
+  with  description
+            "",
+        n_to Elevator12,
+        w_to DockingBay,
+   has  light;
+
+Elevator  Elevator12 "Elevator"
+  with  description
+            "",
+        s_to ControlsL12,
+   has  light;
+
+Importantitem  WiresRight "Wires Right"
+  with  description
+            "",
+        w_to WiresLeft,
+   has  light;
+
+Object ->  POD "POD"
+  with  name 'POD',
+        description "POD";
+
+Importantitem  Leverroom "Lever room"
+  with  description
+            "",
+        n_to EngineRoom,
+   has  light;
+
+ThroughWay  Hall "Hall"
+  with  description
+            "",
+        e_to Fight2Aliens,
+        nw_to PilotRoom,
+   has  light;
+
+Lethal  Fight2Aliens "Fight 2 Aliens"
+  with  description
+            "",
+        e_to Hall2,
+        w_to Hall,
+   has  light;
+
+ThroughWay  Hall2 "Hall"
+  with  description
+            "",
+        s_to Hall3,
+        w_to Fight2Aliens,
+   has  light;
+
+ThroughWay  Hall3 "Hall"
+  with  description
+            "",
+        n_to Hall2,
+        e_to SUITHELMET,
+   has  light;
+
+Importantitem  SUITHELMET "SUIT HELMET"
+  with  description
+            "",
+        w_to Hall3,
+   has  light;
+
+Importantitem  GunCompartment "Gun Compart ment"
+  with  description
+            "",
+        n_to PilotRoom,
+   has  light;
+
+Object ->  GUN "GUN"
+  with  name 'GUN',
+        description "GUN";
+
+Useless  Guards5 "Guards"
+  with  description
+            "",
+        s_to L1hall,
+   has  light;
+
+Useless  L1hall "L1 hall"
+  with  description
+            "",
+        e_to L1hall2,
+        w_to Guards5,
+   has  light;
+
+ThroughWay  L1hall2 "L1 hall"
+  with  description
+            "",
+        n_to Elevator13,
+        e_to L1hall3,
+        w_to L1hall,
+   has  light;
+
+Elevator  Elevator13 "Elevator"
+  with  description
+            "",
+        s_to L1hall2,
+   has  light;
+
+ThroughWay  L1hall3 "L1 hall"
+  with  description
+            "",
+        n_to Science3,
+        w_to L1hall2,
+   has  light;
+
+ThroughWay  Science3 "Science"
+  with  description
+            "",
+        s_to L1hall3,
+        w_to Science4,
+   has  light;
+
+Importantitem  Science4 "Science"
+  with  description
+            "",
+        e_to Science3,
+   has  light;
+
+Useless  Guards6 "Guards"
+  with  description
+            "",
+        e_to L6hall,
+   has  light;
+
+Useless  Guards7 "Guards"
+  with  description
+            "",
+        w_to L6hall3,
+   has  light;
+
+Useless  Guards8 "Guards"
+  with  description
+            "",
+        w_to L3hall2,
+   has  light;
+
+Useless  Guards9 "Guards"
+  with  description
+            "",
+        e_to L3hall,
+   has  light;
+
+Useless  Guards10 "Guards"
+  with  description
+            "",
+        e_to L7hall,
+   has  light;
+
+Useless  Guards11 "Guards"
+  with  description
+            "",
+        w_to L7hall2,
+   has  light;
+
+Useless  GuardsL8 "Guards L8"
+  with  description
+            "",
+        n_to Elevator9,
+   has  light;
+
+Useless  GuardsL9 "Guards L9"
+  with  description
+            "",
+        n_to Elevator10,
+   has  light;
+
+Useless  Guards12 "Guards"
+  with  description
+            "",
+        w_to HallL102,
+   has  light;
+
+Useless  Guards13 "Guards"
+  with  description
+            "",
+        w_to HallL112,
+   has  light;
+
+[ Initialise;
+    location = EngineRoom;
+    ! "^^Your opening paragraph here...^^";
+];
+
+Include "Grammar";
+

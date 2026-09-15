@@ -1,0 +1,61 @@
+<asl version="550">
+
+  <include ref="English.aslx"/>
+  <include ref="Core.aslx"/>
+  <game name="Doors Test">
+    <gameid>7240f7ec-f84d-467d-89cb-b43467ef3f8a</gameid>
+    <version>1.0</version>
+    <firstpublished>2026</firstpublished>
+    <author>Trizbort Qt port</author>
+    <description></description>
+  </game>
+
+  <object name="WestRoom">
+    <inherit name="editor_room" />
+    <alias>West Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="north" to="NorthRoom">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="EastRoom">
+      <inherit name="eastdirection" />
+    </exit>
+    <object name="player">
+      <inherit name="editor_object" />
+      <inherit name="editor_player" />
+    </object>
+  </object>
+
+  <object name="EastRoom">
+    <inherit name="editor_room" />
+    <alias>East Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="west" to="WestRoom">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+
+  <object name="NorthRoom">
+    <inherit name="editor_room" />
+    <alias>North Room</alias>
+    <attr name="grid_width" type="int">3</attr>
+    <attr name="grid_length" type="int">2</attr>
+    <attr name="grid_fill">Transparent</attr>
+    <attr name="grid_border">Transparent</attr>
+    <attr name="implementation_notes"></attr>
+    <exit alias="south" to="WestRoom">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+
+
+</asl>
+

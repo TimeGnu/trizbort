@@ -1,0 +1,650 @@
+"space-quest-lost-chapter-spaceship main file"
+
+<VERSION ZIP>
+<CONSTANT RELEASEID 1>
+
+"Main Loop"
+
+<CONSTANT GAME-BANNER "space-quest-lost-chapter-spaceship|An interactive fiction by A Trizbort User">
+
+<ROUTINE GO ()
+    <CRLF> <CRLF>
+    <TELL "" CR CR>
+    <V-VERSION> <CRLF>
+    <SETG HERE ,ENGINE-ROOM>
+    <MOVE ,PLAYER ,HERE>
+    <V-LOOK>
+    <REPEAT ()
+        <COND (<PARSER>
+               <PERFORM ,PRSA ,PRSO ,PRSI>
+               <COND (<NOT <GAME-VERB?>>
+                      <APPLY <GETP ,HERE ,P?ACTION> ,M-END>
+                      <CLOCKER>)>)>
+        <SETG HERE <LOC ,WINNER>>>>
+
+<INSERT-FILE "parser">
+
+"Objects"
+
+<ROOM ENGINE-ROOM
+    (DESC "Engine Room")
+    (IN ROOMS)
+    (SOUTH TO HALLWAY)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM HALLWAY
+    (DESC "Hallway")
+    (IN ROOMS)
+    (NORTH TO ENGINE-ROOM)
+    (WEST TO ENTRY)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ENTRY
+    (DESC "Entry")
+    (IN ROOMS)
+    (NORTH TO WIRES-LEFT)
+    (EAST TO HALLWAY)
+    (WEST TO PILOT-ROOM)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM PILOT-ROOM
+    (DESC "Pilot Room")
+    (IN ROOMS)
+    (SOUTH TO ENTRY)
+    (SW TO HALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM WIRES-LEFT
+    (DESC "Wires Left")
+    (IN ROOMS)
+    (SOUTH TO ENTRY)
+    (EAST TO WIRES-RIGHT)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ELEVATOR-2
+    (DESC "Elevator")
+    (IN ROOMS)
+    (SOUTH TO L2-ROOM)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM L2-ROOM
+    (DESC "L2 room")
+    (IN ROOMS)
+    (NORTH TO ELEVATOR-2)
+    (EAST TO FROM-POD)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM FROM-POD
+    (DESC "From Pod")
+    (IN ROOMS)
+    (WEST TO L2-ROOM)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT GET-NEW-HAIR
+    (IN FROM-POD)
+    (DESC "GET NEW HAIR")
+    (SYNONYM HAIR)
+    (ADJECTIVE GET NEW)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM L3-HALL
+    (DESC "L3 hall")
+    (IN ROOMS)
+    (NORTH TO ELEVATOR-3)
+    (EAST TO L3-HALL-2)
+    (WEST TO GUARDS-9)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ELEVATOR-3
+    (DESC "Elevator")
+    (IN ROOMS)
+    (SOUTH TO L3-HALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM L3-HALL-2
+    (DESC "L3 hall")
+    (IN ROOMS)
+    (NORTH TO LOOKOUT)
+    (EAST TO GUARDS-8)
+    (WEST TO L3-HALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM LOOKOUT
+    (DESC "Lookout")
+    (IN ROOMS)
+    (SOUTH TO L3-HALL-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM BAR
+    (DESC "Bar")
+    (IN ROOMS)
+    (EAST TO BAR-LISTEN)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT ORDER-FROST
+    (IN BAR)
+    (DESC "Order Frost/")
+    (SYNONYM FROST)
+    (ADJECTIVE ORDER)
+    (FLAGS TAKEBIT VOWELBIT)>
+
+
+<OBJECT TORMEENIAN
+    (IN BAR)
+    (DESC "Tormeenian")
+    (SYNONYM TORMEENIAN)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM BAR-LISTEN
+    (DESC "Bar LISTEN")
+    (IN ROOMS)
+    (SOUTH TO L4-HALL)
+    (EAST TO BAR-2)
+    (WEST TO BAR)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM BAR-2
+    (DESC "Bar")
+    (IN ROOMS)
+    (WEST TO BAR-LISTEN)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT TRADE-STONE
+    (IN BAR-2)
+    (DESC "trade stone")
+    (SYNONYM STONE)
+    (ADJECTIVE TRADE)
+    (FLAGS TAKEBIT)>
+
+
+<OBJECT FOR-CLEARANCE
+    (IN BAR-2)
+    (DESC "for clearance")
+    (SYNONYM CLEARANCE)
+    (ADJECTIVE FOR)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM L4-HALL
+    (DESC "L4 Hall")
+    (IN ROOMS)
+    (NORTH TO BAR-LISTEN)
+    (EAST TO GUARDS)
+    (WEST TO L4-HALL-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GUARDS
+    (DESC "Guards")
+    (IN ROOMS)
+    (WEST TO L4-HALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM L4-HALL-2
+    (DESC "L4 Hall")
+    (IN ROOMS)
+    (NORTH TO ELEVATOR-4)
+    (EAST TO L4-HALL)
+    (WEST TO GUARDS-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ELEVATOR-4
+    (DESC "Elevator")
+    (IN ROOMS)
+    (SOUTH TO L4-HALL-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GUARDS-2
+    (DESC "Guards")
+    (IN ROOMS)
+    (EAST TO L4-HALL-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ELEVATOR-5
+    (DESC "Elevator")
+    (IN ROOMS)
+    (SOUTH TO L5-HALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM L5-HALL
+    (DESC "L5 hall")
+    (IN ROOMS)
+    (NORTH TO ELEVATOR-5)
+    (EAST TO GUARDS-4)
+    (WEST TO GUARDS-3)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GUARDS-3
+    (DESC "Guards")
+    (IN ROOMS)
+    (EAST TO L5-HALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GUARDS-4
+    (DESC "Guards")
+    (IN ROOMS)
+    (WEST TO L5-HALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM L6-HALL
+    (DESC "L6 hall")
+    (IN ROOMS)
+    (NORTH TO SCIENCE-ROOM)
+    (EAST TO L6-HALL-2)
+    (WEST TO GUARDS-6)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SCIENCE-ROOM
+    (DESC "Science Room")
+    (IN ROOMS)
+    (SOUTH TO L6-HALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM L6-HALL-2
+    (DESC "L6 hall")
+    (IN ROOMS)
+    (NORTH TO ELEVATOR-6)
+    (EAST TO L6-HALL-3)
+    (WEST TO L6-HALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM L6-HALL-3
+    (DESC "L6 hall")
+    (IN ROOMS)
+    (NORTH TO ELEVATOR-6)
+    (EAST TO GUARDS-7)
+    (WEST TO L6-HALL-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ELEVATOR-6
+    (DESC "Elevator")
+    (IN ROOMS)
+    (SOUTH TO L6-HALL-2)
+    (EAST TO L6-HALL-3)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SCIENCE
+    (DESC "Science")
+    (IN ROOMS)
+    (EAST TO SCIENCE-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SCIENCE-2
+    (DESC "Science")
+    (IN ROOMS)
+    (SOUTH TO L7-HALL)
+    (WEST TO SCIENCE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM L7-HALL
+    (DESC "L7 hall")
+    (IN ROOMS)
+    (NORTH TO SCIENCE-2)
+    (EAST TO L7-HALL-2)
+    (WEST TO GUARDS-10)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM L7-HALL-2
+    (DESC "L7 hall")
+    (IN ROOMS)
+    (NORTH TO ELEVATOR-7)
+    (EAST TO GUARDS-11)
+    (WEST TO L7-HALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ELEVATOR-7
+    (DESC "Elevator")
+    (IN ROOMS)
+    (SOUTH TO L7-HALL-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ELEVATOR-8
+    (DESC "Elevator")
+    (IN ROOMS)
+    (SOUTH TO HALL-L10)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM HALL-L10
+    (DESC "Hall L10")
+    (IN ROOMS)
+    (NORTH TO ELEVATOR-8)
+    (EAST TO HALL-L10-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM HALL-L10-2
+    (DESC "Hall L10")
+    (IN ROOMS)
+    (NORTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (EAST TO GUARDS-12)
+    (WEST TO HALL-L10)
+    (FLAGS LIGHTBIT)>
+
+
+<ROUTINE TRIZBORT-CONDITIONAL-EXIT ()
+    <TELL "An export nymph appears on your keyboard. She says, 'You can't go that way, as that exit was marked as conditional, you know, a dotted line, in Trizbort. Obviously in your game you'll have a better rationale for this than, er, me.' She looks embarrassed. 'Bye!'" CR>
+    <RFALSE>>
+
+
+<ROOM WAIT--LISTEN
+    (DESC "WAIT & LISTEN")
+    (IN ROOMS)
+    (SOUTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ELEVATOR-9
+    (DESC "Elevator")
+    (IN ROOMS)
+    (SOUTH TO GUARDS-L8)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ELEVATOR-10
+    (DESC "Elevator")
+    (IN ROOMS)
+    (SOUTH TO GUARDS-L9)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ELEVATOR-11
+    (DESC "Elevator")
+    (IN ROOMS)
+    (SOUTH TO HALL-L11)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM HALL-L11
+    (DESC "Hall L11")
+    (IN ROOMS)
+    (NORTH TO ELEVATOR-11)
+    (EAST TO HALL-L11-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM HALL-L11-2
+    (DESC "Hall L11")
+    (IN ROOMS)
+    (NORTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (EAST TO GUARDS-13)
+    (WEST TO HALL-L11)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SCIENCE-ROOM-2
+    (DESC "Science room")
+    (IN ROOMS)
+    (SOUTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (WEST TO BOMB-ROOM)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM BOMB-ROOM
+    (DESC "Bomb Room")
+    (IN ROOMS)
+    (EAST TO SCIENCE-ROOM-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM DOCKING-BAY
+    (DESC "Docking Bay")
+    (IN ROOMS)
+    (EAST PER TRIZBORT-CONDITIONAL-EXIT)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT LISTEN
+    (IN DOCKING-BAY)
+    (DESC "LISTEN")
+    (SYNONYM LISTEN)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM CONTROLS-L12
+    (DESC "Controls L12")
+    (IN ROOMS)
+    (NORTH TO ELEVATOR-12)
+    (WEST PER TRIZBORT-CONDITIONAL-EXIT)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ELEVATOR-12
+    (DESC "Elevator")
+    (IN ROOMS)
+    (SOUTH TO CONTROLS-L12)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM WIRES-RIGHT
+    (DESC "Wires Right")
+    (IN ROOMS)
+    (WEST TO WIRES-LEFT)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT POD
+    (IN WIRES-RIGHT)
+    (DESC "POD")
+    (SYNONYM POD)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM LEVER-ROOM
+    (DESC "Lever room")
+    (IN ROOMS)
+    (NORTH TO ENGINE-ROOM)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM HALL
+    (DESC "Hall")
+    (IN ROOMS)
+    (EAST TO FIGHT-2-ALIENS)
+    (NW TO PILOT-ROOM)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM FIGHT-2-ALIENS
+    (DESC "Fight 2 Aliens")
+    (IN ROOMS)
+    (EAST PER TRIZBORT-CONDITIONAL-EXIT)
+    (WEST TO HALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM HALL-2
+    (DESC "Hall")
+    (IN ROOMS)
+    (SOUTH TO HALL-3)
+    (WEST PER TRIZBORT-CONDITIONAL-EXIT)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM HALL-3
+    (DESC "Hall")
+    (IN ROOMS)
+    (NORTH TO HALL-2)
+    (EAST TO SUIT-HELMET)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SUIT-HELMET
+    (DESC "SUIT HELMET")
+    (IN ROOMS)
+    (WEST TO HALL-3)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GUN-COMPART-MENT
+    (DESC "Gun Compart ment")
+    (IN ROOMS)
+    (NORTH TO PILOT-ROOM)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT GUN
+    (IN GUN-COMPART-MENT)
+    (DESC "GUN")
+    (SYNONYM GUN)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM GUARDS-5
+    (DESC "Guards")
+    (IN ROOMS)
+    (SOUTH TO L1-HALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM L1-HALL
+    (DESC "L1 hall")
+    (IN ROOMS)
+    (EAST TO L1-HALL-2)
+    (WEST TO GUARDS-5)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM L1-HALL-2
+    (DESC "L1 hall")
+    (IN ROOMS)
+    (NORTH TO ELEVATOR-13)
+    (EAST TO L1-HALL-3)
+    (WEST TO L1-HALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ELEVATOR-13
+    (DESC "Elevator")
+    (IN ROOMS)
+    (SOUTH TO L1-HALL-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM L1-HALL-3
+    (DESC "L1 hall")
+    (IN ROOMS)
+    (NORTH TO SCIENCE-3)
+    (WEST TO L1-HALL-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SCIENCE-3
+    (DESC "Science")
+    (IN ROOMS)
+    (SOUTH TO L1-HALL-3)
+    (WEST TO SCIENCE-4)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SCIENCE-4
+    (DESC "Science")
+    (IN ROOMS)
+    (EAST TO SCIENCE-3)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GUARDS-6
+    (DESC "Guards")
+    (IN ROOMS)
+    (EAST TO L6-HALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GUARDS-7
+    (DESC "Guards")
+    (IN ROOMS)
+    (WEST TO L6-HALL-3)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GUARDS-8
+    (DESC "Guards")
+    (IN ROOMS)
+    (WEST TO L3-HALL-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GUARDS-9
+    (DESC "Guards")
+    (IN ROOMS)
+    (EAST TO L3-HALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GUARDS-10
+    (DESC "Guards")
+    (IN ROOMS)
+    (EAST TO L7-HALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GUARDS-11
+    (DESC "Guards")
+    (IN ROOMS)
+    (WEST TO L7-HALL-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GUARDS-L8
+    (DESC "Guards L8")
+    (IN ROOMS)
+    (NORTH TO ELEVATOR-9)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GUARDS-L9
+    (DESC "Guards L9")
+    (IN ROOMS)
+    (NORTH TO ELEVATOR-10)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GUARDS-12
+    (DESC "Guards")
+    (IN ROOMS)
+    (WEST TO HALL-L10-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GUARDS-13
+    (DESC "Guards")
+    (IN ROOMS)
+    (WEST TO HALL-L11-2)
+    (FLAGS LIGHTBIT)>
+

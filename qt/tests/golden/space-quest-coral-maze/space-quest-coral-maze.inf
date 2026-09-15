@@ -1,0 +1,398 @@
+Constant Story "space-quest-coral-maze";
+Constant Headline "^By A Trizbort User^^^";
+
+Include "Parser";
+Include "VerbLib";
+
+Class Importantitem;
+Class Later;
+Class Lethal;
+Class ThroughWay;
+Class Useless;
+
+ThroughWay  MazeStart "Maze Start"
+  with  description
+            "",
+        s_to Tright,
+   has  light;
+
+ThroughWay  Tright "T right"
+  with  description
+            "",
+        n_to MazeStart,
+        s_to UpDown,
+        e_to LeftRight,
+   has  light;
+
+ThroughWay  LeftRight "Left Right"
+  with  description
+            "",
+        e_to Tdown,
+        w_to Tright,
+   has  light;
+
+Useless  UpDown "Up Down"
+  with  description
+            "",
+        n_to Tright,
+        s_to Tleft,
+   has  light;
+
+Useless  Tleft "T left"
+  with  description
+            "",
+        n_to UpDown,
+        w_to DeadEnd,
+   has  light;
+
+Useless  DeadEnd "Dead End"
+  with  description
+            "",
+        e_to Tleft,
+   has  light;
+
+ThroughWay  Tdown "T down"
+  with  description
+            "",
+        s_to Updown2,
+        w_to LeftRight,
+   has  light;
+
+ThroughWay  Updown2 "Up down"
+  with  description
+            "",
+        n_to Tdown,
+        s_to UpRight,
+   has  light;
+
+ThroughWay  UpRight "Up Right"
+  with  description
+            "",
+        n_to Updown2,
+        e_to LeftRight2,
+   has  light;
+
+ThroughWay  LeftRight2 "Left Right"
+  with  description
+            "",
+        e_to LeftRight3,
+        w_to UpRight,
+   has  light;
+
+ThroughWay  LeftRight3 "Left Right"
+  with  description
+            "",
+        e_to Tdown2,
+        w_to LeftRight2,
+   has  light;
+
+ThroughWay  Tdown2 "T down"
+  with  description
+            "",
+        s_to Tright2,
+        w_to LeftRight3,
+   has  light;
+
+ThroughWay  Tright2 "T right"
+  with  description
+            "",
+        n_to Tdown2,
+        s_to CrossRoads,
+   has  light;
+
+ThroughWay  CrossRoads "Cross Roads"
+  with  description
+            "",
+        n_to Tright2,
+        s_to UpDown3,
+   has  light;
+
+ThroughWay  UpDown3 "Up Down"
+  with  description
+            "",
+        n_to CrossRoads,
+        w_to UpLeft,
+   has  light;
+
+ThroughWay  UpLeft "Up Left"
+  with  description
+            "",
+        e_to UpDown3,
+        w_to Tdown3,
+   has  light;
+
+ThroughWay  Tdown3 "T down"
+  with  description
+            "",
+        s_to Tleft2,
+        e_to UpLeft,
+   has  light;
+
+ThroughWay  Tleft2 "T left"
+  with  description
+            "",
+        n_to Tdown3,
+        s_to Upright2,
+   has  light;
+
+ThroughWay  Upright2 "Up right"
+  with  description
+            "",
+        n_to Tleft2,
+        e_to Panel,
+   has  light;
+
+ThroughWay  Panel "Panel"
+  with  description
+            "",
+        e_to GreenButton,
+        w_to Upright2,
+   has  light;
+
+Object ->  Needalienpaper "Need alien paper"
+  with  name 'Need' 'alien' 'paper',
+        description "Need alien paper";
+
+Object ->  Frombehindshark "From behind shark"
+  with  name 'From' 'behind' 'shark',
+        description "From behind shark";
+
+ThroughWay  GreenButton "Green Button"
+  with  description
+            "",
+        s_to Hall,
+        e_to Nicescene,
+        w_to Panel,
+   has  light;
+
+Object ->  Usepanel3 "Use panel  3"
+  with  name 'Use' 'panel' '3',
+        description "Use panel * 3";
+
+Useless  Nicescene "Nice scene"
+  with  description
+            "",
+        w_to GreenButton,
+   has  light;
+
+ThroughWay  Hall "Hall"
+  with  description
+            "",
+        n_to GreenButton,
+        s_to Hall2,
+   has  light;
+
+ThroughWay  Hall2 "Hall"
+  with  description
+            "",
+        n_to Hall,
+        e_to Ship,
+   has  light;
+
+ThroughWay  Ship "Ship"
+  with  description
+            "",
+        w_to Hall2,
+   has  light;
+
+ThroughWay  CraftStart "Craft Start"
+  with  description
+            "",
+        w_to R00,
+   has  light;
+
+ThroughWay  R00 "R00"
+  with  description
+            "",
+        e_to CraftStart,
+        w_to R002,
+   has  light;
+
+ThroughWay  R002 "R00"
+  with  description
+            "",
+        e_to R00,
+        w_to R003,
+   has  light;
+
+ThroughWay  R003 "R00"
+  with  description
+            "",
+        e_to R002,
+        w_to OtherShip,
+   has  light;
+
+Importantitem  OtherShip "Other Ship"
+  with  description
+            "",
+        e_to R003,
+        w_to R004,
+   has  light;
+
+Object ->  Box "Box"
+  with  name 'Box',
+        description "Box";
+
+Object ->  Needpressuresuit "Need pressure suit"
+  with  name 'Need' 'pressure' 'suit',
+        description "Need pressure suit";
+
+ThroughWay  R004 "R00"
+  with  description
+            "",
+        n_to CityEntry,
+        e_to OtherShip,
+   has  light;
+
+ThroughWay  CityEntry "City Entry"
+  with  description
+            "",
+        s_to R004,
+        nw_to DockBay,
+   has  light;
+
+Object ->  USEBOX "USE BOX"
+  with  name 'USE' 'BOX',
+        description "USE BOX";
+
+Object ->  EXITCITYtoleave "EXIT CITY to leave"
+  with  name 'EXIT' 'CITY' 'to' 'leave',
+        description "EXIT CITY to leave";
+
+ThroughWay  DockBay "Dock Bay"
+  with  description
+            "",
+        e_to BigDoor,
+        se_to CityEntry,
+   has  light;
+
+ThroughWay  BigDoor "Big Door"
+  with  description
+            "",
+        e_to Hall3,
+        w_to DockBay,
+   has  light;
+
+Object ->  USEPANEL "USE PANEL"
+  with  name 'USE' 'PANEL',
+        description "USE PANEL";
+
+ThroughWay  Hall3 "Hall"
+  with  description
+            "",
+        s_to BigDoor,
+        e_to Hall4,
+        w_to Aliens,
+   has  light;
+
+Lethal  Aliens "Aliens"
+  with  description
+            "",
+        e_to Hall3,
+   has  light;
+
+ThroughWay  Hall4 "Hall"
+  with  description
+            "",
+        s_to Hall5,
+        w_to Hall3,
+   has  light;
+
+ThroughWay  Hall5 "Hall"
+  with  description
+            "",
+        n_to Hall4,
+        e_to StayNorth,
+   has  light;
+
+ThroughWay  StayNorth "Stay North"
+  with  description
+            "",
+        e_to Hall6,
+        w_to Hall5,
+   has  light;
+
+ThroughWay  Hall6 "Hall"
+  with  description
+            "",
+        n_to Hall7,
+        e_to Aliens2,
+        w_to StayNorth,
+   has  light;
+
+Lethal  Aliens2 "Aliens"
+  with  description
+            "",
+        w_to Hall6,
+   has  light;
+
+Object ->  Extrabad "Extra bad"
+  with  name 'Extra' 'bad',
+        description "Extra bad";
+
+Object ->  Theyllfollow "Theyll follow"
+  with  name 'Theyll' 'follow',
+        description "They'll follow";
+
+ThroughWay  Hall7 "Hall"
+  with  description
+            "",
+        n_to Hall8,
+        s_to Hall6,
+   has  light;
+
+ThroughWay  Hall8 "Hall"
+  with  description
+            "",
+        s_to Hall7,
+        e_to Hall9,
+   has  light;
+
+ThroughWay  Hall9 "Hall"
+  with  description
+            "",
+        e_to Museum,
+        w_to Hall8,
+   has  light;
+
+Importantitem  Museum "Mus-eum"
+  with  description
+            "",
+        w_to Hall9,
+   has  light;
+
+Object ->  MASK "MASK"
+  with  name 'MASK',
+        description "MASK";
+
+Object ->  OUTFIT "OUTFIT"
+  with  name 'OUTFIT',
+        description "OUTFIT";
+
+Importantitem  Item "Item"
+  with  description
+            "",
+   has  light;
+
+Useless  Useless2 "Use-less"
+  with  description
+            "",
+   has  light;
+
+Lethal  Death "Death"
+  with  description
+            "",
+   has  light;
+
+ThroughWay  WalkThru "Walk Thru"
+  with  description
+            "",
+   has  light;
+
+[ Initialise;
+    location = MazeStart;
+    ! "^^Your opening paragraph here...^^";
+];
+
+Include "Grammar";
+

@@ -1,0 +1,821 @@
+#include "verblib.g" ! grammar must come first
+
+#include "hugolib.h"
+
+routine init
+{
+	cls
+	verbosity = 2
+	counter = -1
+	STATUSTYPE = 1 !1 = score / turns, 2 = time, 3 = moves: score:
+	player = you
+	Font(BOLD_ON)
+	"Zork_770614"
+	Font(BOLD_OFF)
+	"by A Trizbort User"
+	location = WestofHouse
+	MovePlayer(location)
+}
+
+room WestofHouse
+{
+	region 
+
+	n_to NorthofHouse
+	s_to SouthofHouse
+	w_to Forest2
+
+}
+
+room SouthofHouse
+{
+	region 
+
+	s_to Forest1
+	e_to BehindHouse
+	w_to WestofHouse
+
+}
+
+room BehindHouse
+{
+	region 
+
+	n_to NorthofHouse
+	s_to SouthofHouse
+	e_to Clearing
+	w_to Kitchen
+
+}
+
+object Smallwindow
+{
+	in BehindHouse
+}
+
+room NorthofHouse
+{
+	region 
+
+	n_to Forest3
+	e_to BehindHouse
+	w_to WestofHouse
+
+}
+
+room Clearing
+{
+	region 
+
+	s_to Forest1
+	w_to Forest3
+	sw_to BehindHouse
+
+}
+
+object Pileofleaves
+{
+	in Clearing
+}
+
+room Kitchen
+{
+	region 
+
+	e_to BehindHouse
+	w_to LivingRoom
+	u_to Attic
+
+}
+
+object Bottle
+{
+	in Kitchen
+}
+
+object Sack
+{
+	in Kitchen
+}
+
+room LivingRoom
+{
+	region 
+
+	e_to Kitchen
+
+}
+
+object Tropgycase
+{
+	in LivingRoom
+}
+
+object Lantern
+{
+	in LivingRoom
+}
+
+object Rug
+{
+	in LivingRoom
+}
+
+room Attic
+{
+	region 
+
+	d_to Kitchen
+
+}
+
+object Rope
+{
+	in Attic
+}
+
+object Knife
+{
+	in Attic
+}
+
+room Forest1
+{
+	region 
+
+	n_to SouthofHouse
+	e_to Clearing
+	w_to Forest2
+
+}
+
+room Forest2
+{
+	region 
+
+	e_to Forest3
+
+}
+
+room Forest3
+{
+	region 
+
+	s_to Clearing
+	e_to Clearing
+	w_to NorthofHouse
+
+}
+
+room Cellar
+{
+	region 
+
+	s_to WestofChasm
+	e_to TrollRoom
+
+}
+
+room WestofChasm
+{
+	region 
+
+	n_to NorthSouthCrawlway
+	s_to Gallery
+	w_to Cellar
+
+}
+
+room Gallery
+{
+	region 
+
+	n_to WestofChasm
+	s_to Studio
+
+}
+
+object Painting
+{
+	in Gallery
+}
+
+room Studio
+{
+	region 
+
+	n_to NorthSouthCrawlway
+	nw_to Gallery
+
+}
+
+object Chimney
+{
+	in Studio
+}
+
+room NorthSouthCrawlway
+{
+	region 
+
+	n_to WestofChasm
+	s_to Studio
+	e_to TrollRoom
+
+}
+
+room TrollRoom
+{
+	region 
+
+	n_to EastWestPassage
+	e_to NorthSouthCrawlway
+	w_to Cellar
+
+}
+
+object Troll
+{
+	in TrollRoom
+}
+
+room EastWestPassage
+{
+	region 
+
+	n_to DeepRavine
+	e_to RoundRoom
+	w_to TrollRoom
+
+}
+
+room CyclopsRoom
+{
+	region 
+
+	u_to TreasureRoom
+
+}
+
+object Cyclop
+{
+	in CyclopsRoom
+}
+
+room StrangePassage
+{
+	region 
+
+
+}
+
+room TreasureRoom
+{
+	region 
+
+	d_to CyclopsRoom
+
+}
+
+object Thief
+{
+	in TreasureRoom
+}
+
+object Chalice
+{
+	in TreasureRoom
+}
+
+room DomeRoom
+{
+	region 
+
+	e_to RockyCrawl
+	d_to TorchRoom
+
+}
+
+object Railing
+{
+	in DomeRoom
+}
+
+room RockyCrawl
+{
+	region 
+
+	e_to DomeRoom
+	w_to DeepRavine
+	nw_to EgyptianRoom
+
+}
+
+room DeepRavine
+{
+	region 
+
+	s_to EastWestPassage
+	e_to Chasm
+	w_to RockyCrawl
+	d_to ReservoirSouth
+
+}
+
+room Chasm
+{
+	region 
+
+	s_to DeepRavine
+	e_to NorthSouthPassage
+
+}
+
+room NorthSouthPassage
+{
+	region 
+
+	n_to Chasm
+	s_to RoundRoom
+	ne_to LoudRoom
+
+}
+
+room LoudRoom
+{
+	region 
+
+	e_to AncientChasm
+	w_to NorthSouthPassage
+	u_to DampCave
+
+}
+
+object PlatinumBar
+{
+	in LoudRoom
+}
+
+room RoundRoom
+{
+	region 
+
+
+}
+
+room EgyptianRoom
+{
+	region 
+
+	e_to RockyCrawl
+	w_to GlacierRoom
+
+}
+
+object GoldCoffin
+{
+	in EgyptianRoom
+}
+
+room GlacierRoom
+{
+	region 
+
+	n_to StreamView
+	e_to EgyptianRoom
+	w_to RubyRoom
+
+}
+
+object Ice
+{
+	in GlacierRoom
+}
+
+room StreamView
+{
+	region 
+
+	n_to GlacierRoom
+	e_to ReservoirSouth
+
+}
+
+room ReservoirSouth
+{
+	region 
+
+	n_to ReservoirNorth
+	s_to DeepRavine
+	w_to StreamView
+	u_to DeepCanyon
+
+}
+
+object Rope2
+{
+	in ReservoirSouth
+}
+
+object TrunkwithJewels
+{
+	in ReservoirSouth
+}
+
+room DeepCanyon
+{
+	region 
+
+	e_to Dam
+	se_to ReservoirSouth
+
+}
+
+room TorchRoom
+{
+	region 
+
+
+}
+
+object Torch
+{
+	in TorchRoom
+}
+
+room Dam
+{
+	region 
+
+	n_to DamLobby
+	s_to DeepCanyon
+	e_to DampCave
+
+}
+
+room DampCave
+{
+	region 
+
+	s_to LoudRoom
+	e_to Dam
+
+}
+
+object SmallCrack
+{
+	in DampCave
+}
+
+room DamLobby
+{
+	region 
+
+	n_to MaintenanceRoom
+	s_to Dam
+	e_to MaintenanceRoom
+
+}
+
+object Matchbook
+{
+	in DamLobby
+}
+
+object Guidebooks
+{
+	in DamLobby
+}
+
+room MaintenanceRoom
+{
+	region 
+
+	s_to DamLobby
+	w_to DamLobby
+
+}
+
+object Tubeoftoothpaste
+{
+	in MaintenanceRoom
+}
+
+object Wrench
+{
+	in MaintenanceRoom
+}
+
+object Screwdriver
+{
+	in MaintenanceRoom
+}
+
+room AncientChasm
+{
+	region 
+
+	n_to DeadEnd2
+	s_to LoudRoom
+	w_to DeadEnd
+
+}
+
+room ReservoirNorth
+{
+	region 
+
+	n_to AtlantisRoom
+	s_to ReservoirSouth
+
+}
+
+room AtlantisRoom
+{
+	region 
+
+	se_to ReservoirNorth
+	u_to Cave
+
+}
+
+object Trident
+{
+	in AtlantisRoom
+}
+
+room Cave
+{
+	region 
+
+	n_to MirrorRoom
+	d_to AtlantisRoom
+
+}
+
+room MirrorRoom
+{
+	region 
+
+	n_to SteepCrawlway
+	e_to Cave
+	w_to ColdPassage
+
+}
+
+room ColdPassage
+{
+	region 
+
+	n_to SteepCrawlway
+	e_to MirrorRoom
+	w_to SlideRoom
+
+}
+
+room SteepCrawlway
+{
+	region 
+
+	s_to MirrorRoom
+	sw_to ColdPassage
+
+}
+
+room SlideRoom
+{
+	region 
+
+	e_to ColdPassage
+	d_to Cellar
+
+}
+
+room EntrancetoHades
+{
+	region 
+
+	e_to LandoftheLivingDead
+	u_to Cave2
+
+}
+
+object EvilSpirits
+{
+	in EntrancetoHades
+}
+
+room NarrowCrawlway
+{
+	region 
+
+	n_to GrailRoom
+	s_to Cave2
+	sw_to MirrorRoom2
+
+}
+
+room GrailRoom
+{
+	region 
+
+	e_to NarrowCrawlway
+	w_to RoundRoom2
+	u_to Temple
+
+}
+
+object Grail
+{
+	in GrailRoom
+}
+
+room RoundRoom2
+{
+	region 
+
+	n_to DeepCanyon2
+	s_to WindingPassage
+	e_to GrailRoom
+	w_to EastWestPassage2
+	ne_to Maze
+	sw_to EngravingsCave
+	nw_to NorthSouthPassage2
+
+}
+
+room EastWestPassage2
+{
+	region 
+
+	e_to RoundRoom2
+
+}
+
+room NorthSouthPassage2
+{
+	region 
+
+	se_to RoundRoom2
+
+}
+
+room WindingPassage
+{
+	region 
+
+	n_to RoundRoom2
+	e_to MirrorRoom2
+
+}
+
+room MirrorRoom2
+{
+	region 
+
+	n_to NarrowCrawlway
+	e_to Cave2
+	w_to WindingPassage
+
+}
+
+object Mirror
+{
+	in MirrorRoom2
+}
+
+room Cave2
+{
+	region 
+
+	n_to NarrowCrawlway
+	w_to MirrorRoom2
+	d_to EntrancetoHades
+
+}
+
+room DeepCanyon2
+{
+	region 
+
+	s_to RoundRoom2
+
+}
+
+room Maze
+{
+	region 
+
+	sw_to RoundRoom2
+
+}
+
+room EngravingsCave
+{
+	region 
+
+	n_to RoundRoom2
+	se_to RiddleRoom
+
+}
+
+object Engravings
+{
+	in EngravingsCave
+}
+
+room RiddleRoom
+{
+	region 
+
+	e_to PearlRoom
+	d_to EngravingsCave
+
+}
+
+room PearlRoom
+{
+	region 
+
+	w_to RiddleRoom
+
+}
+
+object PearlNecklace
+{
+	in PearlRoom
+}
+
+room Temple
+{
+	region 
+
+	e_to Altar
+	w_to GrailRoom
+
+}
+
+object Brassbell
+{
+	in Temple
+}
+
+room Altar
+{
+	region 
+
+	w_to Temple
+
+}
+
+object BlackBook
+{
+	in Altar
+}
+
+object Candles
+{
+	in Altar
+}
+
+room DeadEnd
+{
+	region 
+
+	e_to AncientChasm
+
+}
+
+room DeadEnd2
+{
+	region 
+
+	sw_to AncientChasm
+
+}
+
+room LandoftheLivingDead
+{
+	region 
+
+	w_to EntrancetoHades
+
+}
+
+room RubyRoom
+{
+	region 
+
+	s_to GlacierRoom
+
+}
+
+object Ruby
+{
+	in RubyRoom
+}
+
+player_character you "you"
+{
+}
+

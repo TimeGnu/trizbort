@@ -1,0 +1,48 @@
+Constant Story "Doors Test";
+Constant Headline "^By Trizbort Qt port^^^";
+
+Include "Parser";
+Include "VerbLib";
+
+Object  WestRoom "West Room"
+  with  description
+            "",
+        n_to irongate,
+        e_to oakdoor,
+   has  light;
+
+Object irongate 
+  with  name 'iron' 'gate',
+        description "",
+        found_in WestRoom NorthRoom,
+        door_to [; if (self in WestRoom) return NorthRoom; return WestRoom;],
+        door_dir [; if (self in WestRoom) return n_to; return s_to; ],
+  has   door openable ~open lockable locked ;
+
+Object oakdoor 
+  with  name 'oak' 'door',
+        description "",
+        found_in WestRoom EastRoom,
+        door_to [; if (self in WestRoom) return EastRoom; return WestRoom;],
+        door_dir [; if (self in WestRoom) return e_to; return w_to; ],
+  has   door openable open  ~locked ;
+
+Object  EastRoom "East Room"
+  with  description
+            "",
+        w_to oakdoor,
+   has  light;
+
+Object  NorthRoom "North Room"
+  with  description
+            "",
+        s_to irongate,
+   has  light;
+
+[ Initialise;
+    location = WestRoom;
+    ! "^^Your opening paragraph here...^^";
+];
+
+Include "Grammar";
+

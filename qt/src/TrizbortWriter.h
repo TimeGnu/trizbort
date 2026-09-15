@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2026  Jason Self <j@jxself.org>
  *
  *  This file is free software: you may copy, redistribute and/or modify it
@@ -38,60 +38,28 @@
  *     THE SOFTWARE.
  */
 
-using CommandLine;
+#ifndef TRIZBORT_TRIZBORTWRITER_H
+#define TRIZBORT_TRIZBORTWRITER_H
 
-namespace Trizbort.Domain.Application;
+#include <QString>
 
-public class CommandLineOptions
-{
-  [Value(0)]
-  public string Executable { get; set; }
+#include "MapDocument.h"
 
-  [Value(1)]
-  public string FileName { get; set; }
+// Serializes a Map back to the .trizbort XML format, mirroring the C#
+// LegacyMapFileEngine.Save / Room.Save / Connection.Save / Settings.Save so a
+// round trip loses nothing and the output loads in stock Trizbort.
+namespace trizbort {
 
-  [Option('a', "loadlastproject", HelpText = "Load the last opened project.")]
-  public bool LoadLastProject { get; set; }
+class TrizbortWriter {
+public:
+    // Serialize to a string (used by tests and by save()).
+    static QString toString(const Map &map);
 
-  [Option('m',"automap", HelpText = "Start automap with given transcript.")]
-  public string Transcript { get; set; }
+    // Serialize and write to a file. Returns false and sets errorMessage on I/O
+    // failure.
+    static bool save(const QString &path, const Map &map, QString *errorMessage = nullptr);
+};
 
-  [Option('q',"quicksave", HelpText="Quick save the map to the current Trizbort file.")]
-  public string QuickSave { get; set; }
+} // namespace trizbort
 
-  [Option('s', "smartsave", HelpText = "SmartSave the loaded file")]
-  public bool SmartSave { get; set; }
-
-  [Option('n', "name", HelpText = "Name the current map.")]
-  public string Name { get; set; }
-
-  [Option('x', "exit", HelpText = "Exit Trizbort.")]
-  public bool Exit { get; set; }
-
-  [Option("inform6", HelpText = "Export to I6.")]
-  public string I6 { get; set; }
-
-  [Option("inform7", HelpText = "Export to I7.")]
-  public string I7 { get; set; }
-
-  [Option("tads", HelpText = "Export to Tads.")]
-  public string Tads { get; set; }
-
-  [Option("alan", HelpText = "Export to Alan.")]
-  public string Alan { get; set; }
-
-  [Option("hugo", HelpText = "Export to Hugo.")]
-  public string Hugo { get; set; }
-
-  [Option("zil", HelpText = "Export to Zil.")]
-  public string Zil { get; set; }
-
-  [Option("quest", HelpText = "Export to Quest.")]
-  public string Quest { get; set; }
-
-  [Option("quest rooms", HelpText = "Export to Quest section.")]
-  public string QuestRooms { get; set; }
-
-  [Option("adventuron", HelpText = "Export to Adventuron.")]
-  public string Adventuron { get; set; }
-}
+#endif // TRIZBORT_TRIZBORTWRITER_H

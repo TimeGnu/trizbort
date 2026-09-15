@@ -1,0 +1,681 @@
+Constant Story "Slasher Swamp map";
+Constant Headline "^By Andrew Schultz^This is a map for Slasher Swamp, an IFComp 2014 entry. The dotted lines indicate places you need to search, and in what order.^^";
+
+Include "Parser";
+Include "VerbLib";
+
+Class Forest;
+
+Object  Road "Road"
+  with  description
+            "",
+        s_to MuddySwamp,
+   has  light;
+
+Object ->  TRUCK1 "TRUCK 1"
+  with  name 'TRUCK' '1',
+        description "TRUCK (1)";
+
+Object  Pond "Pond"
+  with  description
+            "",
+        e_to SwampForest,
+   has  light;
+
+Object  MuddySwamp "Muddy Swamp"
+  with  description
+            "",
+        n_to Road,
+        s_to RottingWoodenWalkway,
+        e_to ConcreteBuilding,
+        w_to MangroveForest,
+   has  light;
+
+Object  EmptyFloridaHighway "Empty Florida Highway"
+  with  description
+            "",
+        n_to SwampForest,
+        s_to ConcreteBuilding,
+        e_to GravelRoad,
+   has  light;
+
+Object  BlacktopHighway "Blacktop Highway"
+  with  description
+            "",
+        s_to MangroveForest,
+        w_to CreepyHighway,
+   has  light;
+
+Object  BambooForest "Bamboo Forest"
+  with  description
+            "",
+        n_to DarkGrove,
+        w_to DryEverglades,
+   has  light;
+
+Object  SwampForest "Swamp Forest"
+  with  description
+            "",
+        n_to PineForest,
+        s_to EmptyFloridaHighway,
+        e_to OakSwamp,
+        w_to Pond,
+   has  light;
+
+Object ->  BRIARPATCH5 "BRIAR PATCH 5"
+  with  name 'BRIAR' 'PATCH' '5',
+        description "BRIAR PATCH (5)";
+
+Object  DryEverglades "Dry Everglades*"
+  with  description
+            "",
+        n_to FrontPorch,
+        s_to CreepyHighway,
+        e_to BambooForest,
+        w_to PalmettoFlat,
+   has  light;
+
+Object  DarkGrove "Dark Grove*"
+  with  description
+            "",
+        n_to SouthBankofaBayou,
+        s_to BambooForest,
+   has  light;
+
+Object ->  Etoswampforest "E to swamp forest"
+  with  name 'E' 'to' 'swamp' 'forest',
+        description "E to swamp forest";
+
+Object  CreepyHighway "Creepy Highway"
+  with  description
+            "",
+        n_to DryEverglades,
+        s_to ScrubForest,
+        e_to BlacktopHighway,
+        w_to DesolateHighway,
+   has  light;
+
+Object  MangroveForest "Mangrove Forest"
+  with  description
+            "",
+        n_to BlacktopHighway,
+        e_to MuddySwamp,
+        w_to ScrubForest,
+   has  light;
+
+Object  DesolateHighway "Desolate Highway"
+  with  description
+            "",
+        n_to PalmettoFlat,
+        s_to PineFlatwood,
+        e_to CreepyHighway,
+   has  light;
+
+Object  ScrubForest "Scrub Forest"
+  with  description
+            "",
+        n_to CreepyHighway,
+        e_to MangroveForest,
+        w_to PineFlatwood,
+   has  light;
+
+Object  PineFlatwood "Pine Flatwood*"
+  with  description
+            "",
+        n_to DesolateHighway,
+        e_to ScrubForest,
+   has  light;
+
+Object ->  WStoswamp "WS to swamp"
+  with  name 'WS' 'to' 'swamp',
+        description "W/S to swamp";
+
+Object  RottingWoodenWalkway "Rotting Wooden Walkway"
+  with  description
+            "",
+        n_to MuddySwamp,
+        s_to SandyGrass,
+   has  light;
+
+Object  ConcreteBuilding "Concrete Building"
+  with  description
+            "",
+        n_to EmptyFloridaHighway,
+        s_to DarkConcreteBuilding,
+        e_to ConcreteSlab,
+        w_to MuddySwamp,
+   has  light;
+
+Object  SandyGrass "Sandy Grass"
+  with  description
+            "",
+        n_to RottingWoodenWalkway,
+        s_to DustyClearing,
+        e_to DustyClearing,
+        w_to Gazebo,
+   has  light;
+
+Object ->  KingofSpades "King of Spades"
+  with  name 'King' 'of' 'Spades',
+        description "King of Spades";
+
+Object  Gazebo "Gazebo"
+  with  description
+            "",
+        e_to SandyGrass,
+   has  light;
+
+Object ->  QueenofClubs "Queen of Clubs"
+  with  name 'Queen' 'of' 'Clubs',
+        description "Queen of Clubs";
+
+Object  DustyClearing "Dusty Clearing"
+  with  description
+            "",
+        n_to SandyGrass,
+        e_to Gate,
+   has  light;
+
+Object  Gate "Gate"
+  with  description
+            "",
+        e_to Garden,
+        w_to DustyClearing,
+   has  light;
+
+Object  Garden "Garden"
+  with  description
+            "",
+        n_to Garden2,
+        e_to ConcreteRuins,
+        w_to Gate,
+   has  light;
+
+Object  ConcreteRuins "Concrete Ruins"
+  with  description
+            "",
+        n_to RoseBush,
+        w_to Garden,
+   has  light;
+
+Object ->  JackofSpades "Jack of Spades"
+  with  name 'Jack' 'of' 'Spades',
+        description "Jack of Spades";
+
+Object  RoseBush "Rose Bush"
+  with  description
+            "",
+        s_to ConcreteRuins,
+        w_to Garden2,
+   has  light;
+
+Object  Garden2 "Garden"
+  with  description
+            "",
+        s_to Garden,
+        e_to RoseBush,
+   has  light;
+
+Object  DarkConcreteBuilding "Dark Concrete Building"
+  with  description
+            "",
+        n_to ConcreteBuilding,
+   has  ~light;
+
+Object ->  Deerdollhead "Deer doll head"
+  with  name 'Deer' 'doll' 'head',
+        description "Deer (doll head)";
+
+Object  ConcreteSlab "Concrete Slab"
+  with  description
+            "",
+        n_to GravelRoad,
+        s_to Graveyard,
+        e_to BushThicket,
+        w_to ConcreteBuilding,
+   has  light;
+
+Object  GravelRoad "Gravel Road"
+  with  description
+            "",
+        n_to OakSwamp,
+        s_to BushThicket,
+        e_to GasStationParkingLot,
+        w_to EmptyFloridaHighway,
+   has  light;
+
+Object  BushThicket "Bush Thicket"
+  with  description
+            "",
+        n_to GravelRoad,
+        e_to Meadow,
+        w_to ConcreteSlab,
+   has  light;
+
+Object ->  StoSwampForest "S to Swamp Forest"
+  with  name 'S' 'to' 'Swamp' 'Forest',
+        description "S to Swamp Forest";
+
+Object  OakSwamp "Oak Swamp"
+  with  description
+            "",
+        n_to SwampClearingEtograssfield,
+        s_to GravelRoad,
+        w_to SwampForest,
+   has  light;
+
+Object ->  EtoSwampForest2 "E to Swamp Forest"
+  with  name 'E' 'to' 'Swamp' 'Forest',
+        description "E to Swamp Forest";
+
+Object  PalmettoFlat "Palmetto Flat"
+  with  description
+            "",
+        n_to DustyHill,
+        s_to DesolateHighway,
+        e_to DryEverglades,
+   has  light;
+
+Object ->  WtoSwampForest "W to Swamp Forest"
+  with  name 'W' 'to' 'Swamp' 'Forest',
+        description "W to Swamp Forest";
+
+Object  DustyHill "Dusty Hill*"
+  with  description
+            "",
+        n_to SouthBankofaBayou,
+        s_to PalmettoFlat,
+   has  light;
+
+Object  FrontPorch "Front Porch"
+  with  description
+            "",
+        n_to LivingRoom,
+        s_to DryEverglades,
+   has  light;
+
+Object  LivingRoom "Living Room"
+  with  description
+            "",
+        n_to Kitchen,
+        s_to FrontPorch,
+   has  ~light;
+
+Object  Kitchen "Kitchen"
+  with  description
+            "",
+        n_to SouthBankofaBayou,
+        s_to LivingRoom,
+   has  light;
+
+Object ->  SINK2 "SINK 2"
+  with  name 'SINK' '2',
+        description "SINK (2)";
+
+Object  SouthBankofaBayou "South Bank of a Bayou*"
+  with  description
+            "",
+        s_to Kitchen,
+        e_to DarkGrove,
+        w_to DustyHill,
+   has  light;
+
+Object  Meadow "Meadow*"
+  with  description
+            "",
+        n_to GravelRoad,
+        s_to PalmettoClearing,
+   has  light;
+
+Object  SwampClearingEtograssfield "Swamp Clearing (E to grass field)"
+  with  description
+            "",
+        s_to OakSwamp,
+   has  light;
+
+Object ->  NWtoSwampForest "NW to Swamp Forest"
+  with  name 'NW' 'to' 'Swamp' 'Forest',
+        description "N/W to Swamp Forest";
+
+Object  PalmettoClearing "Palmetto Clearing"
+  with  description
+            "",
+        n_to Meadow,
+        s_to PalmettoField,
+   has  light;
+
+Object ->  WEtoSwampForest "WE to Swamp Forest"
+  with  name 'WE' 'to' 'Swamp' 'Forest',
+        description "W/E to Swamp Forest";
+
+Object  PalmettoField "Palmetto Field"
+  with  description
+            "",
+        n_to PalmettoClearing,
+        s_to InFrontofaStrawHut,
+   has  light;
+
+Object ->  WEtoSwampForest2 "WE to Swamp Forest"
+  with  name 'WE' 'to' 'Swamp' 'Forest',
+        description "W/E to Swamp Forest";
+
+Object  InFrontofaStrawHut "In Front of a Straw Hut"
+  with  description
+            "",
+        n_to PalmettoField,
+        s_to StrawHut,
+   has  light;
+
+Object  StrawHut "Straw Hut"
+  with  description
+            "",
+        n_to InFrontofaStrawHut,
+   has  light;
+
+Object ->  SHACK11 "SHACK11"
+  with  name 'SHACK11',
+        description "SHACK(11)";
+
+Object ->  Needseveredheadandrevolvernotmanwrevolver "Need severed head and revolver not man wrevolver"
+  with  name 'Need' 'severed' 'head' 'and' 'revolver' 'not' 'man' 'wrevolver',
+        description "Need severed head and revolver (not man w/revolver)";
+
+Forest  PineForest "Pine Forest"
+  with  description
+            "",
+        n_to PineForest2,
+        s_to SwampForest,
+        e_to PineForest6,
+   has  light;
+
+Forest  PineForest2 "Pine Forest"
+  with  description
+            "",
+        n_to PineForest3,
+        s_to PineForest,
+        e_to PineForest5,
+   has  light;
+
+Forest  PineForest3 "Pine Forest"
+  with  description
+            "",
+        s_to PineForest2,
+        e_to PineForest4,
+   has  light;
+
+Forest  PineForest4 "Pine Forest"
+  with  description
+            "",
+        s_to PineForest5,
+        e_to PineForest9,
+        w_to PineForest3,
+   has  light;
+
+Forest  PineForest5 "Pine Forest"
+  with  description
+            "",
+        n_to PineForest4,
+        s_to PineForest6,
+        e_to PineForest8,
+        w_to PineForest2,
+   has  light;
+
+Forest  PineForest6 "Pine Forest"
+  with  description
+            "",
+        n_to PineForest5,
+        e_to PineForest7,
+        w_to PineForest,
+   has  light;
+
+Forest  PineForest7 "Pine Forest"
+  with  description
+            "",
+        n_to PineForest8,
+        w_to PineForest6,
+   has  light;
+
+Forest  PineForest8 "Pine Forest"
+  with  description
+            "",
+        n_to PineForest9,
+        s_to PineForest7,
+        w_to PineForest5,
+   has  light;
+
+Forest  PineForest9 "Pine Forest"
+  with  description
+            "",
+        s_to PineForest8,
+        e_to InFrontofShack,
+        w_to PineForest4,
+   has  light;
+
+Object  InFrontofShack "In Front of Shack"
+  with  description
+            "",
+        n_to InShack,
+        w_to PineForest9,
+   has  light;
+
+Object  InShack "In Shack"
+  with  description
+            "",
+        n_to Altar,
+        s_to InFrontofShack,
+   has  light;
+
+Object  Altar "Altar"
+  with  description
+            "",
+        s_to InShack,
+        w_to Shrine,
+   has  light;
+
+Object ->  ALTAR6BODY7 "ALTAR 6 BODY 7"
+  with  name 'ALTAR' '6' 'BODY' '7',
+        description "ALTAR (6), BODY (7)";
+
+Object  Graveyard "Graveyard"
+  with  description
+            "",
+        n_to ConcreteSlab,
+   has  light;
+
+Object ->  GRAVE9needshovel "GRAVE 9 need shovel"
+  with  name 'GRAVE' '9' 'need' 'shovel',
+        description "GRAVE (9) (need shovel)";
+
+Object ->  COFFINwironkeyMAN10 "COFFIN wiron key MAN10"
+  with  name 'COFFIN' 'wiron' 'key' 'MAN10',
+        description "COFFIN w/iron key, MAN(10)";
+
+Object  GasStationParkingLot "Gas Station Parking Lot"
+  with  description
+            "",
+        n_to AlleyNorthofGasStation,
+        s_to SouthoftheGasStation,
+        e_to InsideGasStation,
+        w_to GravelRoad,
+   has  light;
+
+Object  AlleyNorthofGasStation "Alley North of Gas Station"
+  with  description
+            "",
+        e_to GasStationDumpster,
+        w_to GasStationParkingLot,
+   has  light;
+
+Object  SouthoftheGasStation "South of the Gas Station"
+  with  description
+            "",
+        e_to GasStationDumpster,
+        w_to GasStationParkingLot,
+   has  light;
+
+Object  GasStationDumpster "Gas Station Dumpster"
+  with  description
+            "",
+        n_to AlleyNorthofGasStation,
+        s_to SouthoftheGasStation,
+   has  light;
+
+Object ->  DUMPSTER3 "DUMPSTER 3"
+  with  name 'DUMPSTER' '3',
+        description "DUMPSTER (3)";
+
+Object ->  ESwampForest "E Swamp Forest"
+  with  name 'E' 'Swamp' 'Forest',
+        description "E: Swamp Forest";
+
+Object  InsideGasStation "Inside Gas Station"
+  with  description
+            "",
+        n_to GasStationOffice,
+        w_to GasStationParkingLot,
+   has  light;
+
+Object ->  GARBAGE "GARBAGE"
+  with  name 'GARBAGE',
+        description "GARBAGE";
+
+Object  GasStationOffice "Gas Station Office"
+  with  description
+            "",
+        s_to InsideGasStation,
+   has  ~light;
+
+Object ->  BLANKET4 "BLANKET 4"
+  with  name 'BLANKET' '4',
+        description "BLANKET (4)";
+
+Object  Shrine "Shrine"
+  with  description
+            "",
+        e_to Altar,
+   has  ~light;
+
+Object ->  Headneededtowin "Head needed to win"
+  with  name 'Head' 'needed' 'to' 'win',
+        description "Head (needed to win)";
+
+Object  GrassField "Grass Field"
+  with  description
+            "",
+        n_to CloverField,
+        s_to SunflowerField,
+        w_to FlowerField,
+   has  light;
+
+Object ->  Wtoflower "W to flower"
+  with  name 'W' 'to' 'flower',
+        description "(W to flower)";
+
+Object  CloverField "Clover Field"
+  with  description
+            "",
+        s_to MuckField,
+        e_to FlowerField,
+        w_to GrassField,
+   has  light;
+
+Object ->  NtoSwamp "N to Swamp"
+  with  name 'N' 'to' 'Swamp',
+        description "N to Swamp";
+
+Object  MuckField "Muck Field"
+  with  description
+            "",
+        n_to InFrontofanOuthouse,
+        s_to FlowerField,
+        e_to MuckField,
+        w_to CloverField,
+   has  light;
+
+Object ->  Etograss "E to grass"
+  with  name 'E' 'to' 'grass',
+        description "(E to grass)";
+
+Object  SunflowerField "Sunflower Field"
+  with  description
+            "",
+        n_to GrassField,
+        s_to FlowerField,
+        e_to FlowerField,
+        w_to SunflowerField,
+   has  light;
+
+Object  FlowerField "Flower Field"
+  with  description
+            "",
+        s_to CloverField,
+        e_to MuckField,
+        w_to SunflowerField,
+   has  light;
+
+Object ->  Wtograss "W to grass"
+  with  name 'W' 'to' 'grass',
+        description "(W to grass)";
+
+Object  InFrontofanOuthouse "In Front of an Outhouse"
+  with  description
+            "",
+        n_to Outhouse,
+        s_to MuckField,
+   has  light;
+
+Object  Outhouse "Outhouse"
+  with  description
+            "",
+        s_to InFrontofanOuthouse,
+   has  light;
+
+Object ->  HOLE8 "HOLE 8"
+  with  name 'HOLE' '8',
+        description "HOLE (8)";
+
+Object  Swamp1fromvariouslocations "Swamp-1 (from various locations)"
+  with  description
+            "",
+        s_to Swamp2fromvariouslocations,
+   has  light;
+
+Object ->  Northto "North to"
+  with  name 'North' 'to',
+        description "North to";
+
+Object ->  DesolateHighway2 "Desolate Highway"
+  with  name 'Desolate' 'Highway',
+        description "Desolate Highway";
+
+Object  Swamp2fromvariouslocations "Swamp-2 (from various locations)"
+  with  description
+            "",
+        s_to Swamp3,
+   has  light;
+
+Object ->  Alwaysto "Always to"
+  with  name 'Always' 'to',
+        description "Always to";
+
+Object ->  Swamp32 "Swamp-3"
+  with  name 'Swamp-3',
+        description "Swamp-3";
+
+Object  Swamp3 "Swamp-3"
+  with  description
+            "",
+        s_to Pond,
+   has  light;
+
+Object ->  SouthtoPondOtherwisetoSwamp2 "South to Pond Otherwise to Swamp-2"
+  with  name 'South' 'to' 'Pond' 'Otherwise' 'to' 'Swamp-2',
+        description "South to Pond, Otherwise to Swamp-2";
+
+[ Initialise;
+    location = Road;
+    ! "^^Your opening paragraph here...^^";
+];
+
+Include "Grammar";
+

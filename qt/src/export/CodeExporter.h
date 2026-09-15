@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2026  Jason Self <j@jxself.org>
  *
  *  This file is free software: you may copy, redistribute and/or modify it
@@ -38,60 +38,67 @@
  *     THE SOFTWARE.
  */
 
-using CommandLine;
+#ifndef TRIZBORT_EXPORT_CODEEXPORTER_H
+#define TRIZBORT_EXPORT_CODEEXPORTER_H
 
-namespace Trizbort.Domain.Application;
+#include <optional>
 
-public class CommandLineOptions
-{
-  [Value(0)]
-  public string Executable { get; set; }
+#include <QHash>
+#include <QList>
+#include <QSet>
+#include <QString>
 
-  [Value(1)]
-  public string FileName { get; set; }
+#include "../MapDocument.h"
+#include "ExportModel.h"
 
-  [Option('a', "loadlastproject", HelpText = "Load the last opened project.")]
-  public bool LoadLastProject { get; set; }
+// Base class for the code exporters, ported from Export/CodeExporter.cs.
+// Builds the intermediate model (regions, locations, exits, things) from a Map,
+// then a subclass serializes it to a target language.
+namespace trizbort {
 
-  [Option('m',"automap", HelpText = "Start automap with given transcript.")]
-  public string Transcript { get; set; }
+class CodeExporter {
+public:
+    CodeExporter(const Map &map, const QString &sourcePath);
+    virtual ~CodeExporter();
 
-  [Option('q',"quicksave", HelpText="Quick save the map to the current Trizbort file.")]
-  public string QuickSave { get; set; }
+    // Runs the pipeline and returns the full exported source.
+    QString exportToString();
 
-  [Option('s', "smartsave", HelpText = "SmartSave the loaded file")]
-  public bool SmartSave { get; set; }
+protected:
+    virtual QStringList reservedWords() const = 0;
+    virtual void exportHeader(QString &out, const QString &title, const QString &author,
+                              const QString &description, const QString &history) = 0;
+    virtual void exportContent(QString &out) = 0;
+    virtual QString getExportName(const Room &room, std::optional<int> suffix) = 0;
+    virtual QString getExportName(const QString &displayName, std::optional<int> suffix) = 0;
 
-  [Option('n', "name", HelpText = "Name the current map.")]
-  public string Name { get; set; }
+    static QString deaccent(const QString &s);
 
-  [Option('x', "exit", HelpText = "Exit Trizbort.")]
-  public bool Exit { get; set; }
+    const Map &m_map;
+    QString m_sourcePath;
+    QList<Location *> m_locationsInExportOrder;
+    QList<ExportRegion *> m_regionsInExportOrder;
 
-  [Option("inform6", HelpText = "Export to I6.")]
-  public string I6 { get; set; }
+private:
+    void prepareContent();
+    void findRegions();
+    void findRooms();
+    void findExits();
+    void pickBestExits();
+    void findThings();
 
-  [Option("inform7", HelpText = "Export to I7.")]
-  public string I7 { get; set; }
+    const Room *sourceRoom(const Connection &c, CompassPoint &cp) const;
+    const Room *targetRoom(const Connection &c, CompassPoint &cp) const;
 
-  [Option("tads", HelpText = "Export to Tads.")]
-  public string Tads { get; set; }
+    QHash<int, Location *> m_roomIdToLocation;
 
-  [Option("alan", HelpText = "Export to Alan.")]
-  public string Alan { get; set; }
+    // Owned heap objects, freed in the destructor.
+    QList<Location *> m_ownedLocations;
+    QList<Exit *> m_ownedExits;
+    QList<Thing *> m_ownedThings;
+    QList<ExportRegion *> m_ownedRegions;
+};
 
-  [Option("hugo", HelpText = "Export to Hugo.")]
-  public string Hugo { get; set; }
+} // namespace trizbort
 
-  [Option("zil", HelpText = "Export to Zil.")]
-  public string Zil { get; set; }
-
-  [Option("quest", HelpText = "Export to Quest.")]
-  public string Quest { get; set; }
-
-  [Option("quest rooms", HelpText = "Export to Quest section.")]
-  public string QuestRooms { get; set; }
-
-  [Option("adventuron", HelpText = "Export to Adventuron.")]
-  public string Adventuron { get; set; }
-}
+#endif // TRIZBORT_EXPORT_CODEEXPORTER_H

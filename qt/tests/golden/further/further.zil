@@ -1,0 +1,299 @@
+"further main file"
+
+<VERSION ZIP>
+<CONSTANT RELEASEID 1>
+
+"Main Loop"
+
+<CONSTANT GAME-BANNER "further|An interactive fiction by A Trizbort User">
+
+<ROUTINE GO ()
+    <CRLF> <CRLF>
+    <TELL "" CR CR>
+    <V-VERSION> <CRLF>
+    <SETG HERE ,FOGGY-ROOM>
+    <MOVE ,PLAYER ,HERE>
+    <V-LOOK>
+    <REPEAT ()
+        <COND (<PARSER>
+               <PERFORM ,PRSA ,PRSO ,PRSI>
+               <COND (<NOT <GAME-VERB?>>
+                      <APPLY <GETP ,HERE ,P?ACTION> ,M-END>
+                      <CLOCKER>)>)>
+        <SETG HERE <LOC ,WINNER>>>>
+
+<INSERT-FILE "parser">
+
+"Objects"
+
+<ROOM FOGGY-ROOM
+    (DESC "Foggy Room")
+    (IN ROOMS)
+    (NORTH TO PRAIRIE)
+    (SOUTH TO CAVE)
+    (EAST TO HEARTH)
+    (WEST TO SANDSTORM)
+    (NE TO TUNDRA)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT RUDDY-BELL
+    (IN FOGGY-ROOM)
+    (DESC "Ruddy Bell")
+    (SYNONYM BELL)
+    (ADJECTIVE RUDDY)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM PRAIRIE
+    (DESC "Prairie")
+    (IN ROOMS)
+    (SOUTH TO FOGGY-ROOM)
+    (NW TO MANIC-SKY)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM CAVE
+    (DESC "Cave")
+    (IN ROOMS)
+    (NORTH TO FOGGY-ROOM)
+    (DOWN TO SHIFTING-GROTTO)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM HEARTH
+    (DESC "Hearth")
+    (IN ROOMS)
+    (WEST TO FOGGY-ROOM)
+    (DOWN TO LOW-ROOM)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SANDSTORM
+    (DESC "Sandstorm")
+    (IN ROOMS)
+    (EAST TO FOGGY-ROOM)
+    (DOWN TO COUNTLESS-DUNES)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM TUNDRA
+    (DESC "Tundra")
+    (IN ROOMS)
+    (NE TO INFINITE-ICE-FLOES)
+    (SW TO FOGGY-ROOM)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM MANIC-SKY
+    (DESC "Manic Sky")
+    (IN ROOMS)
+    (WEST TO GRASSLAND)
+    (SE TO PRAIRIE)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT BECOMES
+    (IN MANIC-SKY)
+    (DESC "Becomes")
+    (SYNONYM BECOMES)
+    (FLAGS TAKEBIT)>
+
+
+<OBJECT PET-SHOP
+    (IN MANIC-SKY)
+    (DESC "Pet Shop")
+    (SYNONYM SHOP)
+    (ADJECTIVE PET)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM GRASSLAND
+    (DESC "Grassland")
+    (IN ROOMS)
+    (EAST TO MANIC-SKY)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT ASHEN-ROBE
+    (IN GRASSLAND)
+    (DESC "Ashen Robe")
+    (SYNONYM ROBE)
+    (ADJECTIVE ASHEN)
+    (FLAGS TAKEBIT VOWELBIT)>
+
+
+<ROOM INFINITE-ICE-FLOES
+    (DESC "Infinite Ice Floes")
+    (IN ROOMS)
+    (SW TO TUNDRA)
+    (UP PER TRIZBORT-CONDITIONAL-EXIT)
+    (FLAGS LIGHTBIT)>
+
+
+<ROUTINE TRIZBORT-CONDITIONAL-EXIT ()
+    <TELL "An export nymph appears on your keyboard. She says, 'You can't go that way, as that exit was marked as conditional, you know, a dotted line, in Trizbort. Obviously in your game you'll have a better rationale for this than, er, me.' She looks embarrassed. 'Bye!'" CR>
+    <RFALSE>>
+
+
+<OBJECT BECOMES-FROZEN-POND
+    (IN INFINITE-ICE-FLOES)
+    (DESC "Becomes Frozen Pond")
+    (SYNONYM POND)
+    (ADJECTIVE BECOMES FROZEN)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM LOW-ROOM
+    (DESC "Low Room")
+    (IN ROOMS)
+    (SE TO ALCOVE)
+    (UP TO HEARTH)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT BECOMES2
+    (IN LOW-ROOM)
+    (DESC "Becomes")
+    (SYNONYM BECOMES)
+    (FLAGS TAKEBIT)>
+
+
+<OBJECT YOUR-BASEMENT
+    (IN LOW-ROOM)
+    (DESC "Your Basement")
+    (SYNONYM BASEMENT)
+    (ADJECTIVE YOUR)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM ALCOVE
+    (DESC "Alcove")
+    (IN ROOMS)
+    (NW TO LOW-ROOM)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT JAUNDICED-PENNY
+    (IN ALCOVE)
+    (DESC "Jaundiced Penny")
+    (SYNONYM PENNY)
+    (ADJECTIVE JAUNDICED)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM COUNTLESS-DUNES
+    (DESC "Countless Dunes")
+    (IN ROOMS)
+    (SW TO OASIS)
+    (UP TO SANDSTORM)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT BECOMES-ALANS-DEN
+    (IN COUNTLESS-DUNES)
+    (DESC "Becomes Alan's Den")
+    (SYNONYM DEN)
+    (ADJECTIVE BECOMES ALANS)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM OASIS
+    (DESC "Oasis")
+    (IN ROOMS)
+    (NE TO COUNTLESS-DUNES)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT COBALT-RIBBON
+    (IN OASIS)
+    (DESC "Cobalt Ribbon")
+    (SYNONYM RIBBON)
+    (ADJECTIVE COBALT)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM SHIFTING-GROTTO
+    (DESC "Shifting Grotto")
+    (IN ROOMS)
+    (SE TO CRUMBLING-CHIMNEY)
+    (UP TO CAVE)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT BECOMES3
+    (IN SHIFTING-GROTTO)
+    (DESC "Becomes")
+    (SYNONYM BECOMES)
+    (FLAGS TAKEBIT)>
+
+
+<OBJECT LINDAS-ROOM
+    (IN SHIFTING-GROTTO)
+    (DESC "Linda's Room")
+    (SYNONYM ROOM)
+    (ADJECTIVE LINDAS)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM CRUMBLING-CHIMNEY
+    (DESC "Crumbling Chimney")
+    (IN ROOMS)
+    (NW TO SHIFTING-GROTTO)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT OLIVE-ENVELOPE
+    (IN CRUMBLING-CHIMNEY)
+    (DESC "Olive Envelope")
+    (SYNONYM ENVELOPE)
+    (ADJECTIVE OLIVE)
+    (FLAGS TAKEBIT VOWELBIT)>
+
+
+<ROOM CEMENT-ROOM
+    (DESC "Cement Room")
+    (IN ROOMS)
+    (NORTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (DOWN PER TRIZBORT-CONDITIONAL-EXIT)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM BRICK-LINED-ROOM
+    (DESC "Brick-Lined Room")
+    (IN ROOMS)
+    (NORTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (SOUTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SANDY-ROOM
+    (DESC "Sandy Room")
+    (IN ROOMS)
+    (NORTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (SOUTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM WATER-ROOM
+    (DESC "Water Room")
+    (IN ROOMS)
+    (NORTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (SOUTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM WRITING-ROOM
+    (DESC "Writing Room")
+    (IN ROOMS)
+    (NORTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (SOUTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SPINNING-EXPANSE
+    (DESC "Spinning Expanse")
+    (IN ROOMS)
+    (SOUTH PER TRIZBORT-CONDITIONAL-EXIT)
+    (FLAGS LIGHTBIT)>
+

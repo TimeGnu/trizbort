@@ -1,0 +1,513 @@
+#include "verblib.g" ! grammar must come first
+
+#include "hugolib.h"
+
+routine init
+{
+	cls
+	verbosity = 2
+	counter = -1
+	STATUSTYPE = 1 !1 = score / turns, 2 = time, 3 = moves: score:
+	player = you
+	Font(BOLD_ON)
+	"space-quest-coral-maze"
+	Font(BOLD_OFF)
+	"by A Trizbort User"
+	location = MazeStart
+	MovePlayer(location)
+}
+
+property region
+room MazeStart
+{
+	region Through Way
+
+	s_to Tright
+
+}
+
+room Tright
+{
+	region Through Way
+
+	n_to MazeStart
+	s_to UpDown
+	e_to LeftRight
+
+}
+
+room LeftRight
+{
+	region Through Way
+
+	e_to Tdown
+	w_to Tright
+
+}
+
+room UpDown
+{
+	region Useless
+
+	n_to Tright
+	s_to Tleft
+
+}
+
+room Tleft
+{
+	region Useless
+
+	n_to UpDown
+	w_to DeadEnd
+
+}
+
+room DeadEnd
+{
+	region Useless
+
+	e_to Tleft
+
+}
+
+room Tdown
+{
+	region Through Way
+
+	s_to Updown2
+	w_to LeftRight
+
+}
+
+room Updown2
+{
+	region Through Way
+
+	n_to Tdown
+	s_to UpRight
+
+}
+
+room UpRight
+{
+	region Through Way
+
+	n_to Updown2
+	e_to LeftRight2
+
+}
+
+room LeftRight2
+{
+	region Through Way
+
+	e_to LeftRight3
+	w_to UpRight
+
+}
+
+room LeftRight3
+{
+	region Through Way
+
+	e_to Tdown2
+	w_to LeftRight2
+
+}
+
+room Tdown2
+{
+	region Through Way
+
+	s_to Tright2
+	w_to LeftRight3
+
+}
+
+room Tright2
+{
+	region Through Way
+
+	n_to Tdown2
+	s_to CrossRoads
+
+}
+
+room CrossRoads
+{
+	region Through Way
+
+	n_to Tright2
+	s_to UpDown3
+
+}
+
+room UpDown3
+{
+	region Through Way
+
+	n_to CrossRoads
+	w_to UpLeft
+
+}
+
+room UpLeft
+{
+	region Through Way
+
+	e_to UpDown3
+	w_to Tdown3
+
+}
+
+room Tdown3
+{
+	region Through Way
+
+	s_to Tleft2
+	e_to UpLeft
+
+}
+
+room Tleft2
+{
+	region Through Way
+
+	n_to Tdown3
+	s_to Upright2
+
+}
+
+room Upright2
+{
+	region Through Way
+
+	n_to Tleft2
+	e_to Panel
+
+}
+
+room Panel
+{
+	region Through Way
+
+	e_to GreenButton
+	w_to Upright2
+
+}
+
+object Needalienpaper
+{
+	in Panel
+}
+
+object Frombehindshark
+{
+	in Panel
+}
+
+room GreenButton
+{
+	region Through Way
+
+	s_to Hall
+	e_to Nicescene
+	w_to Panel
+
+}
+
+object Usepanel3
+{
+	in GreenButton
+}
+
+room Nicescene
+{
+	region Useless
+
+	w_to GreenButton
+
+}
+
+room Hall
+{
+	region Through Way
+
+	n_to GreenButton
+	s_to Hall2
+
+}
+
+room Hall2
+{
+	region Through Way
+
+	n_to Hall
+	e_to Ship
+
+}
+
+room Ship
+{
+	region Through Way
+
+	w_to Hall2
+
+}
+
+room CraftStart
+{
+	region Through Way
+
+	w_to R00
+
+}
+
+room R00
+{
+	region Through Way
+
+	e_to CraftStart
+	w_to R002
+
+}
+
+room R002
+{
+	region Through Way
+
+	e_to R00
+	w_to R003
+
+}
+
+room R003
+{
+	region Through Way
+
+	e_to R002
+	w_to OtherShip
+
+}
+
+room OtherShip
+{
+	region Important item
+
+	e_to R003
+	w_to R004
+
+}
+
+object Box
+{
+	in OtherShip
+}
+
+object Needpressuresuit
+{
+	in OtherShip
+}
+
+room R004
+{
+	region Through Way
+
+	n_to CityEntry
+	e_to OtherShip
+
+}
+
+room CityEntry
+{
+	region Through Way
+
+	s_to R004
+	nw_to DockBay
+
+}
+
+object USEBOX
+{
+	in CityEntry
+}
+
+object EXITCITYtoleave
+{
+	in CityEntry
+}
+
+room DockBay
+{
+	region Through Way
+
+	e_to BigDoor
+	se_to CityEntry
+
+}
+
+room BigDoor
+{
+	region Through Way
+
+	e_to Hall3
+	w_to DockBay
+
+}
+
+object USEPANEL
+{
+	in BigDoor
+}
+
+room Hall3
+{
+	region Through Way
+
+	s_to BigDoor
+	e_to Hall4
+	w_to Aliens
+
+}
+
+room Aliens
+{
+	region Lethal
+
+	e_to Hall3
+
+}
+
+room Hall4
+{
+	region Through Way
+
+	s_to Hall5
+	w_to Hall3
+
+}
+
+room Hall5
+{
+	region Through Way
+
+	n_to Hall4
+	e_to StayNorth
+
+}
+
+room StayNorth
+{
+	region Through Way
+
+	e_to Hall6
+	w_to Hall5
+
+}
+
+room Hall6
+{
+	region Through Way
+
+	n_to Hall7
+	e_to Aliens2
+	w_to StayNorth
+
+}
+
+room Aliens2
+{
+	region Lethal
+
+	w_to Hall6
+
+}
+
+object Extrabad
+{
+	in Aliens2
+}
+
+object Theyllfollow
+{
+	in Aliens2
+}
+
+room Hall7
+{
+	region Through Way
+
+	n_to Hall8
+	s_to Hall6
+
+}
+
+room Hall8
+{
+	region Through Way
+
+	s_to Hall7
+	e_to Hall9
+
+}
+
+room Hall9
+{
+	region Through Way
+
+	e_to Museum
+	w_to Hall8
+
+}
+
+room Museum
+{
+	region Important item
+
+	w_to Hall9
+
+}
+
+object MASK
+{
+	in Museum
+}
+
+object OUTFIT
+{
+	in Museum
+}
+
+room Item
+{
+	region Important item
+
+
+}
+
+room Useless2
+{
+	region Useless
+
+
+}
+
+room Death
+{
+	region Lethal
+
+
+}
+
+room WalkThru
+{
+	region Through Way
+
+
+}
+
+player_character you "you"
+{
+}
+

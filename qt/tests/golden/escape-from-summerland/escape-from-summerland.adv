@@ -1,0 +1,68 @@
+
+start_at = in_the_caravan_park
+
+locations {
+   in_the_caravan_park           : location "" header = "In the Caravan Park";
+   main_track                    : location "" header = "Main Track";
+   beneath_the_hedge             : location "" header = "Beneath the Hedge";
+   drizzle_court                 : location "" header = "Drizzle Court";
+   orbis_alius                   : location "" header = "Orbis Alius";
+   mirror_maze                   : location "" header = "Mirror Maze";
+   up_in_the_stands              : location "" header = "Up in the Stands";
+   big_top_west                  : location "" header = "Big Top West";
+   big_top_east                  : location "" header = "Big Top East";
+   backways                      : location "" header = "Backways";
+   the_dressing_rooms            : location "" header = "The Dressing Rooms";
+   home_place                    : location "" header = "Home Place";
+   inside_the_caravan            : location "" header = "Inside the Caravan";
+   another_high_place            : location "" header = "Another High Place";
+   jacquottes_cage               : location "" header = "Jacquotte's Cage";
+   going_up_thing_skipped_by_man : location "" header = "Going Up Thing (skipped b";
+   selkie_aquariumaquatic_region : location "" header = "Selkie Aquarium/Aquatic R";
+   control_booth                 : location "" header = "Control Booth";
+   service_corridor              : location "" header = "Service Corridor";
+}
+
+
+connections {
+   from, direction, to = [
+      in_the_caravan_park, south_oneway, main_track,
+      in_the_caravan_park, enter_oneway, inside_the_caravan,
+      main_track, north_oneway, in_the_caravan_park,
+      main_track, east_oneway, beneath_the_hedge,
+      beneath_the_hedge, east_oneway, drizzle_court,
+      beneath_the_hedge, west_oneway, main_track,
+      drizzle_court, east_oneway, orbis_alius,
+      drizzle_court, west_oneway, beneath_the_hedge,
+      orbis_alius, north_oneway, mirror_maze,
+      orbis_alius, south_oneway, selkie_aquariumaquatic_region,
+      orbis_alius, east_oneway, up_in_the_stands,
+      orbis_alius, west_oneway, drizzle_court,
+      mirror_maze, south_oneway, orbis_alius,
+      up_in_the_stands, west_oneway, orbis_alius,
+      up_in_the_stands, down_oneway, big_top_west,
+      big_top_west, east_oneway, big_top_east,
+      big_top_west, up_oneway, up_in_the_stands,
+      big_top_east, north_oneway, another_high_place,
+      big_top_east, south_oneway, backways,
+      big_top_east, west_oneway, big_top_west,
+      backways, north_oneway, big_top_east,
+      backways, east_oneway, the_dressing_rooms,
+      backways, west_oneway, home_place,
+      the_dressing_rooms, west_oneway, backways,
+      the_dressing_rooms, enter_oneway, going_up_thing_skipped_by_man,
+      home_place, east_oneway, backways,
+      inside_the_caravan, leave_oneway, in_the_caravan_park,
+      another_high_place, south_oneway, big_top_east,
+      jacquottes_cage, leave_oneway, home_place,
+      going_up_thing_skipped_by_man, leave_oneway, the_dressing_rooms,
+      selkie_aquariumaquatic_region, north_oneway, orbis_alius,
+      selkie_aquariumaquatic_region, east_oneway, control_booth,
+      control_booth, east_oneway, service_corridor,
+      control_booth, west_oneway, selkie_aquariumaquatic_region,
+      service_corridor, west_oneway, control_booth,
+      service_corridor, enter_oneway, going_up_thing_skipped_by_man,
+   ]
+}
+
+

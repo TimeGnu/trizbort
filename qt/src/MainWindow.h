@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2026  Jason Self <j@jxself.org>
  *
  *  This file is free software: you may copy, redistribute and/or modify it
@@ -38,60 +38,65 @@
  *     THE SOFTWARE.
  */
 
-using CommandLine;
+#ifndef TRIZBORT_MAINWINDOW_H
+#define TRIZBORT_MAINWINDOW_H
 
-namespace Trizbort.Domain.Application;
+#include <QMainWindow>
+#include <QUndoStack>
 
-public class CommandLineOptions
-{
-  [Value(0)]
-  public string Executable { get; set; }
+#include "MapDocument.h"
 
-  [Value(1)]
-  public string FileName { get; set; }
+class QAction;
 
-  [Option('a', "loadlastproject", HelpText = "Load the last opened project.")]
-  public bool LoadLastProject { get; set; }
+namespace trizbort {
 
-  [Option('m',"automap", HelpText = "Start automap with given transcript.")]
-  public string Transcript { get; set; }
+class MapScene;
+class MapView;
 
-  [Option('q',"quicksave", HelpText="Quick save the map to the current Trizbort file.")]
-  public string QuickSave { get; set; }
+class MainWindow : public QMainWindow {
+    Q_OBJECT
 
-  [Option('s', "smartsave", HelpText = "SmartSave the loaded file")]
-  public bool SmartSave { get; set; }
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
 
-  [Option('n', "name", HelpText = "Name the current map.")]
-  public string Name { get; set; }
+    bool loadFile(const QString &path);
 
-  [Option('x', "exit", HelpText = "Exit Trizbort.")]
-  public bool Exit { get; set; }
+protected:
+    void closeEvent(QCloseEvent *event) override;
 
-  [Option("inform6", HelpText = "Export to I6.")]
-  public string I6 { get; set; }
+private slots:
+    void newFile();
+    void openFile();
+    bool save();
+    bool saveAs();
+    void exportMap(const QString &format);
+    void exportImage();
+    void exportPdf();
+    void importTranscript();
+    void addRoom();
+    void addConnectedRoom(const QString &direction);
+    void deleteSelection();
+    void toggleConnectMode(bool on);
+    void editMapProperties();
+    void editMapSettings();
+    void editRoom(int roomId);
+    void editConnection(int connId);
 
-  [Option("inform7", HelpText = "Export to I7.")]
-  public string I7 { get; set; }
+private:
+    void createActions();
+    void updateTitle();
+    bool maybeSave();                 // returns false to cancel the pending action
+    bool writeToPath(const QString &path);
 
-  [Option("tads", HelpText = "Export to Tads.")]
-  public string Tads { get; set; }
+    Map m_map;
+    QString m_filePath;
+    QUndoStack m_undo;
 
-  [Option("alan", HelpText = "Export to Alan.")]
-  public string Alan { get; set; }
+    MapScene *m_scene = nullptr;
+    MapView *m_view = nullptr;
+    QAction *m_connectAction = nullptr;
+};
 
-  [Option("hugo", HelpText = "Export to Hugo.")]
-  public string Hugo { get; set; }
+} // namespace trizbort
 
-  [Option("zil", HelpText = "Export to Zil.")]
-  public string Zil { get; set; }
-
-  [Option("quest", HelpText = "Export to Quest.")]
-  public string Quest { get; set; }
-
-  [Option("quest rooms", HelpText = "Export to Quest section.")]
-  public string QuestRooms { get; set; }
-
-  [Option("adventuron", HelpText = "Export to Adventuron.")]
-  public string Adventuron { get; set; }
-}
+#endif // TRIZBORT_MAINWINDOW_H

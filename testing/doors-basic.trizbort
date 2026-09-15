@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<trizbort version="1.8.0.0">
+	<info>
+		<title>Doors Test</title>
+		<author>Trizbort Qt port</author>
+	</info>
+	<map>
+		<room id="1" name="West Room" subtitle="" x="0" y="0" w="96" h="64" region="NoRegion" handDrawn="no" allcornersequal="no" ellipse="no" roundedCorners="no" octagonal="no" cornerTopLeft="0" cornerTopRight="0" cornerBottomLeft="0" cornerBottomRight="0" borderstyle="Solid" isStartRoom="yes" description="" roomFill="" secondFill="" secondFillLocation="Bottom" roomBorder="" roomLargeText="" roomSubtitleColor="" roomSmallText="" ZOrder="0" />
+		<room id="2" name="East Room" subtitle="" x="192" y="0" w="96" h="64" region="NoRegion" handDrawn="no" allcornersequal="no" ellipse="no" roundedCorners="no" octagonal="no" cornerTopLeft="0" cornerTopRight="0" cornerBottomLeft="0" cornerBottomRight="0" borderstyle="Solid" description="" roomFill="" secondFill="" secondFillLocation="Bottom" roomBorder="" roomLargeText="" roomSubtitleColor="" roomSmallText="" ZOrder="0" />
+		<room id="3" name="North Room" subtitle="" x="0" y="-128" w="96" h="64" region="NoRegion" handDrawn="no" allcornersequal="no" ellipse="no" roundedCorners="no" octagonal="no" cornerTopLeft="0" cornerTopRight="0" cornerBottomLeft="0" cornerBottomRight="0" borderstyle="Solid" description="" roomFill="" secondFill="" secondFillLocation="Bottom" roomBorder="" roomLargeText="" roomSubtitleColor="" roomSmallText="" ZOrder="0" />
+		<line id="4" name="oak door" description="" door="yes" lockable="no" openable="yes" locked="no" open="yes">
+			<dock index="0" id="1" port="e" />
+			<dock index="1" id="2" port="w" />
+		</line>
+		<line id="5" name="iron gate" description="" door="yes" lockable="yes" openable="yes" locked="yes" open="no">
+			<dock index="0" id="1" port="n" />
+			<dock index="1" id="3" port="s" />
+		</line>
+	</map>
+	<settings>
+		<colors>
+			<canvas>White</canvas>
+			<border>MidnightBlue</border>
+			<line>MidnightBlue</line>
+			<selectedLine>Gold</selectedLine>
+			<hoverLine>DarkOrange</hoverLine>
+			<subTitle>MidnightBlue</subTitle>
+			<smallText>MidnightBlue</smallText>
+			<lineText>MidnightBlue</lineText>
+			<grid>#E8E8E8</grid>
+			<startRoom>GreenYellow</startRoom>
+			<endRoom>Red</endRoom>
+		</colors>
+		<regions>
+			<NoRegion Name="NoRegion" TextColor="Blue">White</NoRegion>
+		</regions>
+		<fonts>
+			<room size="13">Arial</room>
+			<object size="11">Arial</object>
+			<subTitle size="9">Arial</subTitle>
+			<line size="9">Arial</line>
+		</fonts>
+		<grid>
+			<snapTo>yes</snapTo>
+			<visible>yes</visible>
+			<showOrigin>yes</showOrigin>
+			<size>32</size>
+		</grid>
+		<lines>
+			<width>2</width>
+			<arrowSize>12</arrowSize>
+			<textOffset>4</textOffset>
+		</lines>
+		<rooms>
+			<darknessStripeSize>24</darknessStripeSize>
+			<objectListOffset>4</objectListOffset>
+			<connectionStalkLength>32</connectionStalkLength>
+			<preferredDistanceBetweenRooms>64</preferredDistanceBetweenRooms>
+			<defaultRoomName>Cave</defaultRoomName>
+			<defaultRoomShape>0</defaultRoomShape>
+		</rooms>
+		<ui>
+			<handleSize>12</handleSize>
+			<snapToElementSize>16</snapToElementSize>
+		</ui>
+		<margins>
+			<documentSpecific>no</documentSpecific>
+			<horizontal>0</horizontal>
+			<vertical>0</vertical>
+			<wrapDashes>yes</wrapDashes>
+		</margins>
+		<keypadNavigation>
+			<creationModifier>control</creationModifier>
+			<unexploredModifier>alt</unexploredModifier>
+		</keypadNavigation>
+	</settings>
+</trizbort>

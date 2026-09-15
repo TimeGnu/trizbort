@@ -1,0 +1,996 @@
+"space-quest-lost-chapter-surface main file"
+
+<VERSION ZIP>
+<CONSTANT RELEASEID 1>
+
+"Main Loop"
+
+<CONSTANT GAME-BANNER "space-quest-lost-chapter-surface|An interactive fiction by A Trizbort User">
+
+<ROUTINE GO ()
+    <CRLF> <CRLF>
+    <TELL "" CR CR>
+    <V-VERSION> <CRLF>
+    <SETG HERE ,ROCK-TREE>
+    <MOVE ,PLAYER ,HERE>
+    <V-LOOK>
+    <REPEAT ()
+        <COND (<PARSER>
+               <PERFORM ,PRSA ,PRSO ,PRSI>
+               <COND (<NOT <GAME-VERB?>>
+                      <APPLY <GETP ,HERE ,P?ACTION> ,M-END>
+                      <CLOCKER>)>)>
+        <SETG HERE <LOC ,WINNER>>>>
+
+<INSERT-FILE "parser">
+
+"Objects"
+
+<ROOM ROCK-TREE
+    (DESC "Rock Tree")
+    (IN ROOMS)
+    (NORTH TO ROCK-WITH-VINES)
+    (SOUTH TO END-OF-PATH)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROCK-WITH-VINES
+    (DESC "Rock With Vines")
+    (IN ROOMS)
+    (SOUTH TO ROCK-TREE)
+    (EAST TO ROCK-PATH)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROCK-PATH
+    (DESC "Rock Path")
+    (IN ROOMS)
+    (EAST TO ROCK-BRIDGE)
+    (WEST TO ROCK-WITH-VINES)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ROCK-BRIDGE
+    (DESC "Rock Bridge")
+    (IN ROOMS)
+    (EAST TO NW-ROCK-PATH-2)
+    (WEST TO ROCK-PATH)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM NW-ROCK-PATH-2
+    (DESC "N/W Rock Path 2")
+    (IN ROOMS)
+    (EAST TO NW-ROCK-PATH)
+    (WEST TO ROCK-BRIDGE)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT BE-CAREFUL-CAN-FALL
+    (IN NW-ROCK-PATH-2)
+    (DESC "Be careful, can fall")
+    (SYNONYM FALL)
+    (ADJECTIVE BE CAREFUL CAN)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM NW-ROCK-PATH
+    (DESC "N/W Rock Path")
+    (IN ROOMS)
+    (SOUTH TO SHORE)
+    (WEST TO NW-ROCK-PATH-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SHORE
+    (DESC "Shore")
+    (IN ROOMS)
+    (NORTH TO NW-ROCK-PATH)
+    (EAST TO SHIP-FRONT)
+    (WEST TO WATER-FALL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM WATER-FALL
+    (DESC "Water fall")
+    (IN ROOMS)
+    (EAST TO SHORE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SHIP-FRONT
+    (DESC "Ship Front")
+    (IN ROOMS)
+    (SOUTH TO MONSTER-CHASES-YOU-2)
+    (EAST TO SHIP-BODY)
+    (WEST TO SHORE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SHIP-BODY
+    (DESC "Ship Body")
+    (IN ROOMS)
+    (SOUTH TO MONSTER-CHASES-YOU-2)
+    (EAST TO SHIP-TAIL)
+    (WEST TO SHIP-FRONT)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SHIP-TAIL
+    (DESC "Ship Tail")
+    (IN ROOMS)
+    (SOUTH TO MONSTER-CHASES-YOU-2)
+    (EAST TO LAKE)
+    (WEST TO SHIP-BODY)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT NAIL
+    (IN SHIP-TAIL)
+    (DESC "NAIL")
+    (SYNONYM NAIL)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM LAKE
+    (DESC "Lake")
+    (IN ROOMS)
+    (EAST TO LAGOON-CLIMB)
+    (WEST TO SHIP-TAIL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM LAGOON-CLIMB
+    (DESC "Lagoon CLIMB")
+    (IN ROOMS)
+    (NORTH TO TREE)
+    (EAST TO WATER-W-TO-LAGOON)
+    (WEST TO LAKE)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT GO-SWW-TO-NEXT-LAKE
+    (IN LAGOON-CLIMB)
+    (DESC "Go SW/W to next lake")
+    (SYNONYM LAKE)
+    (ADJECTIVE GO SWW TO NEXT)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM TREE
+    (DESC "Tree")
+    (IN ROOMS)
+    (SOUTH TO LAGOON-CLIMB)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM TREE-2
+    (DESC "Tree")
+    (IN ROOMS)
+    (EAST TO FRUIT)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM FRUIT
+    (DESC "FRUIT")
+    (IN ROOMS)
+    (WEST TO TREE-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM WATER-W-TO-LAGOON
+    (DESC "Water W to lagoon")
+    (IN ROOMS)
+    (SOUTH TO MONSTER-CHASES-YOU)
+    (EAST TO LAKE-ON-S)
+    (WEST TO LAGOON-CLIMB)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM LAKE-ON-S
+    (DESC "Lake on S")
+    (IN ROOMS)
+    (SOUTH TO MONSTER-CHASES-YOU)
+    (EAST TO LAKE-IN-SW)
+    (WEST TO WATER-W-TO-LAGOON)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM LAKE-IN-SW
+    (DESC "Lake in SW")
+    (IN ROOMS)
+    (NORTH TO JUNGLE)
+    (SOUTH TO DEATH-IN-S)
+    (EAST TO GREY-ROCK)
+    (WEST TO LAKE-ON-S)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM MONSTER-CHASES-YOU
+    (DESC "Monster chases you")
+    (IN ROOMS)
+    (NORTH TO LAKE-ON-S)
+    (EAST TO DEATH-IN-S)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM JUNGLE
+    (DESC "jungle")
+    (IN ROOMS)
+    (SOUTH TO LAKE-IN-SW)
+    (EAST TO MOULD-N)
+    (WEST TO LAKE-IN-SW)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM MOULD-N
+    (DESC "MOULD (N)")
+    (IN ROOMS)
+    (EAST TO FLOWER-N)
+    (WEST TO JUNGLE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM FLOWER-N
+    (DESC "Flower (N)")
+    (IN ROOMS)
+    (SOUTH TO GREY-TREE)
+    (EAST TO JUNGLE-2)
+    (WEST TO MOULD-N)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT MOULD
+    (IN FLOWER-N)
+    (DESC "Mould")
+    (SYNONYM MOULD)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM JUNGLE-2
+    (DESC "jungle")
+    (IN ROOMS)
+    (SOUTH TO JUNGLE-3)
+    (WEST TO FLOWER-N)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM JUNGLE-3
+    (DESC "jungle")
+    (IN ROOMS)
+    (NORTH TO JUNGLE-2)
+    (SOUTH TO JUNGLE-5)
+    (EAST TO YOUR-SHIP)
+    (WEST TO GREY-TREE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM YOUR-SHIP
+    (DESC "Your Ship")
+    (IN ROOMS)
+    (SOUTH TO JUNGLE-3)
+    (EAST TO JUNGLE-4)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM JUNGLE-4
+    (DESC "jungle")
+    (IN ROOMS)
+    (NORTH TO YOUR-SHIP)
+    (WEST TO JUNGLE-5)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM JUNGLE-5
+    (DESC "jungle")
+    (IN ROOMS)
+    (NORTH TO JUNGLE-3)
+    (SOUTH TO CODE-CARD)
+    (EAST TO JUNGLE-4)
+    (WEST TO BLACK-TREE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM BLACK-TREE
+    (DESC "Black Tree")
+    (IN ROOMS)
+    (NORTH TO GREY-TREE)
+    (EAST TO JUNGLE-5)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GREY-TREE
+    (DESC "Grey Tree")
+    (IN ROOMS)
+    (NORTH TO FLOWER-N)
+    (SOUTH TO BLACK-TREE)
+    (EAST TO JUNGLE-3)
+    (WEST TO GREY-ROCK)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GREY-ROCK
+    (DESC "Grey Rock")
+    (IN ROOMS)
+    (EAST TO GREY-TREE)
+    (WEST TO LAKE-IN-SW)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM CODE-CARD
+    (DESC "CODE CARD")
+    (IN ROOMS)
+    (NORTH TO JUNGLE-5)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM DEATH-IN-S
+    (DESC "Death in S")
+    (IN ROOMS)
+    (NORTH TO LAKE-IN-SW)
+    (WEST TO MONSTER-CHASES-YOU)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM END-OF-PATH
+    (DESC "End of Path")
+    (IN ROOMS)
+    (NORTH TO ROCK-TREE)
+    (UP TO MOUNTAIN)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM MOUNTAIN
+    (DESC "Mountain")
+    (IN ROOMS)
+    (NORTH TO MOUNTAIN-2)
+    (DOWN TO END-OF-PATH)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM MOUNTAIN-2
+    (DESC "Mountain")
+    (IN ROOMS)
+    (NORTH TO CAVE)
+    (SOUTH TO MOUNTAIN)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM CAVE
+    (DESC "CAVE")
+    (IN ROOMS)
+    (SOUTH TO MOUNTAIN-2)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT GET-STONE-WITH-BONE
+    (IN CAVE)
+    (DESC "GET STONE WITH BONE")
+    (SYNONYM BONE)
+    (ADJECTIVE GET STONE WITH)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM UNDER-SHIP-BODY
+    (DESC "Under ship body")
+    (IN ROOMS)
+    (SOUTH TO BAG)
+    (EAST TO UNDER-SHIP-TAIL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM BAG
+    (DESC "BAG")
+    (IN ROOMS)
+    (NORTH TO UNDER-SHIP-BODY)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM UNDER-SHIP-TAIL
+    (DESC "Under ship tail")
+    (IN ROOMS)
+    (SOUTH TO WALL-W-E-OPEN)
+    (EAST TO SCENIC)
+    (WEST TO UNDER-SHIP-BODY)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SCENIC
+    (DESC "Scenic")
+    (IN ROOMS)
+    (SOUTH TO TREE-ROOT-NE)
+    (EAST TO SCENIC-2)
+    (WEST TO UNDER-SHIP-TAIL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SCENIC-2
+    (DESC "Scenic")
+    (IN ROOMS)
+    (SOUTH TO TREE-ROOT-NW)
+    (EAST TO SCENIC-3)
+    (WEST TO SCENIC)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SCENIC-3
+    (DESC "Scenic")
+    (IN ROOMS)
+    (SOUTH TO BIG-VINE-W)
+    (EAST TO HIDDEN-PSG-WEST)
+    (WEST TO SCENIC-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM HIDDEN-PSG-WEST
+    (DESC "Hidden Psg West")
+    (IN ROOMS)
+    (SOUTH TO WALL-E)
+    (EAST TO HIDDEN-PSG-EAST)
+    (WEST TO SCENIC-3)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM HIDDEN-PSG-EAST
+    (DESC "Hidden Psg East")
+    (IN ROOMS)
+    (SOUTH TO BLACK-WALL-WEST)
+    (EAST TO SCENIC-4)
+    (WEST TO HIDDEN-PSG-WEST)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SCENIC-4
+    (DESC "Scenic")
+    (IN ROOMS)
+    (SOUTH TO SEA-WEED)
+    (EAST TO FORK-NORTH)
+    (WEST TO HIDDEN-PSG-EAST)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM FORK-NORTH
+    (DESC "Fork North")
+    (IN ROOMS)
+    (NORTH TO TENT-ACLE)
+    (SOUTH TO BROWN-TREE)
+    (EAST TO TINY-TOOTH)
+    (WEST TO SCENIC-4)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM TINY-TOOTH
+    (DESC "Tiny Tooth")
+    (IN ROOMS)
+    (SOUTH TO GEL-BLOB)
+    (EAST TO TURTLE)
+    (WEST TO FORK-NORTH)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM TURTLE
+    (DESC "Turtle")
+    (IN ROOMS)
+    (EAST TO JELLY-FISH)
+    (WEST TO TINY-TOOTH)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM JELLY-FISH
+    (DESC "Jelly Fish")
+    (IN ROOMS)
+    (EAST TO METAL-ROD)
+    (WEST TO TURTLE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM METAL-ROD
+    (DESC "METAL ROD")
+    (IN ROOMS)
+    (EAST TO CAVERN)
+    (WEST TO JELLY-FISH)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM CAVERN
+    (DESC "Cavern")
+    (IN ROOMS)
+    (EAST TO CAVERN-2)
+    (WEST TO METAL-ROD)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM CAVERN-2
+    (DESC "Cavern")
+    (IN ROOMS)
+    (NORTH TO POOL)
+    (WEST TO CAVERN)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM POOL
+    (DESC "Pool")
+    (IN ROOMS)
+    (SOUTH TO CAVERN-2)
+    (WEST TO PUFFY-FISH)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM PUFFY-FISH
+    (DESC "Puffy Fish")
+    (IN ROOMS)
+    (EAST TO POOL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM GEL-BLOB
+    (DESC "Gel Blob")
+    (IN ROOMS)
+    (NORTH TO TINY-TOOTH)
+    (SOUTH TO CLAMS)
+    (WEST TO BROWN-TREE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM BROWN-TREE
+    (DESC "Brown Tree")
+    (IN ROOMS)
+    (NORTH TO FORK-NORTH)
+    (SOUTH TO CLAMS)
+    (EAST TO GEL-BLOB)
+    (WEST TO SEA-WEED)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM CLAMS
+    (DESC "Clams")
+    (IN ROOMS)
+    (NORTH TO BROWN-TREE)
+    (SOUTH TO TRUNK-ALGAE)
+    (WEST TO CLAMS-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM CLAMS-2
+    (DESC "Clams")
+    (IN ROOMS)
+    (NORTH TO SEA-WEED)
+    (SOUTH TO TREE-E)
+    (EAST TO CLAMS)
+    (WEST TO CLAMS-3)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM CLAMS-3
+    (DESC "Clams")
+    (IN ROOMS)
+    (NORTH TO BLACK-WALL-WEST)
+    (EAST TO CLAMS-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM BLACK-WALL-WEST
+    (DESC "Black Wall West")
+    (IN ROOMS)
+    (NORTH TO HIDDEN-PSG-EAST)
+    (SOUTH TO CLAMS-3)
+    (EAST TO SEA-WEED)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SEA-WEED
+    (DESC "Sea Weed")
+    (IN ROOMS)
+    (NORTH TO SCENIC-4)
+    (SOUTH TO CLAMS-2)
+    (EAST TO BROWN-TREE)
+    (WEST TO BLACK-WALL-WEST)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM TREE-E
+    (DESC "TREE (E)")
+    (IN ROOMS)
+    (NORTH TO CLAMS-2)
+    (SOUTH TO CLAMS-5)
+    (EAST TO TRUNK-ALGAE)
+    (WEST TO TREE-SEARCH)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM TRUNK-ALGAE
+    (DESC "Trunk/ Algae")
+    (IN ROOMS)
+    (NORTH TO CLAMS)
+    (SOUTH TO CLAMS-5)
+    (EAST TO STRUC-TURES)
+    (WEST TO TREE-E)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM STRUC-TURES
+    (DESC "Struc tures")
+    (IN ROOMS)
+    (NORTH TO CLAMS-6)
+    (EAST TO OCTO-PUS)
+    (WEST TO TRUNK-ALGAE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM OCTO-PUS
+    (DESC "OCTO PUS")
+    (IN ROOMS)
+    (WEST TO STRUC-TURES)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT BONE
+    (IN OCTO-PUS)
+    (DESC "BONE")
+    (SYNONYM BONE)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM TREE-SEARCH
+    (DESC "TREE (Search)")
+    (IN ROOMS)
+    (SOUTH TO CLAMS-5)
+    (EAST TO TREE-E)
+    (WEST TO WALL-E--ALGAE)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT SEARCH-HOLE
+    (IN TREE-SEARCH)
+    (DESC "SEARCH HOLE")
+    (SYNONYM HOLE)
+    (ADJECTIVE SEARCH)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM WALL-E--ALGAE
+    (DESC "Wall E + Algae")
+    (IN ROOMS)
+    (NORTH TO TREE-W--WALL)
+    (SOUTH TO EELS)
+    (EAST TO TREE-SEARCH)
+    (WEST TO CORAL-PULL)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT S-TO-ALGAE
+    (IN WALL-E--ALGAE)
+    (DESC "S to algae")
+    (SYNONYM ALGAE)
+    (ADJECTIVE S TO)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM CORAL-PULL
+    (DESC "Coral (PULL)")
+    (IN ROOMS)
+    (NORTH TO NW-TO-TREAS-URE)
+    (SOUTH TO EELS)
+    (EAST TO WALL-E--ALGAE)
+    (WEST TO VINE-AND-TRUNK)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM VINE-AND-TRUNK
+    (DESC "Vine and Trunk")
+    (IN ROOMS)
+    (NORTH TO TRUNK-WNE-HOLE)
+    (SOUTH TO EELS)
+    (EAST TO CORAL-PULL)
+    (WEST TO VINE-IN-EAST)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM VINE-IN-EAST
+    (DESC "Vine in East")
+    (IN ROOMS)
+    (NORTH TO 2-ROOT-EDGES)
+    (SOUTH TO CLAMS-4)
+    (EAST TO VINE-AND-TRUNK)
+    (WEST TO TURTLE-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM TURTLE-2
+    (DESC "Turtle")
+    (IN ROOMS)
+    (NORTH TO WALL-W-E-TRUNK)
+    (SOUTH TO CLAMS-4)
+    (EAST TO VINE-IN-EAST)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM CLAMS-4
+    (DESC "Clams")
+    (IN ROOMS)
+    (NORTH TO TURTLE-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM CLAMS-5
+    (DESC "Clams")
+    (IN ROOMS)
+    (NORTH TO TREE-E)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM WALL-W-E-TRUNK
+    (DESC "Wall W, E Trunk")
+    (IN ROOMS)
+    (NORTH TO WALL-W-E-OPEN)
+    (SOUTH TO TURTLE-2)
+    (EAST TO 2-ROOT-EDGES)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM WALL-W-E-OPEN
+    (DESC "Wall W, E open")
+    (IN ROOMS)
+    (NORTH TO UNDER-SHIP-TAIL)
+    (SOUTH TO WALL-W-E-TRUNK)
+    (EAST TO TREE-ROOT-NE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM TREE-ROOT-NE
+    (DESC "Tree Root NE")
+    (IN ROOMS)
+    (NORTH TO SCENIC)
+    (SOUTH TO 2-ROOT-EDGES)
+    (EAST TO TREE-ROOT-NW)
+    (WEST TO WALL-W-E-OPEN)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM TREE-ROOT-NW
+    (DESC "Tree Root NW")
+    (IN ROOMS)
+    (NORTH TO SCENIC-2)
+    (SOUTH TO TRUNK-WNE-HOLE)
+    (EAST TO BIG-VINE-W)
+    (WEST TO TREE-ROOT-NE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM BIG-VINE-W
+    (DESC "Big Vine W")
+    (IN ROOMS)
+    (NORTH TO SCENIC-3)
+    (SOUTH TO NW-TO-TREAS-URE)
+    (EAST TO WALL-E)
+    (WEST TO TREE-ROOT-NW)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM WALL-E
+    (DESC "Wall E")
+    (IN ROOMS)
+    (NORTH TO HIDDEN-PSG-WEST)
+    (SOUTH TO TREE-W--WALL)
+    (WEST TO BIG-VINE-W)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM 2-ROOT-EDGES
+    (DESC "2 root edges")
+    (IN ROOMS)
+    (NORTH TO TREE-ROOT-NE)
+    (SOUTH TO VINE-IN-EAST)
+    (EAST TO TRUNK-WNE-HOLE)
+    (WEST TO WALL-W-E-TRUNK)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM TRUNK-WNE-HOLE
+    (DESC "Trunk w/NE Hole")
+    (IN ROOMS)
+    (NORTH TO TREE-ROOT-NW)
+    (SOUTH TO VINE-AND-TRUNK)
+    (EAST TO NW-TO-TREAS-URE)
+    (WEST TO 2-ROOT-EDGES)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM NW-TO-TREAS-URE
+    (DESC "NW to treas ure")
+    (IN ROOMS)
+    (NORTH TO BIG-VINE-W)
+    (SOUTH TO CORAL-PULL)
+    (EAST TO TREE-W--WALL)
+    (WEST TO TRUNK-WNE-HOLE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM TREE-W--WALL
+    (DESC "Tree W + Wall")
+    (IN ROOMS)
+    (NORTH TO WALL-E)
+    (SOUTH TO WALL-E--ALGAE)
+    (WEST TO NW-TO-TREAS-URE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM WATER-CAVE
+    (DESC "Water Cave")
+    (IN ROOMS)
+    (SOUTH TO WATER-CAVE-3)
+    (EAST TO WATER-CAVE-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM WATER-CAVE-2
+    (DESC "Water Cave")
+    (IN ROOMS)
+    (EAST TO UPDOWN-PSGS)
+    (WEST TO WATER-CAVE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM WATER-CAVE-3
+    (DESC "Water Cave")
+    (IN ROOMS)
+    (NORTH TO WATER-CAVE)
+    (EAST TO WATER-CAVE-4)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM WATER-CAVE-4
+    (DESC "Water Cave")
+    (IN ROOMS)
+    (EAST TO SHIP-WCARD)
+    (WEST TO WATER-CAVE-3)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM SHIP-WCARD
+    (DESC "Ship w/card")
+    (IN ROOMS)
+    (WEST TO WATER-CAVE-4)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM UPDOWN-PSGS
+    (DESC "up/down psgs")
+    (IN ROOMS)
+    (EAST TO UPPER-PSG)
+    (WEST TO WATER-CAVE-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM TEN-TACLE
+    (DESC "Ten Tacle")
+    (IN ROOMS)
+    (EAST TO UPDOWN-PSGS)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM HID-PSG-EAST
+    (DESC "Hid Psg East")
+    (IN ROOMS)
+    (EAST TO ORACLE)
+    (WEST TO TEN-TACLE)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM ORACLE
+    (DESC "Oracle")
+    (IN ROOMS)
+    (WEST TO HID-PSG-EAST)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT TOUCHEXAMINE
+    (IN ORACLE)
+    (DESC "Touch/Examine")
+    (SYNONYM TOUCHEXAMINE)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM SHARK
+    (DESC "Shark")
+    (IN ROOMS)
+    (EAST TO LOWER-PSG)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT USE-FRUIT
+    (IN SHARK)
+    (DESC "Use fruit")
+    (SYNONYM FRUIT)
+    (ADJECTIVE USE)
+    (FLAGS TAKEBIT VOWELBIT)>
+
+
+<OBJECT GET-PAPER
+    (IN SHARK)
+    (DESC "Get paper")
+    (SYNONYM PAPER)
+    (ADJECTIVE GET)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM UPPER-PSG
+    (DESC "Upper Psg")
+    (IN ROOMS)
+    (EAST TO UPPER-PSG-2)
+    (WEST TO UPDOWN-PSGS)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM UPPER-PSG-2
+    (DESC "Upper Psg")
+    (IN ROOMS)
+    (EAST TO UD-HOLE)
+    (WEST TO UPPER-PSG)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM UD-HOLE
+    (DESC "U/D Hole")
+    (IN ROOMS)
+    (WEST TO UPPER-PSG-2)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM MONSTER-CHASES-YOU-2
+    (DESC "Monster chases you")
+    (IN ROOMS)
+    (NORTH TO SHIP-BODY)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM TENT-ACLE
+    (DESC "TENT ACLE")
+    (IN ROOMS)
+    (EAST TO FORK-NORTH)
+    (WEST TO UPDOWN-PSGS)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM FROM-N-OF-CORAL
+    (DESC "From N of Coral")
+    (IN ROOMS)
+    (FLAGS LIGHTBIT)>
+
+
+<OBJECT LINE-JAR
+    (IN FROM-N-OF-CORAL)
+    (DESC "Line, Jar")
+    (SYNONYM JAR)
+    (ADJECTIVE LINE)
+    (FLAGS TAKEBIT)>
+
+
+<ROOM CLAMS-6
+    (DESC "Clams")
+    (IN ROOMS)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM EELS
+    (DESC "Eels")
+    (IN ROOMS)
+    (NORTH TO CORAL-PULL)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM LOWER-PSG
+    (DESC "Lower Psg")
+    (IN ROOMS)
+    (EAST TO LOWER-PSG-2)
+    (WEST TO SHARK)
+    (FLAGS LIGHTBIT)>
+
+
+<ROOM LOWER-PSG-2
+    (DESC "Lower Psg")
+    (IN ROOMS)
+    (EAST TO UD-HOLE)
+    (WEST TO LOWER-PSG)
+    (FLAGS LIGHTBIT)>
+

@@ -1,0 +1,72 @@
+#include "verblib.g" ! grammar must come first
+
+#include "hugolib.h"
+
+routine init
+{
+	cls
+	verbosity = 2
+	counter = -1
+	STATUSTYPE = 1 !1 = score / turns, 2 = time, 3 = moves: score:
+	player = you
+	Font(BOLD_ON)
+	"object-testing"
+	Font(BOLD_OFF)
+	"by A Trizbort User"
+	location = TestRoom
+	MovePlayer(location)
+}
+
+room TestRoom
+{
+
+	e_to cave
+
+}
+
+object MrJones
+{
+	in TestRoom
+}
+
+object Hat
+{
+	in TestRoom
+}
+
+object Hatband
+{
+	in TestRoom
+}
+
+object fishbowl
+{
+	in TestRoom
+}
+
+object goldfish
+{
+	in TestRoom
+}
+
+object MrsJones
+{
+	in TestRoom
+}
+
+object rabbit
+{
+	in TestRoom
+}
+
+room cave
+{
+
+	w_to TestRoom
+
+}
+
+player_character you "you"
+{
+}
+

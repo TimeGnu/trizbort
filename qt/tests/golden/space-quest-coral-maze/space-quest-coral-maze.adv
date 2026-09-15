@@ -1,0 +1,148 @@
+
+start_at = maze_start
+
+locations {
+   maze_start   : location "" header = "Maze Start";
+   t_right      : location "" header = "T right";
+   left_right   : location "" header = "Left Right";
+   up_down      : location "" header = "Up Down";
+   t_left       : location "" header = "T left";
+   dead_end     : location "" header = "Dead End";
+   t_down       : location "" header = "T down";
+   up_down_2    : location "" header = "Up down";
+   up_right     : location "" header = "Up Right";
+   left_right_2 : location "" header = "Left Right";
+   left_right_3 : location "" header = "Left Right";
+   t_down_2     : location "" header = "T down";
+   t_right_2    : location "" header = "T right";
+   cross_roads  : location "" header = "Cross Roads";
+   up_down_3    : location "" header = "Up Down";
+   up_left      : location "" header = "Up Left";
+   t_down_3     : location "" header = "T down";
+   t_left_2     : location "" header = "T left";
+   up_right_2   : location "" header = "Up right";
+   panel        : location "" header = "Panel";
+   green_button : location "" header = "Green Button";
+   nice_scene   : location "" header = "Nice scene";
+   hall         : location "" header = "Hall";
+   hall_2       : location "" header = "Hall";
+   ship         : location "" header = "Ship";
+   craft_start  : location "" header = "Craft Start";
+   r00          : location "" header = "R00";
+   r00_2        : location "" header = "R00";
+   r00_3        : location "" header = "R00";
+   other_ship   : location "" header = "Other Ship";
+   r00_4        : location "" header = "R00";
+   city_entry   : location "" header = "City Entry";
+   dock_bay     : location "" header = "Dock Bay";
+   big_door     : location "" header = "Big Door";
+   hall_3       : location "" header = "Hall";
+   aliens       : location "" header = "Aliens";
+   hall_4       : location "" header = "Hall";
+   hall_5       : location "" header = "Hall";
+   stay_north   : location "" header = "Stay North";
+   hall_6       : location "" header = "Hall";
+   aliens_2     : location "" header = "Aliens";
+   hall_7       : location "" header = "Hall";
+   hall_8       : location "" header = "Hall";
+   hall_9       : location "" header = "Hall";
+   museum       : location "" header = "Mus-eum";
+   item         : location "" header = "Item";
+   useless      : location "" header = "Use-less";
+   death        : location "" header = "Death";
+   walk_thru    : location "" header = "Walk Thru";
+}
+
+
+connections {
+   from, direction, to = [
+      maze_start, south_oneway, t_right,
+      t_right, north_oneway, maze_start,
+      t_right, south_oneway, up_down,
+      t_right, east_oneway, left_right,
+      left_right, east_oneway, t_down,
+      left_right, west_oneway, t_right,
+      up_down, north_oneway, t_right,
+      up_down, south_oneway, t_left,
+      t_left, north_oneway, up_down,
+      t_left, west_oneway, dead_end,
+      dead_end, east_oneway, t_left,
+      t_down, south_oneway, up_down_2,
+      t_down, west_oneway, left_right,
+      up_down_2, north_oneway, t_down,
+      up_down_2, south_oneway, up_right,
+      up_right, north_oneway, up_down_2,
+      up_right, east_oneway, left_right_2,
+      left_right_2, east_oneway, left_right_3,
+      left_right_2, west_oneway, up_right,
+      left_right_3, east_oneway, t_down_2,
+      left_right_3, west_oneway, left_right_2,
+      t_down_2, south_oneway, t_right_2,
+      t_down_2, west_oneway, left_right_3,
+      t_right_2, north_oneway, t_down_2,
+      t_right_2, south_oneway, cross_roads,
+      cross_roads, north_oneway, t_right_2,
+      cross_roads, south_oneway, up_down_3,
+      up_down_3, north_oneway, cross_roads,
+      up_down_3, west_oneway, up_left,
+      up_left, east_oneway, up_down_3,
+      up_left, west_oneway, t_down_3,
+      t_down_3, south_oneway, t_left_2,
+      t_down_3, east_oneway, up_left,
+      t_left_2, north_oneway, t_down_3,
+      t_left_2, south_oneway, up_right_2,
+      up_right_2, north_oneway, t_left_2,
+      up_right_2, east_oneway, panel,
+      panel, east_oneway, green_button,
+      panel, west_oneway, up_right_2,
+      green_button, south_oneway, hall,
+      green_button, east_oneway, nice_scene,
+      green_button, west_oneway, panel,
+      nice_scene, west_oneway, green_button,
+      hall, north_oneway, green_button,
+      hall, south_oneway, hall_2,
+      hall_2, north_oneway, hall,
+      hall_2, east_oneway, ship,
+      ship, west_oneway, hall_2,
+      craft_start, west_oneway, r00,
+      r00, east_oneway, craft_start,
+      r00, west_oneway, r00_2,
+      r00_2, east_oneway, r00,
+      r00_2, west_oneway, r00_3,
+      r00_3, east_oneway, r00_2,
+      r00_3, west_oneway, other_ship,
+      other_ship, east_oneway, r00_3,
+      other_ship, west_oneway, r00_4,
+      r00_4, north_oneway, city_entry,
+      r00_4, east_oneway, other_ship,
+      city_entry, south_oneway, r00_4,
+      city_entry, northwest_oneway, dock_bay,
+      dock_bay, east_oneway, big_door,
+      dock_bay, southeast_oneway, city_entry,
+      big_door, east_oneway, hall_3,
+      big_door, west_oneway, dock_bay,
+      hall_3, south_oneway, big_door,
+      hall_3, east_oneway, hall_4,
+      hall_3, west_oneway, aliens,
+      aliens, east_oneway, hall_3,
+      hall_4, south_oneway, hall_5,
+      hall_4, west_oneway, hall_3,
+      hall_5, north_oneway, hall_4,
+      hall_5, east_oneway, stay_north,
+      stay_north, east_oneway, hall_6,
+      stay_north, west_oneway, hall_5,
+      hall_6, north_oneway, hall_7,
+      hall_6, east_oneway, aliens_2,
+      hall_6, west_oneway, stay_north,
+      aliens_2, west_oneway, hall_6,
+      hall_7, north_oneway, hall_8,
+      hall_7, south_oneway, hall_6,
+      hall_8, south_oneway, hall_7,
+      hall_8, east_oneway, hall_9,
+      hall_9, east_oneway, museum,
+      hall_9, west_oneway, hall_8,
+      museum, west_oneway, hall_9,
+   ]
+}
+
+

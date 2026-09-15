@@ -1,0 +1,541 @@
+Constant Story "Gemstone Warrior Trizbort map";
+Constant Headline "^By Andrew Schultz^I set the preferred distance between rooms to 16, and I set regions to ^^";
+
+Include "Parser";
+Include "VerbLib";
+
+Class Beginning;
+Class Inward;
+Class Outward;
+
+Beginning  Room1 "Room 1"
+  with  description
+            "",
+        e_to Room4,
+   has  light;
+
+Beginning  Room4 "Room 4"
+  with  description
+            "",
+        n_to Room0,
+        s_to Room5,
+        e_to Room6,
+        w_to Room1,
+   has  light;
+
+Beginning  Room0 "Room 0"
+  with  description
+            "",
+        s_to Room4,
+   has  light;
+
+Beginning  Room5 "Room 5"
+  with  description
+            "",
+        n_to Room4,
+        s_to Room3,
+        e_to Room6,
+        w_to Room2,
+   has  light;
+
+Beginning  Room3 "Room 3"
+  with  description
+            "",
+        n_to Room5,
+   has  light;
+
+Beginning  Room2 "Room 2"
+  with  description
+            "",
+        e_to Room5,
+   has  light;
+
+Beginning  Room6 "Room 6"
+  with  description
+            "",
+        n_to Room4,
+        e_to Room7,
+        w_to Room5,
+   has  light;
+
+Object  Room7 "Room 7"
+  with  description
+            "",
+        n_to Room8,
+        w_to Room6,
+   has  light;
+
+Inward  Room8 "Room 8"
+  with  description
+            "",
+        n_to Room9,
+        s_to Room7,
+        e_to Room10,
+   has  light;
+
+Inward  Room10 "Room 10"
+  with  description
+            "",
+        e_to Room102,
+        w_to Room8,
+   has  light;
+
+Inward  Room9 "Room 9"
+  with  description
+            "",
+        n_to Room12,
+        s_to Room8,
+        e_to Room102,
+   has  light;
+
+Inward  Room102 "Room 10"
+  with  description
+            "",
+        n_to Room12,
+        w_to Room9,
+   has  light;
+
+Inward  Room12 "Room 12"
+  with  description
+            "",
+        n_to Room15,
+        s_to Room102,
+   has  light;
+
+Inward  Room13 "Room 13"
+  with  description
+            "",
+        n_to Room12,
+        e_to Room14,
+   has  light;
+
+Inward  Room14 "Room 14"
+  with  description
+            "",
+        n_to Room16,
+        w_to Room13,
+   has  light;
+
+Inward  Room16 "Room 16"
+  with  description
+            "",
+        n_to Room15,
+        s_to Room14,
+   has  light;
+
+Inward  Room15 "Room 15"
+  with  description
+            "",
+        s_to Room16,
+        e_to Room17,
+   has  light;
+
+Inward  Room17 "Room 17"
+  with  description
+            "",
+        s_to Room18,
+        e_to Room20,
+        w_to Room15,
+   has  light;
+
+Inward  Room18 "Room 18"
+  with  description
+            "",
+        n_to Room17,
+        s_to Room19,
+   has  light;
+
+Inward  Room19 "Room 19"
+  with  description
+            "",
+        n_to Room18,
+        s_to Room21,
+   has  light;
+
+Inward  Room21 "Room 21"
+  with  description
+            "",
+        n_to Room19,
+        e_to Room22,
+   has  light;
+
+Inward  Room22 "Room 22"
+  with  description
+            "",
+        e_to Room20,
+        w_to Room21,
+   has  light;
+
+Inward  Room20 "Room 20"
+  with  description
+            "",
+        e_to Room24,
+        w_to Room17,
+   has  light;
+
+Inward  Room24 "Room 24"
+  with  description
+            "",
+        w_to Room20,
+   has  light;
+
+Inward  Room25 "Room 25"
+  with  description
+            "",
+        e_to Room24,
+        w_to Room23,
+   has  light;
+
+Inward  Room23 "Room 23"
+  with  description
+            "",
+        s_to Room27,
+        e_to Room25,
+        w_to Room26,
+   has  light;
+
+Inward  Room26 "Room 26"
+  with  description
+            "",
+        e_to Room23,
+   has  light;
+
+Inward  Room27 "Room 27"
+  with  description
+            "",
+        n_to Room23,
+        s_to Room28,
+   has  light;
+
+Inward  Room28 "Room 28"
+  with  description
+            "",
+        n_to Room27,
+        s_to Room29,
+        e_to Room31,
+   has  light;
+
+Inward  Room29 "Room 29"
+  with  description
+            "",
+        n_to Room28,
+        w_to Room26,
+   has  light;
+
+Inward  Room31 "Room 31"
+  with  description
+            "",
+        s_to Room34,
+        e_to Room32,
+        w_to Room28,
+   has  light;
+
+Inward  Room32 "Room 32"
+  with  description
+            "",
+        w_to Room31,
+   has  light;
+
+Inward  Room34 "Room 34"
+  with  description
+            "",
+        n_to Room31,
+        s_to Room35,
+   has  light;
+
+Inward  Room33 "Room 33"
+  with  description
+            "",
+        e_to Room32,
+        w_to Room38,
+   has  light;
+
+Inward  Room38 "Room 38"
+  with  description
+            "",
+        s_to Room39,
+        e_to Room33,
+   has  light;
+
+Inward  Room35 "Room 35"
+  with  description
+            "",
+        n_to Room36,
+        e_to Room34,
+   has  light;
+
+Inward  Room36 "Room 36"
+  with  description
+            "",
+        s_to Room35,
+        w_to Room37,
+   has  light;
+
+Inward  Room37 "Room 37"
+  with  description
+            "",
+        e_to Room36,
+        w_to Room40,
+   has  light;
+
+Inward  Room40 "Room 40"
+  with  description
+            "",
+        s_to Room42,
+        e_to Room37,
+   has  light;
+
+Inward  Room42 "Room 42"
+  with  description
+            "",
+        n_to Room40,
+        s_to Room41,
+   has  light;
+
+Inward  Room43 "Room 43"
+  with  description
+            "",
+        n_to Room40,
+        s_to Room41,
+   has  light;
+
+Inward  Room41 "Room 41"
+  with  description
+            "",
+        n_to Room43,
+   has  light;
+
+Object  Room69 "Room 69"
+  with  description
+            "",
+   has  light;
+
+Inward  Room39 "Room 39"
+  with  description
+            "",
+        n_to Room38,
+   has  light;
+
+Object  Room692 "Room 69"
+  with  description
+            "",
+        s_to Room68,
+   has  light;
+
+Object  Room68 "Room 68"
+  with  description
+            "",
+        s_to Room67,
+   has  light;
+
+Object  Room67 "Room 67"
+  with  description
+            "",
+        n_to Room68,
+        s_to Room66,
+   has  light;
+
+Object  Room66 "Room 66"
+  with  description
+            "",
+        n_to Room67,
+        s_to Room65,
+   has  light;
+
+Object  Room65 "Room 65"
+  with  description
+            "",
+        n_to Room66,
+        w_to Room64,
+   has  light;
+
+Object  Room64 "Room 64"
+  with  description
+            "",
+        n_to Room64,
+        s_to Room63,
+        e_to Room65,
+        w_to Room64,
+   has  light;
+
+Object  Room63 "Room 63"
+  with  description
+            "",
+        n_to Room62,
+        w_to Room61,
+   has  light;
+
+Object  Room56 "Room 56"
+  with  description
+            "",
+        e_to Room58,
+   has  light;
+
+Object  Room61 "Room 61"
+  with  description
+            "",
+        n_to Room58,
+        e_to Room63,
+   has  light;
+
+Object  Room57 "Room 57"
+  with  description
+            "",
+        e_to Room58,
+   has  light;
+
+Object  Room58 "Room 58"
+  with  description
+            "",
+        s_to Room61,
+        e_to Room59,
+        w_to Room57,
+   has  light;
+
+Object  Room62 "Room 62"
+  with  description
+            "",
+        s_to Room63,
+        e_to Room60,
+   has  light;
+
+Object  Room59 "Room 59"
+  with  description
+            "",
+        e_to Room60,
+        w_to Room58,
+   has  light;
+
+Object  Room60 "Room 60"
+  with  description
+            "",
+        w_to Room59,
+   has  light;
+
+Outward  Room52 "Room 52"
+  with  description
+            "",
+        s_to Room53,
+        e_to Room54,
+        w_to Room51,
+   has  light;
+
+Outward  Room54 "Room 54"
+  with  description
+            "",
+        e_to Room562,
+        w_to Room52,
+   has  light;
+
+Outward  Room53 "Room 53"
+  with  description
+            "",
+        n_to Room52,
+        e_to Room55,
+   has  light;
+
+Outward  Room55 "Room 55"
+  with  description
+            "",
+        e_to Room572,
+        w_to Room53,
+   has  light;
+
+Outward  Room572 "Room 57"
+  with  description
+            "",
+        e_to Room582,
+        w_to Room55,
+   has  light;
+
+Outward  Room582 "Room 58"
+  with  description
+            "",
+        w_to Room572,
+   has  light;
+
+Outward  Room562 "Room 56"
+  with  description
+            "",
+        e_to Room583,
+        w_to Room54,
+   has  light;
+
+Outward  Room583 "Room 58"
+  with  description
+            "",
+        w_to Room562,
+   has  light;
+
+Object  Room72 "Room 7"
+  with  description
+            "",
+   has  light;
+
+Outward  Room44 "Room 44"
+  with  description
+            "",
+        w_to Room45,
+   has  light;
+
+Outward  Room45 "Room 45"
+  with  description
+            "",
+        e_to Room44,
+        w_to Room47,
+   has  light;
+
+Outward  Room46 "Room 46"
+  with  description
+            "",
+        e_to Room44,
+        w_to Room48,
+   has  light;
+
+Outward  Room48 "Room 48"
+  with  description
+            "",
+        e_to Room46,
+        w_to Room50,
+   has  light;
+
+Outward  Room47 "Room 47"
+  with  description
+            "",
+        e_to Room45,
+        w_to Room49,
+   has  light;
+
+Outward  Room49 "Room 49"
+  with  description
+            "",
+        e_to Room47,
+        w_to Room50,
+   has  light;
+
+Outward  Room50 "Room 50"
+  with  description
+            "",
+        e_to Room49,
+        w_to Room51,
+   has  light;
+
+Outward  Room51 "Room 51"
+  with  description
+            "",
+        e_to Room52,
+   has  light;
+
+[ Initialise;
+    location = Room1;
+    ! "^^Your opening paragraph here...^^";
+];
+
+Include "Grammar";
+
+Verb meta 'about' * -> About;
+
+[ AboutSub ;
+  print("Not much");
+];
+

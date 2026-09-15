@@ -1,0 +1,450 @@
+Constant Story "Leadlight Gamma Map";
+Constant Headline "^By Andrew Schultz^Map of Wade Clarke's 2010 game Leadlight (and its Inform port Leadlight Gamma). Orange=dorm grey=library purple=indoor yellow=inner sanctum red=inner inner sanctum^^";
+
+Include "Parser";
+Include "VerbLib";
+
+Class Dorms;
+Class Endgame;
+Class Hidden;
+Class Library;
+Class Outside;
+Class School;
+
+Library  LinvilleStudentLibrary "Linville Student Library"
+  with  description
+            "",
+        s_to AmongsttheLibraryStacks,
+        e_to IntheLibraryFoyer,
+        w_to LibraryToilet,
+   has  light;
+
+Object ->  CharlotteJeffs "Charlotte Jeffs"
+  with  name 'Charlotte' 'Jeffs',
+        description "Charlotte Jeffs";
+
+Library  LibraryToilet "Library Toilet"
+  with  description
+            "",
+        e_to LinvilleStudentLibrary,
+   has  light;
+
+Library  AmongsttheLibraryStacks "Amongst the Library Stacks"
+  with  description
+            "",
+        n_to LinvilleStudentLibrary,
+   has  light;
+
+Library  IntheLibraryFoyer "In the Library Foyer"
+  with  description
+            "",
+        e_to IntheQuadrangle,
+        w_to LinvilleStudentLibrary,
+   has  light;
+
+Object ->  NarelleParker "Narelle Parker"
+  with  name 'Narelle' 'Parker',
+        description "Narelle Parker";
+
+Outside  IntheQuadrangle "In the Quadrangle"
+  with  description
+            "",
+        n_to OntheSchoolSteps,
+        s_to OntheRoseGardenLawn,
+        e_to IntheDormitoryCourtyard,
+        w_to IntheLibraryFoyer,
+   has  light;
+
+Outside  OntheRoseGardenLawn "On the Rose Garden Lawn"
+  with  description
+            "",
+        n_to IntheQuadrangle,
+   has  light;
+
+Object ->  AlexisKarpa "Alexis Karpa"
+  with  name 'Alexis' 'Karpa',
+        description "Alexis Karpa";
+
+Outside  IntheDormitoryCourtyard "In the Dormitory Courtyard"
+  with  description
+            "",
+        s_to IntheGymEntry,
+        e_to IntheDormitoryEntryway,
+        w_to IntheQuadrangle,
+   has  light;
+
+School  IntheGymEntry "In the Gym Entry"
+  with  description
+            "",
+        n_to IntheDormitoryCourtyard,
+        s_to OntheGymCourtNorth,
+   has  light;
+
+School  OntheGymCourtNorth "On the Gym Court, North"
+  with  description
+            "",
+        n_to IntheGymEntry,
+        s_to OntheGymCourtSouth,
+        u_to IntheUpstairsChangingRoom,
+   has  light;
+
+School  OntheGymCourtSouth "On the Gym Court, South"
+  with  description
+            "",
+        n_to OntheGymCourtNorth,
+   has  ~light;
+
+Dorms  IntheDormitoryEntryway "In the Dormitory Entryway"
+  with  description
+            "",
+        n_to Room106,
+        s_to Room101,
+        e_to HalfwayAlongtheDormHall,
+        w_to IntheDormitoryCourtyard,
+   has  light;
+
+Object ->  MsPalmerDianeFallon "Ms PalmerDiane Fallon"
+  with  name 'Ms' 'PalmerDiane' 'Fallon',
+        description "Ms Palmer/Diane Fallon";
+
+Dorms  Room106 "Room 106"
+  with  description
+            "",
+        s_to IntheDormitoryEntryway,
+   has  light;
+
+Dorms  Room101 "Room 101"
+  with  description
+            "",
+        n_to IntheDormitoryEntryway,
+   has  light;
+
+Object ->  SherylBourke "Sheryl Bourke"
+  with  name 'Sheryl' 'Bourke',
+        description "Sheryl Bourke";
+
+Dorms  HalfwayAlongtheDormHall "Halfway Along the Dorm Hall"
+  with  description
+            "",
+        n_to Room105,
+        s_to Room102,
+        e_to AttheDormHallsEastEnd,
+        w_to IntheDormitoryEntryway,
+   has  light;
+
+Dorms  Room105 "Room 105"
+  with  description
+            "",
+        s_to HalfwayAlongtheDormHall,
+   has  light;
+
+Dorms  Room102 "Room 102"
+  with  description
+            "",
+        n_to HalfwayAlongtheDormHall,
+   has  light;
+
+Object ->  Louise "Louise"
+  with  name 'Louise',
+        description "Louise";
+
+Dorms  AttheDormHallsEastEnd "At the Dorm Hall's East End"
+  with  description
+            "",
+        n_to Room104,
+        s_to Room103,
+        w_to HalfwayAlongtheDormHall,
+   has  light;
+
+Dorms  Room104 "Room 104"
+  with  description
+            "",
+        s_to AttheDormHallsEastEnd,
+   has  light;
+
+Dorms  Room103 "Room 103"
+  with  description
+            "",
+        n_to AttheDormHallsEastEnd,
+   has  light;
+
+Outside  OntheSchoolSteps "On the School Steps"
+  with  description
+            "",
+        n_to IntheSchoolFoyer,
+        s_to IntheQuadrangle,
+        e_to OntheTrellisedPatio,
+        w_to BytheSchoolFountain,
+   has  light;
+
+School  IntheSchoolFoyer "In the School Foyer"
+  with  description
+            "",
+        n_to IntheMarbleStateroom,
+        s_to OntheSchoolSteps,
+        e_to IntheSickBay,
+        w_to IntheReceptionistsOffice,
+   has  light;
+
+Outside  OntheTrellisedPatio "On the Trellised Patio"
+  with  description
+            "",
+        w_to OntheSchoolSteps,
+   has  light;
+
+Object ->  Gardener "Gardener"
+  with  name 'Gardener',
+        description "Gardener";
+
+Outside  BytheSchoolFountain "By the School Fountain"
+  with  description
+            "",
+        n_to IntheArtCottage,
+        s_to InStaffCottageB,
+        e_to OntheSchoolSteps,
+   has  light;
+
+Object ->  MysteryGirl "Mystery Girl"
+  with  name 'Mystery' 'Girl',
+        description "Mystery Girl";
+
+School  IntheArtCottage "In the Art Cottage"
+  with  description
+            "",
+        s_to BytheSchoolFountain,
+   has  light;
+
+Object ->  MrRhodes "Mr Rhodes"
+  with  name 'Mr' 'Rhodes',
+        description "Mr Rhodes";
+
+School  InStaffCottageB "In Staff Cottage B"
+  with  description
+            "",
+        n_to BytheSchoolFountain,
+   has  light;
+
+Object ->  FileMissArden "File Miss Arden"
+  with  name 'File' 'Miss' 'Arden',
+        description "File (Miss Arden)";
+
+School  IntheReceptionistsOffice "In the Receptionist's Office"
+  with  description
+            "",
+        e_to IntheSchoolFoyer,
+   has  light;
+
+School  IntheSickBay "In the Sick Bay"
+  with  description
+            "",
+        w_to IntheSchoolFoyer,
+   has  light;
+
+Object ->  UnnamedGirl "Unnamed Girl"
+  with  name 'Unnamed' 'Girl',
+        description "Unnamed Girl";
+
+School  IntheMarbleStateroom "In the Marble Stateroom"
+  with  description
+            "",
+        n_to IntheSouthHall,
+        s_to IntheSchoolFoyer,
+   has  light;
+
+Object ->  MaureenSallis "Maureen Sallis"
+  with  name 'Maureen' 'Sallis',
+        description "Maureen Sallis";
+
+School  IntheSouthHall "In the South Hall"
+  with  description
+            "",
+        n_to IntheGrandHall,
+        s_to IntheMarbleStateroom,
+        e_to IntheSittingRoom,
+   has  light;
+
+School  IntheSittingRoom "In the Sitting Room"
+  with  description
+            "",
+        n_to IntheEasternHallway,
+        w_to IntheSouthHall,
+   has  light;
+
+Object ->  LucindaParker "Lucinda Parker"
+  with  name 'Lucinda' 'Parker',
+        description "Lucinda Parker";
+
+School  IntheEasternHallway "In the Eastern Hallway"
+  with  description
+            "",
+        n_to IntheWaitingRoom,
+        s_to IntheSittingRoom,
+        e_to IntheDanceRoom,
+        w_to IntheGrandHall,
+   has  light;
+
+Object ->  MiaFellini "Mia Fellini"
+  with  name 'Mia' 'Fellini',
+        description "Mia Fellini";
+
+School  IntheDanceRoom "In the Dance Room"
+  with  description
+            "",
+        w_to IntheEasternHallway,
+   has  light;
+
+Object ->  TheDancer "The Dancer"
+  with  name 'The' 'Dancer',
+        description "The Dancer";
+
+School  IntheWaitingRoom "In the Waiting Room"
+  with  description
+            "",
+        n_to IntheStaffLibrary,
+        s_to IntheEasternHallway,
+        w_to InScienceLab1C,
+   has  light;
+
+School  InScienceLab1C "In Science Lab 1C"
+  with  description
+            "",
+        s_to IntheGrandHall,
+        e_to IntheWaitingRoom,
+   has  light;
+
+School  IntheGrandHall "In the Grand Hall"
+  with  description
+            "",
+        n_to InScienceLab1C,
+        s_to IntheSouthHall,
+        e_to IntheEasternHallway,
+        w_to IntheSchoolChapel,
+   has  light;
+
+Object ->  MadisonJones "Madison Jones"
+  with  name 'Madison' 'Jones',
+        description "Madison Jones";
+
+Object ->  KateSeung "Kate Seung"
+  with  name 'Kate' 'Seung',
+        description "Kate, Seung";
+
+School  IntheSchoolChapel "In the School Chapel"
+  with  description
+            "",
+        e_to IntheGrandHall,
+   has  light;
+
+Hidden  IntheStaffLibrary "In the Staff Library"
+  with  description
+            "",
+        n_to IntheLeatherStudy,
+        s_to IntheWaitingRoom,
+   has  light;
+
+Hidden  IntheLeatherStudy "In the Leather Study"
+  with  description
+            "",
+        s_to IntheStaffLibrary,
+        e_to IntheStrangeGallery,
+        w_to InaCurtainedHallway,
+        u_to OntheBalcony,
+   has  light;
+
+Hidden  IntheStrangeGallery "In the Strange Gallery"
+  with  description
+            "",
+        w_to IntheLeatherStudy,
+   has  light;
+
+Hidden  OntheBalcony "On the Balcony"
+  with  description
+            "",
+        d_to IntheLeatherStudy,
+   has  light;
+
+Object ->  Witch "Witch"
+  with  name 'Witch',
+        description "Witch";
+
+Hidden  InaCurtainedHallway "In a Curtained Hallway"
+  with  description
+            "",
+        e_to IntheLeatherStudy,
+        w_to InaCurtainedHallway2,
+   has  light;
+
+Hidden  InaCurtainedHallway2 "In a Curtained Hallway"
+  with  description
+            "",
+        e_to InaCurtainedHallway,
+        w_to AttheOpulentCorner,
+   has  light;
+
+Hidden  AttheOpulentCorner "At the Opulent Corner"
+  with  description
+            "",
+        n_to BeforetheLeadlightDoor,
+        e_to InaCurtainedHallway2,
+   has  light;
+
+Object ->  EveJoshi "Eve Joshi"
+  with  name 'Eve' 'Joshi',
+        description "Eve Joshi";
+
+Hidden  BeforetheLeadlightDoor "Before the Leadlight Door"
+  with  description
+            "",
+        n_to room,
+        s_to AttheOpulentCorner,
+   has  light;
+
+Endgame  room "???"
+  with  description
+            "",
+        n_to IntheFoundersRoom,
+        s_to BeforetheLeadlightDoor,
+   has  ~light;
+
+Endgame  IntheFoundersRoom "In the Founder's Room"
+  with  description
+            "",
+        s_to room,
+        e_to IntheSecretPlace,
+   has  light;
+
+Object ->  Founder "Founder"
+  with  name 'Founder',
+        description "Founder";
+
+Endgame  IntheSecretPlace "In the Secret Place"
+  with  description
+            "",
+        w_to IntheFoundersRoom,
+   has  light;
+
+Object ->  Shadow "Shadow"
+  with  name 'Shadow',
+        description "Shadow";
+
+Object ->  Founder2 "Founder"
+  with  name 'Founder',
+        description "Founder";
+
+School  IntheUpstairsChangingRoom "In the Upstairs Changing Room"
+  with  description
+            "",
+        d_to OntheGymCourtNorth,
+   has  light;
+
+Object ->  IsabelleGreen "Isabelle Green"
+  with  name 'Isabelle' 'Green',
+        description "Isabelle Green";
+
+[ Initialise;
+    location = LinvilleStudentLibrary;
+    ! "^^Your opening paragraph here...^^";
+];
+
+Include "Grammar";
+

@@ -1,0 +1,231 @@
+
+start_at = room_1
+
+locations {
+   room_1    : location "" header = "Room 1";
+   room_4    : location "" header = "Room 4";
+   room_0    : location "" header = "Room 0";
+   room_5    : location "" header = "Room 5";
+   room_3    : location "" header = "Room 3";
+   room_2    : location "" header = "Room 2";
+   room_6    : location "" header = "Room 6";
+   room_7    : location "" header = "Room 7";
+   room_8    : location "" header = "Room 8";
+   room_10   : location "" header = "Room 10";
+   room_9    : location "" header = "Room 9";
+   room_10_2 : location "" header = "Room 10";
+   room_12   : location "" header = "Room 12";
+   room_13   : location "" header = "Room 13";
+   room_14   : location "" header = "Room 14";
+   room_16   : location "" header = "Room 16";
+   room_15   : location "" header = "Room 15";
+   room_17   : location "" header = "Room 17";
+   room_18   : location "" header = "Room 18";
+   room_19   : location "" header = "Room 19";
+   room_21   : location "" header = "Room 21";
+   room_22   : location "" header = "Room 22";
+   room_20   : location "" header = "Room 20";
+   room_24   : location "" header = "Room 24";
+   room_25   : location "" header = "Room 25";
+   room_23   : location "" header = "Room 23";
+   room_26   : location "" header = "Room 26";
+   room_27   : location "" header = "Room 27";
+   room_28   : location "" header = "Room 28";
+   room_29   : location "" header = "Room 29";
+   room_31   : location "" header = "Room 31";
+   room_32   : location "" header = "Room 32";
+   room_34   : location "" header = "Room 34";
+   room_33   : location "" header = "Room 33";
+   room_38   : location "" header = "Room 38";
+   room_35   : location "" header = "Room 35";
+   room_36   : location "" header = "Room 36";
+   room_37   : location "" header = "Room 37";
+   room_40   : location "" header = "Room 40";
+   room_42   : location "" header = "Room 42";
+   room_43   : location "" header = "Room 43";
+   room_41   : location "" header = "Room 41";
+   room_69   : location "" header = "Room 69";
+   room_39   : location "" header = "Room 39";
+   room_69_2 : location "" header = "Room 69";
+   room_68   : location "" header = "Room 68";
+   room_67   : location "" header = "Room 67";
+   room_66   : location "" header = "Room 66";
+   room_65   : location "" header = "Room 65";
+   room_64   : location "" header = "Room 64";
+   room_63   : location "" header = "Room 63";
+   room_56   : location "" header = "Room 56";
+   room_61   : location "" header = "Room 61";
+   room_57   : location "" header = "Room 57";
+   room_58   : location "" header = "Room 58";
+   room_62   : location "" header = "Room 62";
+   room_59   : location "" header = "Room 59";
+   room_60   : location "" header = "Room 60";
+   room_52   : location "" header = "Room 52";
+   room_54   : location "" header = "Room 54";
+   room_53   : location "" header = "Room 53";
+   room_55   : location "" header = "Room 55";
+   room_57_2 : location "" header = "Room 57";
+   room_58_2 : location "" header = "Room 58";
+   room_56_2 : location "" header = "Room 56";
+   room_58_3 : location "" header = "Room 58";
+   room_7_2  : location "" header = "Room 7";
+   room_44   : location "" header = "Room 44";
+   room_45   : location "" header = "Room 45";
+   room_46   : location "" header = "Room 46";
+   room_48   : location "" header = "Room 48";
+   room_47   : location "" header = "Room 47";
+   room_49   : location "" header = "Room 49";
+   room_50   : location "" header = "Room 50";
+   room_51   : location "" header = "Room 51";
+}
+
+
+connections {
+   from, direction, to = [
+      room_1, east_oneway, room_4,
+      room_4, north_oneway, room_0,
+      room_4, south_oneway, room_5,
+      room_4, east_oneway, room_6,
+      room_4, west_oneway, room_1,
+      room_0, south_oneway, room_4,
+      room_5, north_oneway, room_4,
+      room_5, south_oneway, room_3,
+      room_5, east_oneway, room_6,
+      room_5, west_oneway, room_2,
+      room_3, north_oneway, room_5,
+      room_2, east_oneway, room_5,
+      room_6, north_oneway, room_4,
+      room_6, east_oneway, room_7,
+      room_6, west_oneway, room_5,
+      room_7, north_oneway, room_8,
+      room_7, west_oneway, room_6,
+      room_8, north_oneway, room_9,
+      room_8, south_oneway, room_7,
+      room_8, east_oneway, room_10,
+      room_10, east_oneway, room_10_2,
+      room_10, west_oneway, room_8,
+      room_9, north_oneway, room_12,
+      room_9, south_oneway, room_8,
+      room_9, east_oneway, room_10_2,
+      room_10_2, north_oneway, room_12,
+      room_10_2, west_oneway, room_9,
+      room_12, north_oneway, room_15,
+      room_12, south_oneway, room_10_2,
+      room_13, north_oneway, room_12,
+      room_13, east_oneway, room_14,
+      room_14, north_oneway, room_16,
+      room_14, west_oneway, room_13,
+      room_16, north_oneway, room_15,
+      room_16, south_oneway, room_14,
+      room_15, south_oneway, room_16,
+      room_15, east_oneway, room_17,
+      room_17, south_oneway, room_18,
+      room_17, east_oneway, room_20,
+      room_17, west_oneway, room_15,
+      room_18, north_oneway, room_17,
+      room_18, south_oneway, room_19,
+      room_19, north_oneway, room_18,
+      room_19, south_oneway, room_21,
+      room_21, north_oneway, room_19,
+      room_21, east_oneway, room_22,
+      room_22, east_oneway, room_20,
+      room_22, west_oneway, room_21,
+      room_20, east_oneway, room_24,
+      room_20, west_oneway, room_17,
+      room_24, west_oneway, room_20,
+      room_25, east_oneway, room_24,
+      room_25, west_oneway, room_23,
+      room_23, south_oneway, room_27,
+      room_23, east_oneway, room_25,
+      room_23, west_oneway, room_26,
+      room_26, east_oneway, room_23,
+      room_27, north_oneway, room_23,
+      room_27, south_oneway, room_28,
+      room_28, north_oneway, room_27,
+      room_28, south_oneway, room_29,
+      room_28, east_oneway, room_31,
+      room_29, north_oneway, room_28,
+      room_29, west_oneway, room_26,
+      room_31, south_oneway, room_34,
+      room_31, east_oneway, room_32,
+      room_31, west_oneway, room_28,
+      room_32, west_oneway, room_31,
+      room_34, north_oneway, room_31,
+      room_34, south_oneway, room_35,
+      room_33, east_oneway, room_32,
+      room_33, west_oneway, room_38,
+      room_38, south_oneway, room_39,
+      room_38, east_oneway, room_33,
+      room_35, north_oneway, room_36,
+      room_35, east_oneway, room_34,
+      room_36, south_oneway, room_35,
+      room_36, west_oneway, room_37,
+      room_37, east_oneway, room_36,
+      room_37, west_oneway, room_40,
+      room_40, south_oneway, room_42,
+      room_40, east_oneway, room_37,
+      room_42, north_oneway, room_40,
+      room_42, south_oneway, room_41,
+      room_43, north_oneway, room_40,
+      room_43, south_oneway, room_41,
+      room_41, north_oneway, room_43,
+      room_39, north_oneway, room_38,
+      room_69_2, south_oneway, room_68,
+      room_68, south_oneway, room_67,
+      room_67, north_oneway, room_68,
+      room_67, south_oneway, room_66,
+      room_66, north_oneway, room_67,
+      room_66, south_oneway, room_65,
+      room_65, north_oneway, room_66,
+      room_65, west_oneway, room_64,
+      room_64, north_oneway, room_64,
+      room_64, south_oneway, room_63,
+      room_64, east_oneway, room_65,
+      room_64, west_oneway, room_64,
+      room_63, north_oneway, room_62,
+      room_63, west_oneway, room_61,
+      room_56, east_oneway, room_58,
+      room_61, north_oneway, room_58,
+      room_61, east_oneway, room_63,
+      room_57, east_oneway, room_58,
+      room_58, south_oneway, room_61,
+      room_58, east_oneway, room_59,
+      room_58, west_oneway, room_57,
+      room_62, south_oneway, room_63,
+      room_62, east_oneway, room_60,
+      room_59, east_oneway, room_60,
+      room_59, west_oneway, room_58,
+      room_60, west_oneway, room_59,
+      room_52, south_oneway, room_53,
+      room_52, east_oneway, room_54,
+      room_52, west_oneway, room_51,
+      room_54, east_oneway, room_56_2,
+      room_54, west_oneway, room_52,
+      room_53, north_oneway, room_52,
+      room_53, east_oneway, room_55,
+      room_55, east_oneway, room_57_2,
+      room_55, west_oneway, room_53,
+      room_57_2, east_oneway, room_58_2,
+      room_57_2, west_oneway, room_55,
+      room_58_2, west_oneway, room_57_2,
+      room_56_2, east_oneway, room_58_3,
+      room_56_2, west_oneway, room_54,
+      room_58_3, west_oneway, room_56_2,
+      room_44, west_oneway, room_45,
+      room_45, east_oneway, room_44,
+      room_45, west_oneway, room_47,
+      room_46, east_oneway, room_44,
+      room_46, west_oneway, room_48,
+      room_48, east_oneway, room_46,
+      room_48, west_oneway, room_50,
+      room_47, east_oneway, room_45,
+      room_47, west_oneway, room_49,
+      room_49, east_oneway, room_47,
+      room_49, west_oneway, room_50,
+      room_50, east_oneway, room_49,
+      room_50, west_oneway, room_51,
+      room_51, east_oneway, room_52,
+   ]
+}
+
+

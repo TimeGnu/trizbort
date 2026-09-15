@@ -1,0 +1,225 @@
+
+start_at = west_of_house
+
+locations {
+   west_of_house           : location "" header = "West of House";
+   south_of_house          : location "" header = "South of House";
+   behind_house            : location "" header = "Behind House";
+   north_of_house          : location "" header = "North of House";
+   clearing                : location "" header = "Clearing";
+   kitchen                 : location "" header = "Kitchen";
+   living_room             : location "" header = "Living Room";
+   attic                   : location "" header = "Attic";
+   forest_1                : location "" header = "Forest 1";
+   forest_2                : location "" header = "Forest 2";
+   forest_3                : location "" header = "Forest 3";
+   cellar                  : location "" header = "Cellar";
+   west_of_chasm           : location "" header = "West of Chasm";
+   gallery                 : location "" header = "Gallery";
+   studio                  : location "" header = "Studio";
+   northsouth_crawlway     : location "" header = "North-South Crawlway";
+   troll_room              : location "" header = "Troll Room";
+   eastwest_passage        : location "" header = "East-West Passage";
+   cyclops_room            : location "" header = "Cyclops Room";
+   strange_passage         : location "" header = "Strange Passage";
+   treasure_room           : location "" header = "Treasure Room";
+   dome_room               : location "" header = "Dome Room";
+   rocky_crawl             : location "" header = "Rocky Crawl";
+   deep_ravine             : location "" header = "Deep Ravine";
+   chasm                   : location "" header = "Chasm";
+   northsouth_passage      : location "" header = "North-South Passage";
+   loud_room               : location "" header = "Loud Room";
+   round_room              : location "" header = "Round Room";
+   egyptian_room           : location "" header = "Egyptian Room";
+   glacier_room            : location "" header = "Glacier Room";
+   stream_view             : location "" header = "Stream View";
+   reservoir_south         : location "" header = "Reservoir South";
+   deep_canyon             : location "" header = "Deep Canyon";
+   torch_room              : location "" header = "Torch Room";
+   dam                     : location "" header = "Dam";
+   damp_cave               : location "" header = " Damp Cave";
+   dam_lobby               : location "" header = "Dam Lobby";
+   maintenance_room        : location "" header = "Maintenance Room";
+   ancient_chasm           : location "" header = "Ancient Chasm";
+   reservoir_north         : location "" header = "Reservoir North";
+   atlantis_room           : location "" header = "Atlantis Room";
+   cave                    : location "" header = "Cave";
+   mirror_room             : location "" header = "Mirror Room";
+   cold_passage            : location "" header = "Cold Passage";
+   steep_crawlway          : location "" header = "Steep Crawlway";
+   slide_room              : location "" header = "Slide Room";
+   entrance_to_hades       : location "" header = "*Entrance to Hades";
+   narrow_crawlway         : location "" header = "Narrow Crawlway";
+   grail_room              : location "" header = "Grail Room";
+   round_room_2            : location "" header = "Round Room";
+   eastwest_passage_2      : location "" header = "East-West Passage";
+   northsouth_passage_2    : location "" header = "North-South Passage";
+   winding_passage         : location "" header = "Winding Passage";
+   mirror_room_2           : location "" header = "Mirror Room";
+   cave_2                  : location "" header = "Cave";
+   deep_canyon_2           : location "" header = "Deep Canyon";
+   maze                    : location "" header = "Maze";
+   engravings_cave         : location "" header = "Engravings Cave";
+   riddle_room             : location "" header = "Riddle Room";
+   pearl_room              : location "" header = "Pearl Room";
+   temple                  : location "" header = "Temple";
+   altar                   : location "" header = "Altar";
+   dead_end                : location "" header = "Dead End";
+   dead_end_2              : location "" header = "Dead End";
+   land_of_the_living_dead : location "" header = "Land of the Living Dead";
+   ruby_room               : location "" header = "Ruby Room";
+}
+
+
+connections {
+   from, direction, to = [
+      west_of_house, north_oneway, north_of_house,
+      west_of_house, south_oneway, south_of_house,
+      west_of_house, west_oneway, forest_2,
+      south_of_house, south_oneway, forest_1,
+      south_of_house, east_oneway, behind_house,
+      south_of_house, west_oneway, west_of_house,
+      behind_house, north_oneway, north_of_house,
+      behind_house, south_oneway, south_of_house,
+      behind_house, east_oneway, clearing,
+      behind_house, west_oneway, kitchen,
+      north_of_house, north_oneway, forest_3,
+      north_of_house, east_oneway, behind_house,
+      north_of_house, west_oneway, west_of_house,
+      clearing, south_oneway, forest_1,
+      clearing, west_oneway, forest_3,
+      clearing, southwest_oneway, behind_house,
+      kitchen, east_oneway, behind_house,
+      kitchen, west_oneway, living_room,
+      kitchen, up_oneway, attic,
+      living_room, east_oneway, kitchen,
+      attic, down_oneway, kitchen,
+      forest_1, north_oneway, south_of_house,
+      forest_1, east_oneway, clearing,
+      forest_1, west_oneway, forest_2,
+      forest_2, east_oneway, forest_3,
+      forest_3, south_oneway, clearing,
+      forest_3, east_oneway, clearing,
+      forest_3, west_oneway, north_of_house,
+      cellar, south_oneway, west_of_chasm,
+      cellar, east_oneway, troll_room,
+      west_of_chasm, north_oneway, northsouth_crawlway,
+      west_of_chasm, south_oneway, gallery,
+      west_of_chasm, west_oneway, cellar,
+      gallery, north_oneway, west_of_chasm,
+      gallery, south_oneway, studio,
+      studio, north_oneway, northsouth_crawlway,
+      studio, northwest_oneway, gallery,
+      northsouth_crawlway, north_oneway, west_of_chasm,
+      northsouth_crawlway, south_oneway, studio,
+      northsouth_crawlway, east_oneway, troll_room,
+      troll_room, north_oneway, eastwest_passage,
+      troll_room, east_oneway, northsouth_crawlway,
+      troll_room, west_oneway, cellar,
+      eastwest_passage, north_oneway, deep_ravine,
+      eastwest_passage, east_oneway, round_room,
+      eastwest_passage, west_oneway, troll_room,
+      cyclops_room, up_oneway, treasure_room,
+      treasure_room, down_oneway, cyclops_room,
+      dome_room, east_oneway, rocky_crawl,
+      dome_room, down_oneway, torch_room,
+      rocky_crawl, east_oneway, dome_room,
+      rocky_crawl, west_oneway, deep_ravine,
+      rocky_crawl, northwest_oneway, egyptian_room,
+      deep_ravine, south_oneway, eastwest_passage,
+      deep_ravine, east_oneway, chasm,
+      deep_ravine, west_oneway, rocky_crawl,
+      deep_ravine, down_oneway, reservoir_south,
+      chasm, south_oneway, deep_ravine,
+      chasm, east_oneway, northsouth_passage,
+      northsouth_passage, north_oneway, chasm,
+      northsouth_passage, south_oneway, round_room,
+      northsouth_passage, northeast_oneway, loud_room,
+      loud_room, east_oneway, ancient_chasm,
+      loud_room, west_oneway, northsouth_passage,
+      loud_room, up_oneway, damp_cave,
+      egyptian_room, east_oneway, rocky_crawl,
+      egyptian_room, west_oneway, glacier_room,
+      glacier_room, north_oneway, stream_view,
+      glacier_room, east_oneway, egyptian_room,
+      glacier_room, west_oneway, ruby_room,
+      stream_view, north_oneway, glacier_room,
+      stream_view, east_oneway, reservoir_south,
+      reservoir_south, north_oneway, reservoir_north,
+      reservoir_south, south_oneway, deep_ravine,
+      reservoir_south, west_oneway, stream_view,
+      reservoir_south, up_oneway, deep_canyon,
+      deep_canyon, east_oneway, dam,
+      deep_canyon, southeast_oneway, reservoir_south,
+      dam, north_oneway, dam_lobby,
+      dam, south_oneway, deep_canyon,
+      dam, east_oneway, damp_cave,
+      damp_cave, south_oneway, loud_room,
+      damp_cave, east_oneway, dam,
+      dam_lobby, north_oneway, maintenance_room,
+      dam_lobby, south_oneway, dam,
+      dam_lobby, east_oneway, maintenance_room,
+      maintenance_room, south_oneway, dam_lobby,
+      maintenance_room, west_oneway, dam_lobby,
+      ancient_chasm, north_oneway, dead_end_2,
+      ancient_chasm, south_oneway, loud_room,
+      ancient_chasm, west_oneway, dead_end,
+      reservoir_north, north_oneway, atlantis_room,
+      reservoir_north, south_oneway, reservoir_south,
+      atlantis_room, southeast_oneway, reservoir_north,
+      atlantis_room, up_oneway, cave,
+      cave, north_oneway, mirror_room,
+      cave, down_oneway, atlantis_room,
+      mirror_room, north_oneway, steep_crawlway,
+      mirror_room, east_oneway, cave,
+      mirror_room, west_oneway, cold_passage,
+      cold_passage, north_oneway, steep_crawlway,
+      cold_passage, east_oneway, mirror_room,
+      cold_passage, west_oneway, slide_room,
+      steep_crawlway, south_oneway, mirror_room,
+      steep_crawlway, southwest_oneway, cold_passage,
+      slide_room, east_oneway, cold_passage,
+      slide_room, down_oneway, cellar,
+      entrance_to_hades, east_oneway, land_of_the_living_dead,
+      entrance_to_hades, up_oneway, cave_2,
+      narrow_crawlway, north_oneway, grail_room,
+      narrow_crawlway, south_oneway, cave_2,
+      narrow_crawlway, southwest_oneway, mirror_room_2,
+      grail_room, east_oneway, narrow_crawlway,
+      grail_room, west_oneway, round_room_2,
+      grail_room, up_oneway, temple,
+      round_room_2, north_oneway, deep_canyon_2,
+      round_room_2, south_oneway, winding_passage,
+      round_room_2, east_oneway, grail_room,
+      round_room_2, west_oneway, eastwest_passage_2,
+      round_room_2, northeast_oneway, maze,
+      round_room_2, southwest_oneway, engravings_cave,
+      round_room_2, northwest_oneway, northsouth_passage_2,
+      eastwest_passage_2, east_oneway, round_room_2,
+      northsouth_passage_2, southeast_oneway, round_room_2,
+      winding_passage, north_oneway, round_room_2,
+      winding_passage, east_oneway, mirror_room_2,
+      mirror_room_2, north_oneway, narrow_crawlway,
+      mirror_room_2, east_oneway, cave_2,
+      mirror_room_2, west_oneway, winding_passage,
+      cave_2, north_oneway, narrow_crawlway,
+      cave_2, west_oneway, mirror_room_2,
+      cave_2, down_oneway, entrance_to_hades,
+      deep_canyon_2, south_oneway, round_room_2,
+      maze, southwest_oneway, round_room_2,
+      engravings_cave, north_oneway, round_room_2,
+      engravings_cave, southeast_oneway, riddle_room,
+      riddle_room, east_oneway, pearl_room,
+      riddle_room, down_oneway, engravings_cave,
+      pearl_room, west_oneway, riddle_room,
+      temple, east_oneway, altar,
+      temple, west_oneway, grail_room,
+      altar, west_oneway, temple,
+      dead_end, east_oneway, ancient_chasm,
+      dead_end_2, southwest_oneway, ancient_chasm,
+      land_of_the_living_dead, west_oneway, entrance_to_hades,
+      ruby_room, south_oneway, glacier_room,
+   ]
+}
+
+
