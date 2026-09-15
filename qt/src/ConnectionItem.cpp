@@ -43,15 +43,106 @@
 #include <algorithm>
 #include <cmath>
 
+#include <QFontMetricsF>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPainterPathStroker>
 #include <QPolygonF>
 
+#include "FontUtil.h"
 #include "MapScene.h"
 
 namespace trizbort {
+
+namespace {
+
+// The point half way along a poly-line by arc length.
+QPointF midpointAlongPath(const QList<QPointF> &pts)
+{
+    if (pts.size() < 2)
+        return pts.isEmpty() ? QPointF() : pts.first();
+    double total = 0.0;
+    for (int i = 1; i < pts.size(); ++i)
+        total += std::hypot(pts[i].x() - pts[i - 1].x(), pts[i].y() - pts[i - 1].y());
+    double half = total / 2.0;
+    for (int i = 1; i < pts.size(); ++i) {
+        const QPointF d = pts[i] - pts[i - 1];
+        const double len = std::hypot(d.x(), d.y());
+        if (half <= len && len > 0.0)
+            return pts[i - 1] + d * (half / len);
+        half -= len;
+    }
+    return pts.last();
+}
+
+// Draw one connection annotation (start/mid/end text) offset from an anchor on
+// the line, on the side the line points away to. Mirrors Connection.annotate:
+// the label sits clear of the line, growing away from the anchor.
+void drawConnectionLabel(QPainter *painter, const QPointF &anchor, const QPointF &outward,
+                         const QString &text, const QFont &font, const QColor &color,
+                         double offset)
+{
+    if (text.isEmpty())
+        return;
+    painter->setFont(font);
+    painter->setPen(color);
+    const QFontMetricsF fm(font);
+    const QRectF box = fm.boundingRect(QRectF(0, 0, 1000, 1000),
+                                       Qt::AlignLeft | Qt::TextWordWrap, text);
+    const double w = box.width();
+    const double h = box.height();
+    const QPointF at = anchor + outward * offset;
+    double left, top;
+    if (outward.x() > 0.3)
+        left = at.x();
+    else if (outward.x() < -0.3)
+        left = at.x() - w;
+    else
+        left = at.x() - w / 2.0;
+    if (outward.y() > 0.3)
+        top = at.y();
+    else if (outward.y() < -0.3)
+        top = at.y() - h;
+    else
+        top = at.y() - h / 2.0;
+    painter->drawText(QRectF(left, top, w, h),
+                      Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip, text);
+}
+
+// A small upright door glyph centred on pos: a solid leaf when closed, an open
+// (outline) leaf when open.
+void drawDoorGlyph(QPainter *painter, const QPointF &pos, const QColor &color, bool open)
+{
+    const QRectF leaf(pos.x() - 5, pos.y() - 7, 10, 14);
+    painter->setPen(QPen(color, 1.5));
+    painter->setBrush(open ? QBrush(Qt::white) : QBrush(color));
+    painter->drawRect(leaf);
+    // Door knob.
+    painter->setPen(QPen(open ? color : QColor(Qt::white), 1.0));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawPoint(QPointF(leaf.right() - 2.5, pos.y()));
+}
+
+// A small padlock glyph centred on pos: closed shackle when locked, an open
+// (offset) shackle when unlocked.
+void drawLockGlyph(QPainter *painter, const QPointF &pos, const QColor &color, bool locked)
+{
+    const QRectF body(pos.x() - 4, pos.y() - 1, 8, 7);
+    painter->setPen(QPen(color, 1.2));
+    painter->setBrush(QBrush(color));
+    painter->drawRect(body);
+    painter->setBrush(Qt::NoBrush);
+    if (locked) {
+        // Closed shackle sitting on top of the body.
+        painter->drawArc(QRectF(pos.x() - 3, pos.y() - 6, 6, 8), 0 * 16, 180 * 16);
+    } else {
+        // Open shackle, pivoted up to one side.
+        painter->drawArc(QRectF(pos.x() - 1, pos.y() - 7, 6, 8), 30 * 16, 160 * 16);
+    }
+}
+
+} // namespace
 
 ConnectionItem::ConnectionItem(MapScene *scene, int connId)
     : m_scene(scene)
@@ -112,7 +203,9 @@ QRectF ConnectionItem::boundingRect() const
     QRectF r(m_points.first(), m_points.first());
     for (const QPointF &p : m_points)
         r = r.united(QRectF(p, p));
-    return r.adjusted(-12, -12, 12, 12);
+    // Margin covers the line width, arrowheads, door/lock glyphs and short
+    // end/mid labels drawn just off the line.
+    return r.adjusted(-40, -40, 40, 40);
 }
 
 QPainterPath ConnectionItem::shape() const
@@ -190,12 +283,43 @@ void ConnectionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         }
     }
 
-    // A small square at the midpoint marks a door.
+    // A door is shown as a door-leaf glyph plus a padlock reflecting the
+    // open/locked state, at the middle of the connection (matching the C#
+    // door + lock icon pair).
     if (c.hasDoor) {
-        const QPointF mid = (m_points.first() + m_points.last()) / 2.0;
-        painter->setPen(QPen(color, 1.5));
-        painter->setBrush(c.door.open ? QBrush(Qt::white) : QBrush(color));
-        painter->drawRect(QRectF(mid.x() - 4, mid.y() - 4, 8, 8));
+        const QPointF mid = midpointAlongPath(m_points);
+        drawDoorGlyph(painter, mid - QPointF(7, 0), color, c.door.open);
+        drawLockGlyph(painter, mid + QPointF(7, 0), color, c.door.locked);
+    }
+
+    // Start / mid / end text labels, drawn in the line font and line-text colour.
+    if (!c.startText.isEmpty() || !c.midText.isEmpty() || !c.endText.isEmpty()) {
+        const QFont lineFont = qfontFromSpec(map->settings.lineFont, 9.0);
+        QColor textColor = map->settings.colors[ColorLineText];
+        if (!textColor.isValid())
+            textColor = QColor(Qt::black);
+        const double off = map->settings.textOffset > 0.0 ? map->settings.textOffset : 4.0;
+
+        if (!c.startText.isEmpty()) {
+            const QPointF a = m_points.first();
+            const QPointF b = m_points.at(1);
+            QPointF out = a - b;
+            const double l = std::hypot(out.x(), out.y());
+            out = (l > 1e-6) ? out / l : QPointF(0, -1);
+            drawConnectionLabel(painter, a, out, c.startText, lineFont, textColor, off);
+        }
+        if (!c.endText.isEmpty()) {
+            const QPointF a = m_points.last();
+            const QPointF b = m_points.at(m_points.size() - 2);
+            QPointF out = a - b;
+            const double l = std::hypot(out.x(), out.y());
+            out = (l > 1e-6) ? out / l : QPointF(0, -1);
+            drawConnectionLabel(painter, a, out, c.endText, lineFont, textColor, off);
+        }
+        if (!c.midText.isEmpty()) {
+            const QPointF mid = midpointAlongPath(m_points);
+            drawConnectionLabel(painter, mid, QPointF(0, 1), c.midText, lineFont, textColor, off);
+        }
     }
 }
 
