@@ -77,13 +77,30 @@ void ConnectionItem::updateRoute()
     QList<Vertex> vertices = c.vertices;
     std::sort(vertices.begin(), vertices.end(),
               [](const Vertex &a, const Vertex &b) { return a.index < b.index; });
-    for (const Vertex &v : vertices) {
-        if (v.docked) {
-            if (const Room *room = map->roomById(v.roomId))
-                m_points.append(MapScene::portPoint(*room, v.port));
-        } else {
-            m_points.append(v.point);
+
+    // Build the poly-line through every vertex, and where an endpoint docks to a
+    // room, run an outward "stalk" between the room outline and the endpoint so
+    // the line leaves the room perpendicular to its edge (matching the C#
+    // Connection.getSegments stalk handling).
+    const double stalk = map->settings.connectionStalkLength;
+    const int n = vertices.size();
+    for (int i = 0; i < n; ++i) {
+        const Vertex &v = vertices.at(i);
+        const Room *room = v.docked ? map->roomById(v.roomId) : nullptr;
+        const QPointF base = (room != nullptr) ? MapScene::portPoint(*room, v.port) : v.point;
+
+        QPointF sp;
+        bool haveStalk = false;
+        if (room != nullptr && n >= 2 && stalk > 0.0) {
+            sp = MapScene::portStalkPoint(*room, v.port, stalk);
+            haveStalk = (sp != base);
         }
+
+        if (i == n - 1 && haveStalk) // last endpoint: the stalk precedes it
+            m_points.append(sp);
+        m_points.append(base);
+        if (i == 0 && haveStalk)     // first endpoint: the stalk follows it
+            m_points.append(sp);
     }
     update();
 }
@@ -143,21 +160,33 @@ void ConnectionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         path.lineTo(m_points.at(i));
     painter->drawPath(path);
 
-    // One-way arrowhead at the far end.
-    if (c.flow == ConnectionFlow::OneWay && m_points.size() >= 2) {
-        const QPointF from = m_points.at(m_points.size() - 2);
-        const QPointF to = m_points.last();
-        const QPointF d = to - from;
-        const double len = std::hypot(d.x(), d.y());
-        if (len > 1e-6) {
+    // One-way chevrons: a ">"-shaped arrowhead at the midpoint of every segment
+    // long enough to hold one, pointing along the flow direction. This mirrors
+    // the C# Connection.Draw, which draws a chevron per segment sized from
+    // Settings.ConnectionArrowSize, rather than a single arrow at the end.
+    if (c.flow == ConnectionFlow::OneWay) {
+        const double arrow = map->settings.arrowSize > 0.0 ? map->settings.arrowSize : 12.0;
+        QPen arrowPen(color);
+        arrowPen.setWidthF(pen.widthF());
+        painter->setPen(arrowPen);
+        painter->setBrush(Qt::NoBrush);
+        for (int i = 1; i < m_points.size(); ++i) {
+            const QPointF a = m_points.at(i - 1);
+            const QPointF b = m_points.at(i);
+            const QPointF d = b - a;
+            const double len = std::hypot(d.x(), d.y());
+            if (len <= arrow)
+                continue;
             const QPointF u = d / len;
-            const QPointF n(-u.y(), u.x());
-            const QPointF base = to - u * 11.0;
-            QPolygonF head;
-            head << to << (base + n * 5.0) << (base - n * 5.0);
-            painter->setPen(Qt::NoPen);
-            painter->setBrush(color);
-            painter->drawPolygon(head);
+            const QPointF nrm(-u.y(), u.x());
+            const QPointF mid = (a + b) / 2.0;
+            const double s = arrow / 2.0;
+            const QPointF apex = mid + u * s;
+            const QPointF right = mid - u * s + nrm * s;
+            const QPointF left = mid - u * s - nrm * s;
+            QPolygonF chevron;
+            chevron << apex << right << left;
+            painter->drawPolygon(chevron);
         }
     }
 

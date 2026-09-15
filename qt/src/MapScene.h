@@ -82,8 +82,17 @@ public:
     double gridSize() const;
     QPointF snap(const QPointF &p) const;
 
-    // The world-space point of a room's port ("n","s","e",...); centre otherwise.
+    // The world-space point of a room's port. Supports all sixteen compass
+    // ports (n, nne, ne, ene, e, ...) mapped onto the room's outline, and is
+    // shape-aware for ellipse and octagonal rooms; centre for an unknown token.
     static QPointF portPoint(const Room &room, const QString &port);
+    // The outward "stalk" point a docked connection endpoint runs to before it
+    // reaches the room outline, mirroring Room.GetPortStalkPosition. Returns the
+    // port point itself when stalk <= 0 (no stalk).
+    static QPointF portStalkPoint(const Room &room, const QString &port, double stalk);
+    // A room's port point on its plain bounding rectangle (no shape awareness).
+    static QPointF squareCorner(double x, double y, double w, double h,
+                                const QString &port);
 
     // Editing entry points used by the window's actions.
     int addRoomAt(const QPointF &scenePos);   // returns new room id

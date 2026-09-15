@@ -72,25 +72,100 @@ QPointF MapScene::snap(const QPointF &p) const
     return QPointF(std::round(p.x() / g) * g, std::round(p.y() / g) * g);
 }
 
+namespace {
+
+// The compass index (0..15) used to place a port on an ellipse, matching
+// CompassPointHelper.getPointIntegerValue: East is 0 and the index advances
+// clockwise. Returns -1 for an unknown token.
+int ellipseCompassIndex(const QString &p)
+{
+    static const QHash<QString, int> kIndex = {
+        {"e", 0},  {"ese", 1}, {"se", 2},  {"sse", 3},
+        {"s", 4},  {"ssw", 5}, {"sw", 6},  {"wsw", 7},
+        {"w", 8},  {"wnw", 9}, {"nw", 10}, {"nnw", 11},
+        {"n", 12}, {"nne", 13},{"ne", 14}, {"ene", 15},
+    };
+    return kIndex.value(p, -1);
+}
+
+} // namespace
+
+QPointF MapScene::squareCorner(double x, double y, double w, double h, const QString &port)
+{
+    // Fractions of (w, h) for each of the sixteen compass ports on a rectangle,
+    // matching Rect.GetCorner (square branch).
+    double fx = 0.5, fy = 0.5;
+    const QString p = port.toLower();
+    if (p == QLatin1String("n"))        { fx = 0.5;  fy = 0.0;  }
+    else if (p == QLatin1String("nne")) { fx = 0.75; fy = 0.0;  }
+    else if (p == QLatin1String("ne"))  { fx = 1.0;  fy = 0.0;  }
+    else if (p == QLatin1String("ene")) { fx = 1.0;  fy = 0.25; }
+    else if (p == QLatin1String("e"))   { fx = 1.0;  fy = 0.5;  }
+    else if (p == QLatin1String("ese")) { fx = 1.0;  fy = 0.75; }
+    else if (p == QLatin1String("se"))  { fx = 1.0;  fy = 1.0;  }
+    else if (p == QLatin1String("sse")) { fx = 0.75; fy = 1.0;  }
+    else if (p == QLatin1String("s"))   { fx = 0.5;  fy = 1.0;  }
+    else if (p == QLatin1String("ssw")) { fx = 0.25; fy = 1.0;  }
+    else if (p == QLatin1String("sw"))  { fx = 0.0;  fy = 1.0;  }
+    else if (p == QLatin1String("wsw")) { fx = 0.0;  fy = 0.75; }
+    else if (p == QLatin1String("w"))   { fx = 0.0;  fy = 0.5;  }
+    else if (p == QLatin1String("wnw")) { fx = 0.0;  fy = 0.25; }
+    else if (p == QLatin1String("nw"))  { fx = 0.0;  fy = 0.0;  }
+    else if (p == QLatin1String("nnw")) { fx = 0.25; fy = 0.0;  }
+    // else: centre (fx = fy = 0.5), matching the C# unknown-port fallback.
+    return QPointF(x + w * fx, y + h * fy);
+}
+
 QPointF MapScene::portPoint(const Room &room, const QString &port)
 {
-    const double left = room.x;
-    const double top = room.y;
-    const double right = room.x + room.w;
-    const double bottom = room.y + room.h;
-    const double cx = room.x + room.w / 2.0;
-    const double cy = room.y + room.h / 2.0;
-
+    const double x = room.x;
+    const double y = room.y;
+    const double w = room.w;
+    const double h = room.h;
     const QString p = port.toLower();
-    if (p == QLatin1String("n"))  return {cx, top};
-    if (p == QLatin1String("s"))  return {cx, bottom};
-    if (p == QLatin1String("e"))  return {right, cy};
-    if (p == QLatin1String("w"))  return {left, cy};
-    if (p == QLatin1String("ne")) return {right, top};
-    if (p == QLatin1String("nw")) return {left, top};
-    if (p == QLatin1String("se")) return {right, bottom};
-    if (p == QLatin1String("sw")) return {left, bottom};
-    return {cx, cy};
+
+    if (room.ellipse) {
+        const int i = ellipseCompassIndex(p);
+        if (i < 0)
+            return QPointF(x + w / 2.0, y + h / 2.0);
+        const double kPi = 3.14159265358979323846;
+        const double theta = i * (2.0 * kPi / 16.0);
+        return QPointF(x + w / 2.0 + (w / 2.0) * std::cos(theta),
+                       y + h / 2.0 + (h / 2.0) * std::sin(theta));
+    }
+
+    if (room.octagonal) {
+        // The four ordinals are chamfered to 1/8 insets; the rest lie on the
+        // bounding rectangle exactly as a square room's do.
+        if (p == QLatin1String("ne")) return {x + w * 7.0 / 8.0, y + h * 1.0 / 8.0};
+        if (p == QLatin1String("se")) return {x + w * 7.0 / 8.0, y + h * 7.0 / 8.0};
+        if (p == QLatin1String("sw")) return {x + w * 1.0 / 8.0, y + h * 7.0 / 8.0};
+        if (p == QLatin1String("nw")) return {x + w * 1.0 / 8.0, y + h * 1.0 / 8.0};
+    }
+
+    return squareCorner(x, y, w, h, p);
+}
+
+QPointF MapScene::portStalkPoint(const Room &room, const QString &port, double stalk)
+{
+    if (stalk <= 0.0)
+        return portPoint(room, port);
+
+    // Mirrors Room.GetPortStalkPosition: the inner corner is taken on the room
+    // itself, the outer corner on the room inflated by the stalk length, and the
+    // two are combined so the eight "half" ports run a straight stalk that stays
+    // perpendicular to the room edge.
+    const QPointF inner = squareCorner(room.x, room.y, room.w, room.h, port);
+    const QPointF outer = squareCorner(room.x - stalk, room.y - stalk,
+                                       room.w + 2.0 * stalk, room.h + 2.0 * stalk, port);
+    const QString p = port.toLower();
+    if (p == QLatin1String("ene") || p == QLatin1String("ese") ||
+        p == QLatin1String("wnw") || p == QLatin1String("wsw"))
+        return {outer.x(), inner.y()};
+    if (p == QLatin1String("nne") || p == QLatin1String("nnw") ||
+        p == QLatin1String("sse") || p == QLatin1String("ssw"))
+        return {inner.x(), outer.y()};
+    return outer;
 }
 
 void MapScene::setDocument(Map *map)
