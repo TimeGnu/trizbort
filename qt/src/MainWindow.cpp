@@ -67,6 +67,7 @@
 #include "EditCommands.h"
 #include "MapRender.h"
 #include "MapScene.h"
+#include "MapStatisticsDialog.h"
 #include "MapView.h"
 #include "RoomDialog.h"
 #include "SettingsDialog.h"
@@ -258,6 +259,13 @@ void MainWindow::createActions()
     };
     for (QAction *a : {vUnique, vDesc, vSub, vDang})
         connect(a, &QAction::triggered, this, applyValidation);
+
+    // --- Tools menu ---
+    QMenu *toolsMenu = menuBar()->addMenu(tr("&Tools"));
+    toolsMenu->addAction(tr("Map St&atistics…"), this, [this] {
+        MapStatisticsDialog dlg(m_map, this);
+        dlg.exec();
+    });
 
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
     viewMenu->addAction(tr("Zoom &In"), QKeySequence::ZoomIn, m_view, &MapView::zoomIn);

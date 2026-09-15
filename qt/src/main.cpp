@@ -57,6 +57,7 @@
 #include "MapDocument.h"
 #include "MapRender.h"
 #include "MapScene.h"
+#include "MapStatisticsDialog.h"
 #include "RoomItem.h"
 #include "SettingsDialog.h"
 #include "TranscriptAutomapper.h"
@@ -165,6 +166,18 @@ static int runSave(const QString &mapPath, const QString &outPath)
         err << "save failed: " << error << Qt::endl;
         return 3;
     }
+    return 0;
+}
+
+static int runStats(const QString &mapPath)
+{
+    trizbort::Map map;
+    QString error;
+    if (!trizbort::TrizbortReader::load(mapPath, map, &error)) {
+        QTextStream(stderr) << "load failed: " << error << Qt::endl;
+        return 1;
+    }
+    QTextStream(stdout) << trizbort::buildStatisticsReport(map) << Qt::endl;
     return 0;
 }
 
@@ -542,6 +555,7 @@ int main(int argc, char *argv[])
     QString transcriptOut;
     QString exportFmt;
     QString exportOut;
+    bool statsRequested = false;
     static const struct {
         const char *flag;
         const char *fmt;
@@ -563,6 +577,10 @@ int main(int argc, char *argv[])
         }
         if (args.at(i) == QLatin1String("--save") && i + 1 < args.size()) {
             savePath = args.at(++i);
+            continue;
+        }
+        if (args.at(i) == QLatin1String("--stats")) {
+            statsRequested = true;
             continue;
         }
         if (args.at(i) == QLatin1String("--import-transcript") && i + 2 < args.size()) {
@@ -589,6 +607,14 @@ int main(int argc, char *argv[])
             return 2;
         }
         return runExport(exportFmt, mapPath, exportOut);
+    }
+
+    if (statsRequested) {
+        if (mapPath.isEmpty()) {
+            QTextStream(stderr) << "usage: trizbort-qt <map.trizbort> --stats" << Qt::endl;
+            return 2;
+        }
+        return runStats(mapPath);
     }
 
     if (!transcriptPath.isEmpty()) {
