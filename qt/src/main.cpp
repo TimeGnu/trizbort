@@ -308,6 +308,17 @@ static int runEditSelftest()
         check(sc.roomNearestWithin(QPointF(-100, 20), 16.0) == -1, "snap: no room when far");
     }
 
+    // Update-check version comparison (handles a leading "v", extra components,
+    // and pre-release suffixes).
+    check(MainWindow::compareVersionStrings(QStringLiteral("v1.9.0"), QStringLiteral("1.8.0.0")) > 0,
+          "version newer");
+    check(MainWindow::compareVersionStrings(QStringLiteral("1.8.0"), QStringLiteral("1.8.0.0")) == 0,
+          "version equal with trailing zeros");
+    check(MainWindow::compareVersionStrings(QStringLiteral("v1.7.5"), QStringLiteral("1.8.0.0")) < 0,
+          "version older");
+    check(MainWindow::compareVersionStrings(QStringLiteral("v2.0.0-beta"), QStringLiteral("1.8.0.0")) > 0,
+          "version newer ignoring pre-release suffix");
+
     QFile::remove(path);
     out << (failures == 0 ? "edit-selftest: PASS" : "edit-selftest: FAIL") << Qt::endl;
     return failures == 0 ? 0 : 1;
