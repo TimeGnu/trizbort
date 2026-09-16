@@ -200,6 +200,26 @@ int MapScene::roomIdAt(const QPointF &scenePos) const
     return -1;
 }
 
+int MapScene::roomNearestWithin(const QPointF &scenePos, double maxDist) const
+{
+    if (!m_map)
+        return -1;
+    int best = -1;
+    double bestDist = maxDist;
+    for (const Room &r : m_map->rooms) {
+        const QRectF rect(r.x, r.y, r.w, r.h);
+        // Distance from the point to the room rectangle (0 when inside).
+        const double dx = std::max({rect.left() - scenePos.x(), 0.0, scenePos.x() - rect.right()});
+        const double dy = std::max({rect.top() - scenePos.y(), 0.0, scenePos.y() - rect.bottom()});
+        const double dist = std::hypot(dx, dy);
+        if (dist <= bestDist) {
+            bestDist = dist;
+            best = r.id;
+        }
+    }
+    return best;
+}
+
 QVector<QPair<QLineF, int>> MapScene::connectionSegmentsExcept(int exceptId) const
 {
     QVector<QPair<QLineF, int>> segs;

@@ -110,6 +110,11 @@ public:
     // The id of the room whose outline contains a scene point, or -1.
     int roomIdAt(const QPointF &scenePos) const;
 
+    // The id of the room nearest a scene point whose rectangle is within maxDist
+    // of it (0 => must contain the point), or -1. Implements snap-to-element
+    // magnetism when re-docking connection endpoints.
+    int roomNearestWithin(const QPointF &scenePos, double maxDist) const;
+
     // All routed segments of connections other than exceptId, each tagged with
     // its owner connection id. Used to draw "smart" gaps where lines cross.
     QVector<QPair<QLineF, int>> connectionSegmentsExcept(int exceptId) const;

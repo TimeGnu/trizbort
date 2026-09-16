@@ -30,11 +30,18 @@ namespace trizbort {
 
 namespace {
 
-QRectF contentRect(QGraphicsScene &scene)
+QRectF contentRect(QGraphicsScene &scene, const Map &map)
 {
     QRectF r = scene.itemsBoundingRect();
     if (r.isEmpty())
         r = QRectF(0, 0, 200, 200);
+    // Honour document-specific page margins when set; otherwise a small default
+    // gutter so nothing is clipped at the edge.
+    if (map.settings.documentSpecificMargins) {
+        const double hm = map.settings.horizontalMargin;
+        const double vm = map.settings.verticalMargin;
+        return r.adjusted(-hm, -vm, hm, vm);
+    }
     return r.adjusted(-24, -24, 24, 24);
 }
 
@@ -54,7 +61,7 @@ bool renderMapToImage(const Map &map, const QString &path, QString *errorMessage
     MapScene scene;
     scene.setDocument(&copy);
 
-    const QRectF bounds = contentRect(scene);
+    const QRectF bounds = contentRect(scene, copy);
     const QSize size = bounds.size().toSize();
     QImage image(size, QImage::Format_ARGB32);
     image.fill(canvas(copy));
@@ -79,7 +86,7 @@ bool renderMapToPdf(const Map &map, const QString &path, QString *errorMessage)
     MapScene scene;
     scene.setDocument(&copy);
 
-    const QRectF bounds = contentRect(scene);
+    const QRectF bounds = contentRect(scene, copy);
 
     QPdfWriter writer(path);
     writer.setResolution(72); // 1 map unit == 1 PostScript point

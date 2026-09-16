@@ -296,6 +296,18 @@ static int runEditSelftest()
         check(rep.contains(QLatin1String("# of Connections: 2 total")), "stats connection total");
     }
 
+    // Snap-to-element magnetism: a room within the snap distance of a point.
+    {
+        Map nm;
+        nm.addRoom(0, 0); // 96x64 at the origin
+        MapScene sc;
+        sc.setDocument(&nm);
+        const int rid = nm.rooms.first().id;
+        check(sc.roomNearestWithin(QPointF(10, 10), 16.0) == rid, "snap: point inside room");
+        check(sc.roomNearestWithin(QPointF(-8, 20), 16.0) == rid, "snap: point near room within range");
+        check(sc.roomNearestWithin(QPointF(-100, 20), 16.0) == -1, "snap: no room when far");
+    }
+
     QFile::remove(path);
     out << (failures == 0 ? "edit-selftest: PASS" : "edit-selftest: FAIL") << Qt::endl;
     return failures == 0 ? 0 : 1;

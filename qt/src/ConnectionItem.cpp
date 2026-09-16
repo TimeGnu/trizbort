@@ -473,7 +473,11 @@ void ConnectionItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             Connection &c = map->connections[idx];
             Vertex &v = c.vertices[dragged];
             const bool isEndpoint = (dragged == 0 || dragged == c.vertices.size() - 1);
-            const int roomId = m_scene->roomIdAt(event->scenePos());
+            // Snap-to-element magnetism: dock onto a room that contains the drop
+            // point, or one within the snap-to-element distance of it.
+            int roomId = m_scene->roomIdAt(event->scenePos());
+            if (roomId < 0 && map->settings.snapToElementSize > 0.0)
+                roomId = m_scene->roomNearestWithin(event->scenePos(), map->settings.snapToElementSize);
             if (isEndpoint && roomId >= 0) {
                 // Re-dock the endpoint onto the room's port facing the next vertex.
                 const int otherIdx = (dragged == 0) ? 1 : dragged - 1;
