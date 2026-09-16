@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Trizbort (Qt)
+GenericName=Interactive Fiction Mapper
+Comment=Draw maps for interactive fiction and text adventures
+Exec=trizbort-qt %f
+TryExec=trizbort-qt
+Icon=trizbort-qt
+Terminal=false
+Categories=Graphics;
+MimeType=application/x-trizbort;
+Keywords=interactive fiction;text adventure;map;mapper;IF;adventure;
+StartupNotify=true
+StartupWMClass=trizbort-qt

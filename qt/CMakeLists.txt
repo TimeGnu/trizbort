@@ -47,3 +47,20 @@ add_executable(trizbort-qt
 )
 
 target_link_libraries(trizbort-qt PRIVATE Qt6::Widgets Qt6::Network)
+
+# Installation (FHS layout via GNUInstallDirs; used by `cmake --install` and by
+# the Debian packaging).
+include(GNUInstallDirs)
+
+install(TARGETS trizbort-qt RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+install(FILES packaging/trizbort-qt.desktop
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+install(FILES packaging/trizbort-qt.svg
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
+install(FILES packaging/trizbort-qt.xml
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/mime/packages)
+install(FILES packaging/org.jxself.trizbort-qt.metainfo.xml
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
+install(FILES packaging/trizbort-qt.1
+        DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
