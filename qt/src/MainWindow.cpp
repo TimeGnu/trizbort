@@ -64,7 +64,11 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QEventLoop>
 #include <QMimeData>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QSet>
 #include <QSettings>
 #include <QTimer>
@@ -146,6 +150,8 @@ void MainWindow::createActions()
 
     auto *newAct = fileMenu->addAction(tr("&New"), QKeySequence::New, this, &MainWindow::newFile);
     auto *openAct = fileMenu->addAction(tr("&Open…"), QKeySequence::Open, this, &MainWindow::openFile);
+    fileMenu->addAction(tr("Open from &URL…"), QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_O), this,
+                        &MainWindow::openFromUrl);
     auto *saveAct = fileMenu->addAction(tr("&Save"), QKeySequence::Save, this, [this] { save(); });
     fileMenu->addAction(tr("Save &As…"), QKeySequence::SaveAs, this, [this] { saveAs(); });
     m_recentMenu = fileMenu->addMenu(tr("Recent &Maps"));
@@ -253,6 +259,17 @@ void MainWindow::createActions()
         if (!d.shortcut.isEmpty())
             act->setShortcut(d.shortcut);
     }
+    automapMenu->addSeparator();
+    // Up/Down/In/Out place the room in a cardinal direction and label the
+    // connection, mirroring the C# up/down/in/out mapping.
+    automapMenu->addAction(tr("Up"), this,
+                           [this] { addConnectedRoomLabeled("n", "up", "down", tr("Up")); });
+    automapMenu->addAction(tr("Down"), this,
+                           [this] { addConnectedRoomLabeled("s", "down", "up", tr("Down")); });
+    automapMenu->addAction(tr("In"), this,
+                           [this] { addConnectedRoomLabeled("e", "in", "out", tr("In")); });
+    automapMenu->addAction(tr("Out"), this,
+                           [this] { addConnectedRoomLabeled("w", "out", "in", tr("Out")); });
     editMenu->addSeparator();
     editMenu->addAction(tr("&Map Properties…"), this, &MainWindow::editMapProperties);
     editMenu->addAction(tr("Map &Settings…"), this, &MainWindow::editMapSettings);
@@ -540,6 +557,54 @@ void MainWindow::openFile()
     if (path.isEmpty())
         return;
     loadFile(path);
+}
+
+void MainWindow::openFromUrl()
+{
+    if (!maybeSave())
+        return;
+    bool ok = false;
+    const QString url = QInputDialog::getText(this, tr("Open from URL"),
+                                              tr("Map URL (https://…/map.trizbort):"),
+                                              QLineEdit::Normal, QString(), &ok);
+    if (!ok || url.trimmed().isEmpty())
+        return;
+
+    QNetworkAccessManager manager;
+    QNetworkRequest request{QUrl(url.trimmed())};
+    request.setAttribute(QNetworkRequest::RedirectPolicyAttribute,
+                         QNetworkRequest::NoLessSafeRedirectPolicy);
+    QNetworkReply *reply = manager.get(request);
+    QEventLoop loop;
+    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    loop.exec();
+    QApplication::restoreOverrideCursor();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        QMessageBox::warning(this, tr("Open Failed"),
+                             tr("Could not download the map: %1").arg(reply->errorString()));
+        reply->deleteLater();
+        return;
+    }
+    const QString xml = QString::fromUtf8(reply->readAll());
+    reply->deleteLater();
+
+    Map loaded;
+    QString error;
+    if (!TrizbortReader::loadFromString(xml, loaded, &error)) {
+        QMessageBox::warning(this, tr("Open Failed"),
+                             tr("The download is not a valid Trizbort map: %1").arg(error));
+        return;
+    }
+    m_map = loaded;
+    m_map.reindex();
+    m_filePath.clear(); // came from a URL; Save will prompt for a local path
+    m_scene->setDocument(&m_map);
+    m_undo.clear();
+    updateTitle();
+    m_view->zoomToFit();
+    statusBar()->showMessage(tr("Opened map from %1").arg(url));
 }
 
 bool MainWindow::loadFile(const QString &path)
@@ -844,6 +909,25 @@ void MainWindow::addConnectedRoom(const QString &direction)
     const int newId = cmd->newRoomId();
     m_undo.push(cmd);
     statusBar()->showMessage(tr("Added room %1 (%2)").arg(newId).arg(direction.toUpper()));
+}
+
+void MainWindow::addConnectedRoomLabeled(const QString &placementDir, const QString &startLabel,
+                                         const QString &endLabel, const QString &displayName)
+{
+    const int fromId = m_scene->selectedRoomId();
+    if (fromId < 0) {
+        statusBar()->showMessage(tr("Select a room first, then add a connected room."));
+        return;
+    }
+    auto *cmd =
+        new AddConnectedRoomCommand(m_scene, fromId, placementDir, startLabel, endLabel);
+    if (!cmd->valid()) {
+        delete cmd;
+        return;
+    }
+    const int newId = cmd->newRoomId();
+    m_undo.push(cmd);
+    statusBar()->showMessage(tr("Added room %1 (%2)").arg(newId).arg(displayName));
 }
 
 void MainWindow::deleteSelection()

@@ -74,6 +74,7 @@ protected:
 private slots:
     void newFile();
     void openFile();
+    void openFromUrl();
     bool save();
     bool saveAs();
     void exportMap(const QString &format);
@@ -85,6 +86,8 @@ private slots:
     void automapTick();
     void addRoom();
     void addConnectedRoom(const QString &direction);
+    void addConnectedRoomLabeled(const QString &placementDir, const QString &startLabel,
+                                 const QString &endLabel, const QString &displayName);
     void deleteSelection();
     void toggleConnectMode(bool on);
     void editMapProperties();

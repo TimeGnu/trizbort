@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Network)
 
 add_executable(trizbort-qt
     src/main.cpp
@@ -46,4 +46,4 @@ add_executable(trizbort-qt
     src/export/QuestExporter.cpp
 )
 
-target_link_libraries(trizbort-qt PRIVATE Qt6::Widgets)
+target_link_libraries(trizbort-qt PRIVATE Qt6::Widgets Qt6::Network)

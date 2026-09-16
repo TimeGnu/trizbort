@@ -221,7 +221,8 @@ void directionVector(const QString &dir, int &dx, int &dy)
 } // namespace
 
 AddConnectedRoomCommand::AddConnectedRoomCommand(MapScene *scene, int fromRoomId,
-                                                 const QString &direction)
+                                                 const QString &direction,
+                                                 const QString &startLabel, const QString &endLabel)
     : m_scene(scene)
 {
     Map *map = scene->document();
@@ -280,6 +281,8 @@ AddConnectedRoomCommand::AddConnectedRoomCommand(MapScene *scene, int fromRoomId
     b.roomId = m_room.id;
     b.port = oppositePort(direction);
     m_conn.vertices << a << b;
+    m_conn.startText = startLabel;
+    m_conn.endText = endLabel;
 
     m_valid = true;
     setText(QObject::tr("Add Room %1").arg(direction.toUpper()));

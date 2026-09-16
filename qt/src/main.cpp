@@ -565,6 +565,7 @@ int main(int argc, char *argv[])
         {"--zil", "zil"},         {"--adventuron", "adventuron"}, {"--inform6", "inform6"},
         {"--inform7", "inform7"}, {"--tads", "tads"},             {"--alan", "alan"},
         {"--hugo", "hugo"},       {"--quest", "quest"},
+        {"--questrooms", "questrooms"},
     };
 
     const QStringList args = QApplication::arguments();

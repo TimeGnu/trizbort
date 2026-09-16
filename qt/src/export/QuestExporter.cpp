@@ -141,6 +141,8 @@ void QuestExporter::exportHeader(QString &out, const QString &title, const QStri
                                  const QString &description, const QString &history)
 {
     Q_UNUSED(history);
+    if (!includeWrapper())
+        return;
     auto wl = [&out](const QString &s = QString()) { out += s; out += QLatin1Char('\n'); };
 
     wl(QStringLiteral("<asl version=\"550\">"));
@@ -237,8 +239,10 @@ void QuestExporter::exportContent(QString &out)
 
     wl();
 
-    wl(QStringLiteral("</asl>"));
-    wl();
+    if (includeWrapper()) {
+        wl(QStringLiteral("</asl>"));
+        wl();
+    }
 }
 
 } // namespace trizbort
