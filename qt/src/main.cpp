@@ -244,6 +244,27 @@ static int runEditSelftest()
     check(reloaded.rooms.size() == 1, "removeRoom left one room");
     check(reloaded.connections.isEmpty(), "removeRoom dropped its connection");
 
+    // Facing-port geometry used by Insert Room on Connection: a room presents
+    // the port on the side facing each neighbour, for any orientation.
+    {
+        Room mid;
+        mid.x = 200;
+        mid.y = 200;
+        mid.w = 96;
+        mid.h = 64;
+        const QPointF c(mid.x + mid.w / 2.0, mid.y + mid.h / 2.0);
+        check(MapScene::portTowards(mid, c + QPointF(300, 0)) == QLatin1String("e"),
+              "facing port east");
+        check(MapScene::portTowards(mid, c - QPointF(300, 0)) == QLatin1String("w"),
+              "facing port west");
+        check(MapScene::portTowards(mid, c + QPointF(0, 300)) == QLatin1String("s"),
+              "facing port south");
+        check(MapScene::portTowards(mid, c - QPointF(0, 300)) == QLatin1String("n"),
+              "facing port north");
+        check(MapScene::portTowards(mid, c + QPointF(300, 300)) == QLatin1String("se"),
+              "facing port southeast");
+    }
+
     QFile::remove(path);
     out << (failures == 0 ? "edit-selftest: PASS" : "edit-selftest: FAIL") << Qt::endl;
     return failures == 0 ? 0 : 1;

@@ -1166,6 +1166,15 @@ void MainWindow::insertRoomOnConnection()
     }
     after.rooms.append(newRoom);
 
+    // Compute the ports the new room presents to each neighbour from geometry:
+    // the port facing the source takes the incoming segment, the port facing the
+    // target takes the outgoing one (the C# crossover of source/target compass
+    // points, generalized to any orientation and to dangling ends).
+    const QPointF sourcePoint = vertexPoint(first);
+    const QPointF targetPoint = vertexPoint(last);
+    const QString incomingPort = MapScene::portTowards(newRoom, sourcePoint);
+    const QString outgoingPort = MapScene::portTowards(newRoom, targetPoint);
+
     // Re-target the original connection's far end onto the new room, and add a
     // second connection from the new room to the original target.
     for (Connection &c : after.connections) {
@@ -1176,7 +1185,7 @@ void MainWindow::insertRoomOnConnection()
         Vertex &end = c.vertices.last();
         end.docked = true;
         end.roomId = newRoom.id;
-        end.port = QStringLiteral("w");
+        end.port = incomingPort;
         break;
     }
     Connection second;
@@ -1188,7 +1197,7 @@ void MainWindow::insertRoomOnConnection()
     a.index = 0;
     a.docked = true;
     a.roomId = newRoom.id;
-    a.port = QStringLiteral("e");
+    a.port = outgoingPort;
     Vertex b = last; // original far endpoint
     b.index = 1;
     second.vertices << a << b;
