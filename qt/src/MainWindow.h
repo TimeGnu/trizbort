@@ -59,6 +59,8 @@ namespace trizbort {
 
 class MapScene;
 class MapView;
+class TranscriptAutomapper;
+class GuiAutomapController;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -83,6 +85,7 @@ private slots:
     void importTranscript();
     void startLiveAutomap();
     void stopLiveAutomap();
+    void abandonLiveAutomap(); // tear down without recording an undo step
     void automapTick();
     void addRoom();
     void addConnectedRoom(const QString &direction);
@@ -146,13 +149,20 @@ private:
     QFileSystemWatcher *m_watcher = nullptr;
     qint64 m_lastSaveMs = 0; // ignore watcher events right after our own save
 
-    // Live automap: tail a transcript and re-derive the map as it grows.
+    // Live automap: an incremental, controller-driven engine fed the transcript
+    // as it grows on disk.
     QTimer *m_automapTimer = nullptr;
     QString m_automapPath;
     qint64 m_automapSize = -1;
+    int m_automapFedLines = 0;        // lines already fed to the engine
     Map m_automapPreMap;              // map content captured when automap started
     QAction *m_automapStopAction = nullptr;
+    QAction *m_automapStepAction = nullptr;
+    QAction *m_automapRunAction = nullptr;
     bool m_automapping = false;
+    bool m_automapBusy = false;       // guard against re-entrant ticks while stepping
+    TranscriptAutomapper *m_automapper = nullptr;
+    GuiAutomapController *m_automapController = nullptr;
 
     MapScene *m_scene = nullptr;
     MapView *m_view = nullptr;

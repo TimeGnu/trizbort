@@ -527,6 +527,87 @@ static int runTranscriptSelftest()
     check(exporter && exporter->exportToString().contains(QLatin1String("West of House")),
           "automapped map exports");
 
+    // A dangling exit stub: one vertex docked to the room at `port`, one free.
+    auto stubsFrom = [](const Map &m, int roomId, const QString &port) {
+        int count = 0;
+        for (const Connection &c : m.connections) {
+            bool dockHere = false;
+            bool hasFree = false;
+            for (const Vertex &v : c.vertices) {
+                if (v.docked && v.roomId == roomId && v.port == port)
+                    dockHere = true;
+                if (!v.docked)
+                    hasFree = true;
+            }
+            if (dockHere && hasFree)
+                ++count;
+        }
+        return count;
+    };
+
+    // 'tb exit <dir>' adds a dangling stub; 'tb noexit <dir>' takes it away.
+    {
+        const QString t = QStringLiteral(
+            "Stub Game\n"
+            "\n"
+            "Kitchen\n"
+            "A cosy kitchen.\n"
+            "\n"
+            ">tb exit north\n"
+            ">tb exit east\n"
+            ">tb noexit north\n"
+            ">\n");
+        Map m;
+        TranscriptAutomapper mp;
+        mp.run(m, t);
+        check(m.rooms.size() == 1, "stub test: one room");
+        const int kitchen = m.rooms.isEmpty() ? -1 : m.rooms.first().id;
+        check(kitchen >= 0 && stubsFrom(m, kitchen, QStringLiteral("n")) == 0,
+              "tb noexit removed the north stub");
+        check(kitchen >= 0 && stubsFrom(m, kitchen, QStringLiteral("e")) == 1,
+              "tb exit east stub remains");
+    }
+
+    // 'trypush <dir>' nudges the current room a step in that direction.
+    {
+        const QString t = QStringLiteral(
+            "Push Game\n"
+            "\n"
+            "Hall\n"
+            "A long hall.\n"
+            "\n"
+            ">trypush east\n"
+            ">\n");
+        Map m;
+        TranscriptAutomapper mp;
+        mp.run(m, t);
+        check(m.rooms.size() == 1, "trypush test: one room");
+        if (!m.rooms.isEmpty())
+            check(m.rooms.first().x > 100.0, "trypush east moved the room right");
+    }
+
+    // guessExits: direction words in a description become dangling stubs.
+    {
+        const QString t = QStringLiteral(
+            "Guess Game\n"
+            "\n"
+            "Clearing\n"
+            "Paths lead north and east from this clearing.\n"
+            "\n"
+            ">\n");
+        AutomapSettings s;
+        s.guessExits = true;
+        Map m;
+        TranscriptAutomapper mp(s);
+        mp.run(m, t);
+        check(m.rooms.size() == 1, "guess test: one room");
+        const int clearing = m.rooms.isEmpty() ? -1 : m.rooms.first().id;
+        check(clearing >= 0 && stubsFrom(m, clearing, QStringLiteral("n")) == 1,
+              "guessed a north exit");
+        check(clearing >= 0 && stubsFrom(m, clearing, QStringLiteral("e")) == 1,
+              "guessed an east exit");
+    }
+
     out << (failures == 0 ? "transcript-selftest: PASS" : "transcript-selftest: FAIL") << Qt::endl;
     return failures == 0 ? 0 : 1;
 }

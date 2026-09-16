@@ -77,6 +77,7 @@
 #include <QStatusBar>
 #include <QToolBar>
 
+#include "AutomapGui.h"
 #include "ConnectionDialog.h"
 #include "EditCommands.h"
 #include "MapRender.h"
@@ -396,6 +397,17 @@ void MainWindow::createActions()
     m_automapStopAction =
         automapTopMenu->addAction(tr("S&top Automapping"), this, &MainWindow::stopLiveAutomap);
     m_automapStopAction->setEnabled(false);
+    m_automapStepAction = automapTopMenu->addAction(tr("Ste&p"), QKeySequence(Qt::Key_F11), this, [this] {
+        if (m_automapController)
+            m_automapController->proceed();
+    });
+    m_automapStepAction->setEnabled(false);
+    m_automapRunAction = automapTopMenu->addAction(
+        tr("&Run to Completion"), QKeySequence(Qt::CTRL | Qt::Key_F5), this, [this] {
+            if (m_automapController)
+                m_automapController->runToCompletion();
+        });
+    m_automapRunAction->setEnabled(false);
     automapTopMenu->addSeparator();
     automapTopMenu->addAction(tr("&Import Transcript (one-shot)…"), this,
                               &MainWindow::importTranscript);
@@ -527,13 +539,7 @@ void MainWindow::newFile()
 {
     if (!maybeSave())
         return;
-    if (m_automapping) {
-        if (m_automapTimer)
-            m_automapTimer->stop();
-        m_automapping = false;
-        if (m_automapStopAction)
-            m_automapStopAction->setEnabled(false);
-    }
+    abandonLiveAutomap();
     m_map.clear();
     // A fresh document has the default palette and a single NoRegion region.
     m_map.regions.append(Region{kNoRegion, QColor(0, 0, 255), QColor(255, 255, 255), QString(), QString()});
@@ -547,13 +553,7 @@ void MainWindow::openFile()
 {
     if (!maybeSave())
         return;
-    if (m_automapping) {
-        if (m_automapTimer)
-            m_automapTimer->stop();
-        m_automapping = false;
-        if (m_automapStopAction)
-            m_automapStopAction->setEnabled(false);
-    }
+    abandonLiveAutomap();
     const QString path = QFileDialog::getOpenFileName(
         this, tr("Open Map"), QString(), tr("Trizbort maps (*.trizbort);;All files (*)"));
     if (path.isEmpty())
@@ -807,35 +807,77 @@ void MainWindow::startLiveAutomap()
         statusBar()->showMessage(tr("Automapping is already running."));
         return;
     }
-    const QString path = QFileDialog::getOpenFileName(
-        this, tr("Live Automap — Choose Transcript"), QString(),
-        tr("Transcripts (*.txt *.log *.scr);;All files (*)"));
-    if (path.isEmpty())
-        return;
 
-    // Snapshot the current map: each poll re-derives from this snapshot plus the
-    // whole transcript so far, so re-running as the file grows is idempotent.
+    // Options dialog (transcript, toggles, command words, step mode), seeded
+    // from the persisted automap preferences.
+    QSettings s;
+    AutomapSettings settings;
+    settings.assumeTwoWayConnections = s.value(QStringLiteral("automap/twoWay"), true).toBool();
+    settings.assumeSameNameSameRoom = s.value(QStringLiteral("automap/sameName"), true).toBool();
+    settings.guessExits = s.value(QStringLiteral("automap/guessExits"), false).toBool();
+    settings.objectCommand =
+        s.value(QStringLiteral("automap/objectCommand"), QStringLiteral("tb see")).toString();
+    settings.regionCommand =
+        s.value(QStringLiteral("automap/regionCommand"), QStringLiteral("tb region")).toString();
+    settings.preferredDistanceBetweenRooms = m_map.settings.preferredDistanceBetweenRooms;
+    settings.gridSize = m_map.settings.gridSize;
+
+    AutomapOptionsDialog dialog(settings, this);
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+    const QString path = dialog.transcriptPath();
+    if (path.isEmpty()) {
+        statusBar()->showMessage(tr("No transcript chosen."));
+        return;
+    }
+    settings = dialog.settings();
+    s.setValue(QStringLiteral("automap/twoWay"), settings.assumeTwoWayConnections);
+    s.setValue(QStringLiteral("automap/sameName"), settings.assumeSameNameSameRoom);
+    s.setValue(QStringLiteral("automap/guessExits"), settings.guessExits);
+    s.setValue(QStringLiteral("automap/objectCommand"), settings.objectCommand);
+    s.setValue(QStringLiteral("automap/regionCommand"), settings.regionCommand);
+
+    // Snapshot for one-step undo.
     m_automapPreMap = m_map;
     m_automapPath = path;
     m_automapSize = -1;
+    m_automapFedLines = 0;
     m_automapping = true;
+
+    m_automapController = new GuiAutomapController(this);
+    m_automapController->setStepping(dialog.stepping());
+    m_automapController->setStatusFn(
+        [this](const QString &msg) { statusBar()->showMessage(msg); });
+    m_automapController->setLabelFn([this](int id) -> QString {
+        const Room *r = m_map.roomById(id);
+        if (!r)
+            return tr("Room %1").arg(id);
+        return QStringLiteral("%1 (%2, %3)").arg(r->name).arg(qRound(r->x)).arg(qRound(r->y));
+    });
+    m_automapper = new TranscriptAutomapper(settings);
+    m_automapper->begin(m_map, m_automapController);
+
     if (m_automapStopAction)
         m_automapStopAction->setEnabled(true);
+    if (m_automapStepAction)
+        m_automapStepAction->setEnabled(dialog.stepping());
+    if (m_automapRunAction)
+        m_automapRunAction->setEnabled(dialog.stepping());
 
     if (!m_automapTimer) {
         m_automapTimer = new QTimer(this);
         m_automapTimer->setInterval(400);
         connect(m_automapTimer, &QTimer::timeout, this, &MainWindow::automapTick);
     }
-    automapTick(); // process whatever is already there
     m_automapTimer->start();
     statusBar()->showMessage(
         tr("Live automap: following %1 — play your game, then Stop.").arg(QFileInfo(path).fileName()));
+    automapTick(); // process whatever is already there
 }
 
 void MainWindow::automapTick()
 {
-    if (!m_automapping)
+    if (!m_automapping || m_automapBusy || !m_automapper)
         return;
     QFile file(m_automapPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -844,27 +886,55 @@ void MainWindow::automapTick()
     if (size == m_automapSize)
         return; // nothing appended since last poll
     m_automapSize = size;
-    const QString text = QString::fromUtf8(file.readAll());
 
-    // Re-derive from the pre-automap snapshot so the growing transcript maps
-    // consistently rather than duplicating rooms.
-    Map working = m_automapPreMap;
-    AutomapSettings settings;
-    settings.preferredDistanceBetweenRooms = m_map.settings.preferredDistanceBetweenRooms;
-    settings.gridSize = m_map.settings.gridSize;
-    TranscriptAutomapper mapper(settings);
-    const int added = mapper.run(working, text);
+    QString text = QString::fromUtf8(file.readAll());
+    text.replace(QLatin1String("\r\n"), QLatin1String("\n"));
+    text.replace(QLatin1Char('\r'), QLatin1Char('\n'));
+    const QStringList allLines = text.split(QLatin1Char('\n'));
+    if (allLines.size() <= m_automapFedLines)
+        return;
+    const QStringList newLines = allLines.mid(m_automapFedLines);
+    m_automapFedLines = allLines.size();
 
-    m_map.rooms = working.rooms;
-    m_map.connections = working.connections;
-    m_map.regions = working.regions;
+    // Feed only the new lines to the incremental engine (final=false: the last
+    // room waits for its next command or for Stop). step() may block on a nested
+    // event loop while single-stepping, so guard against re-entrant ticks.
+    m_automapBusy = true;
+    const bool ok = m_automapper->feed(newLines, /*final=*/false);
+    m_automapBusy = false;
+
     m_map.reindex();
     m_scene->setDocument(&m_map);
     setWindowModified(true);
+    if (!ok) {
+        stopLiveAutomap(); // the user cancelled during a step
+        return;
+    }
     statusBar()->showMessage(tr("Live automap: %1 rooms, %2 connections so far…")
                                  .arg(m_map.rooms.size())
                                  .arg(m_map.connections.size()));
-    Q_UNUSED(added);
+}
+
+void MainWindow::abandonLiveAutomap()
+{
+    if (!m_automapping)
+        return;
+    if (m_automapTimer)
+        m_automapTimer->stop();
+    if (m_automapController)
+        m_automapController->cancel();
+    m_automapping = false;
+    m_automapBusy = false;
+    delete m_automapper;
+    m_automapper = nullptr;
+    delete m_automapController;
+    m_automapController = nullptr;
+    if (m_automapStopAction)
+        m_automapStopAction->setEnabled(false);
+    if (m_automapStepAction)
+        m_automapStepAction->setEnabled(false);
+    if (m_automapRunAction)
+        m_automapRunAction->setEnabled(false);
 }
 
 void MainWindow::stopLiveAutomap()
@@ -876,6 +946,22 @@ void MainWindow::stopLiveAutomap()
     m_automapping = false;
     if (m_automapStopAction)
         m_automapStopAction->setEnabled(false);
+    if (m_automapStepAction)
+        m_automapStepAction->setEnabled(false);
+    if (m_automapRunAction)
+        m_automapRunAction->setEnabled(false);
+
+    // Flush the final room block, then tear down the engine/controller.
+    if (m_automapper) {
+        m_automapController->runToCompletion(); // release any pending step gate
+        m_automapper->feed(QStringList(), /*final=*/true);
+        m_map.reindex();
+        m_scene->setDocument(&m_map);
+        delete m_automapper;
+        m_automapper = nullptr;
+    }
+    delete m_automapController;
+    m_automapController = nullptr;
 
     // Record the whole automap session as a single undoable step.
     ReplaceContentCommand::Content before{m_automapPreMap.rooms, m_automapPreMap.connections,
