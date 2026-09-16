@@ -58,6 +58,7 @@ public:
 
     int connId() const { return m_connId; }
     void updateRoute();      // recompute geometry from the model
+    const QVector<QPointF> &routePoints() const { return m_points; }
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;

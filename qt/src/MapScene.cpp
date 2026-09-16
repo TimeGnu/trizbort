@@ -200,6 +200,19 @@ int MapScene::roomIdAt(const QPointF &scenePos) const
     return -1;
 }
 
+QVector<QPair<QLineF, int>> MapScene::connectionSegmentsExcept(int exceptId) const
+{
+    QVector<QPair<QLineF, int>> segs;
+    for (ConnectionItem *item : m_connItems) {
+        if (item->connId() == exceptId)
+            continue;
+        const QVector<QPointF> &pts = item->routePoints();
+        for (int i = 1; i < pts.size(); ++i)
+            segs.append({QLineF(pts.at(i - 1), pts.at(i)), item->connId()});
+    }
+    return segs;
+}
+
 void MapScene::setDocument(Map *map)
 {
     m_map = map;

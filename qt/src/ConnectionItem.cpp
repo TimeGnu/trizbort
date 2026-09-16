@@ -260,10 +260,45 @@ void ConnectionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, 
     painter->setPen(pen);
     painter->setBrush(Qt::NoBrush);
 
-    QPainterPath path(m_points.first());
-    for (int i = 1; i < m_points.size(); ++i)
-        path.lineTo(m_points.at(i));
-    painter->drawPath(path);
+    // "Smart" line segments: draw a small gap wherever this line crosses another
+    // connection, so crossings read clearly. To avoid gapping both lines of a
+    // pair, only the higher-id connection gaps (against lower-id ones).
+    const QVector<QPair<QLineF, int>> others = m_scene->connectionSegmentsExcept(m_connId);
+    const double gap = 4.0;
+    for (int i = 1; i < m_points.size(); ++i) {
+        const QPointF a = m_points.at(i - 1);
+        const QPointF b = m_points.at(i);
+        const QLineF seg(a, b);
+        const double len = seg.length();
+        QVector<double> ts;
+        if (len > 1e-6) {
+            for (const QPair<QLineF, int> &o : others) {
+                if (o.second >= m_connId)
+                    continue; // the other (lower id) will gap instead
+                QPointF ip;
+                if (seg.intersects(o.first, &ip) == QLineF::BoundedIntersection) {
+                    const double t = QLineF(a, ip).length() / len;
+                    if (t > 0.03 && t < 0.97) // ignore near shared endpoints
+                        ts.append(t);
+                }
+            }
+        }
+        if (ts.isEmpty()) {
+            painter->drawLine(a, b);
+            continue;
+        }
+        std::sort(ts.begin(), ts.end());
+        const double gt = gap / len;
+        double cursor = 0.0;
+        for (double t : ts) {
+            const double stop = std::max(cursor, t - gt);
+            if (stop > cursor)
+                painter->drawLine(a + (b - a) * cursor, a + (b - a) * stop);
+            cursor = std::min(1.0, t + gt);
+        }
+        if (cursor < 1.0)
+            painter->drawLine(a + (b - a) * cursor, b);
+    }
 
     // One-way chevrons: a ">"-shaped arrowhead at the midpoint of every segment
     // long enough to hold one, pointing along the flow direction. This mirrors

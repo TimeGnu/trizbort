@@ -43,7 +43,10 @@
 
 #include <QGraphicsScene>
 #include <QHash>
+#include <QLineF>
+#include <QPair>
 #include <QPointF>
+#include <QVector>
 
 #include "MapDocument.h"
 
@@ -106,6 +109,10 @@ public:
 
     // The id of the room whose outline contains a scene point, or -1.
     int roomIdAt(const QPointF &scenePos) const;
+
+    // All routed segments of connections other than exceptId, each tagged with
+    // its owner connection id. Used to draw "smart" gaps where lines cross.
+    QVector<QPair<QLineF, int>> connectionSegmentsExcept(int exceptId) const;
 
     // Editing entry points used by the window's actions.
     int addRoomAt(const QPointF &scenePos);   // returns new room id

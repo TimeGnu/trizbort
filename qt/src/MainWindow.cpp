@@ -328,6 +328,8 @@ void MainWindow::createActions()
                         [this] { rotateSelectedConnectors(true); });
     connMenu->addAction(tr("Rotate &Target Port"), QKeySequence(Qt::Key_BracketRight), this,
                         [this] { rotateSelectedConnectors(false); });
+    connMenu->addAction(tr("&Insert Room on Connection"), this,
+                        &MainWindow::insertRoomOnConnection);
     QMenu *styleMenu = connMenu->addMenu(tr("&Line Style"));
     styleMenu->addAction(tr("&Solid"), this, [this] {
         applyToSelectedConnections(tr("Solid Line"),
@@ -1015,6 +1017,100 @@ void MainWindow::reverseSelectedConnections()
             c.vertices[i].index = i;
         std::swap(c.startText, c.endText);
     });
+}
+
+void MainWindow::insertRoomOnConnection()
+{
+    const QList<int> sel = m_scene->selectedConnectionIds();
+    if (sel.size() != 1) {
+        statusBar()->showMessage(tr("Select exactly one connection to split."));
+        return;
+    }
+    const int cid = sel.first();
+    const int idx = m_map.connectionIndex(cid);
+    if (idx < 0)
+        return;
+
+    Connection orig = m_map.connections.at(idx);
+    std::sort(orig.vertices.begin(), orig.vertices.end(),
+              [](const Vertex &a, const Vertex &b) { return a.index < b.index; });
+    if (orig.vertices.size() < 2)
+        return;
+    const Vertex first = orig.vertices.first();
+    const Vertex last = orig.vertices.last();
+
+    // Midpoint (scene) for the new room.
+    auto vertexPoint = [this](const Vertex &v) -> QPointF {
+        if (v.docked) {
+            if (const Room *r = m_map.roomById(v.roomId))
+                return MapScene::portPoint(*r, v.port);
+        }
+        return v.point;
+    };
+    const QPointF mid = (vertexPoint(first) + vertexPoint(last)) / 2.0;
+
+    ReplaceContentCommand::Content before{m_map.rooms, m_map.connections, m_map.regions};
+    ReplaceContentCommand::Content after = before;
+
+    int maxRoomId = 0, maxConnId = 0, maxSeq = 0;
+    for (const Room &r : m_map.rooms) {
+        maxRoomId = std::max(maxRoomId, r.id);
+        maxSeq = std::max(maxSeq, r.seq);
+    }
+    for (const Connection &c : m_map.connections) {
+        maxConnId = std::max(maxConnId, c.id);
+        maxSeq = std::max(maxSeq, c.seq);
+    }
+
+    Room newRoom;
+    newRoom.id = ++maxRoomId;
+    newRoom.seq = ++maxSeq;
+    newRoom.name = m_map.settings.defaultRoomName;
+    newRoom.w = 96.0;
+    newRoom.h = 64.0;
+    const QPointF tl = m_scene->snap(QPointF(mid.x() - newRoom.w / 2.0, mid.y() - newRoom.h / 2.0));
+    newRoom.x = tl.x();
+    newRoom.y = tl.y();
+    // Inherit the region when both ends are in the same one.
+    if (first.docked && last.docked) {
+        const Room *ra = m_map.roomById(first.roomId);
+        const Room *rb = m_map.roomById(last.roomId);
+        if (ra && rb && ra->region == rb->region)
+            newRoom.region = ra->region;
+    }
+    after.rooms.append(newRoom);
+
+    // Re-target the original connection's far end onto the new room, and add a
+    // second connection from the new room to the original target.
+    for (Connection &c : after.connections) {
+        if (c.id != cid)
+            continue;
+        std::sort(c.vertices.begin(), c.vertices.end(),
+                  [](const Vertex &a, const Vertex &b) { return a.index < b.index; });
+        Vertex &end = c.vertices.last();
+        end.docked = true;
+        end.roomId = newRoom.id;
+        end.port = QStringLiteral("w");
+        break;
+    }
+    Connection second;
+    second.id = ++maxConnId;
+    second.seq = ++maxSeq;
+    second.style = orig.style;
+    second.flow = orig.flow;
+    Vertex a;
+    a.index = 0;
+    a.docked = true;
+    a.roomId = newRoom.id;
+    a.port = QStringLiteral("e");
+    Vertex b = last; // original far endpoint
+    b.index = 1;
+    second.vertices << a << b;
+    after.connections.append(second);
+
+    m_undo.push(new ReplaceContentCommand(m_scene, before, after, tr("Insert Room on Connection")));
+    m_scene->selectRoomItem(newRoom.id);
+    statusBar()->showMessage(tr("Inserted a room on the connection."));
 }
 
 void MainWindow::rotateSelectedConnectors(bool source)
