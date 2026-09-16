@@ -43,7 +43,9 @@
 #include <QApplication>
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QImage>
+#include <QSettings>
 #include <QUndoStack>
 #include <QPainter>
 #include <QRectF>
@@ -168,6 +170,61 @@ static int runSave(const QString &mapPath, const QString &outPath)
         return 3;
     }
     return 0;
+}
+
+// Quick-save (C# -q/--quicksave): re-save the map back to its own file,
+// upgrading/normalising it in place.
+static int runQuickSave(const QString &mapPath)
+{
+    return runSave(mapPath, mapPath);
+}
+
+// Smart-save (C# -s/--smartsave): re-save the project and, per the persisted
+// Smart Save preferences, write a PDF and/or an image alongside it. Headless,
+// so images render at 100%.
+static int runSmartSave(const QString &mapPath)
+{
+    QTextStream err(stderr);
+    trizbort::Map map;
+    QString error;
+    if (!trizbort::TrizbortReader::load(mapPath, map, &error)) {
+        err << "load failed: " << error << Qt::endl;
+        return 1;
+    }
+    if (!trizbort::TrizbortWriter::save(mapPath, map, &error)) {
+        err << "save failed: " << error << Qt::endl;
+        return 3;
+    }
+    QSettings s;
+    const bool wantPdf = s.value(QStringLiteral("smartSave/pdf"), true).toBool();
+    const bool wantImage = s.value(QStringLiteral("smartSave/image"), true).toBool();
+    const QString fmt =
+        s.value(QStringLiteral("smartSave/imageFormat"), QStringLiteral("png")).toString().toLower();
+    const QFileInfo fi(mapPath);
+    const QString base = fi.path() + QLatin1Char('/') + fi.completeBaseName();
+    int rc = 0;
+    if (wantPdf && !trizbort::renderMapToPdf(map, base + QStringLiteral(".pdf"), &error)) {
+        err << "pdf failed: " << error << Qt::endl;
+        rc = 3;
+    }
+    if (wantImage &&
+        !trizbort::renderMapToImage(map, base + QLatin1Char('.') + fmt, &error)) {
+        err << "image failed: " << error << Qt::endl;
+        rc = 3;
+    }
+    return rc;
+}
+
+// The most recent map on the recent-files list that still exists (C#
+// -a/--loadlastproject), or empty if there is none.
+static QString lastProjectPath()
+{
+    const QStringList recent = QSettings().value(QStringLiteral("recentFiles")).toStringList();
+    for (const QString &p : recent) {
+        if (!p.isEmpty() && QFile::exists(p))
+            return p;
+    }
+    return QString();
 }
 
 static int runStats(const QString &mapPath)
@@ -767,6 +824,10 @@ int main(int argc, char *argv[])
     QString exportFmt;
     QString exportOut;
     bool statsRequested = false;
+    bool loadLastRequested = false;
+    bool smartSaveRequested = false;
+    bool quickSaveRequested = false;
+    bool exitRequested = false;
     static const struct {
         const char *flag;
         const char *fmt;
@@ -795,6 +856,23 @@ int main(int argc, char *argv[])
             statsRequested = true;
             continue;
         }
+        if (args.at(i) == QLatin1String("--loadlastproject") ||
+            args.at(i) == QLatin1String("-a")) {
+            loadLastRequested = true;
+            continue;
+        }
+        if (args.at(i) == QLatin1String("--smartsave") || args.at(i) == QLatin1String("-s")) {
+            smartSaveRequested = true;
+            continue;
+        }
+        if (args.at(i) == QLatin1String("--quicksave") || args.at(i) == QLatin1String("-q")) {
+            quickSaveRequested = true;
+            continue;
+        }
+        if (args.at(i) == QLatin1String("--exit") || args.at(i) == QLatin1String("-x")) {
+            exitRequested = true;
+            continue;
+        }
         if (args.at(i) == QLatin1String("--import-transcript") && i + 2 < args.size()) {
             transcriptPath = args.at(++i);
             transcriptOut = args.at(++i);
@@ -811,6 +889,26 @@ int main(int argc, char *argv[])
         }
         if (!matched)
             mapPath = args.at(i);
+    }
+
+    // --loadlastproject supplies the map when none was named on the command line.
+    if (loadLastRequested && mapPath.isEmpty())
+        mapPath = lastProjectPath();
+
+    if (smartSaveRequested) {
+        if (mapPath.isEmpty()) {
+            QTextStream(stderr) << "usage: trizbort-qt <map.trizbort> --smartsave" << Qt::endl;
+            return 2;
+        }
+        return runSmartSave(mapPath);
+    }
+
+    if (quickSaveRequested) {
+        if (mapPath.isEmpty()) {
+            QTextStream(stderr) << "usage: trizbort-qt <map.trizbort> --quicksave" << Qt::endl;
+            return 2;
+        }
+        return runQuickSave(mapPath);
     }
 
     if (!exportFmt.isEmpty()) {
@@ -858,6 +956,10 @@ int main(int argc, char *argv[])
         }
         return renderToFile(mapPath, renderPath, /*pdf=*/false);
     }
+
+    // --exit (C# -x): after any batch work, don't open the editor window.
+    if (exitRequested)
+        return 0;
 
     trizbort::MainWindow window;
     window.resize(1000, 700);
