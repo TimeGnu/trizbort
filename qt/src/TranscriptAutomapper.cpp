@@ -44,6 +44,7 @@
 
 #include <QHash>
 #include <QRectF>
+#include <QRegularExpression>
 
 namespace trizbort {
 
@@ -243,14 +244,19 @@ bool TranscriptAutomapper::extractParagraph(const QStringList &lines, int lineIn
     return have;
 }
 
-int TranscriptAutomapper::findRoom(const QString &name) const
+int TranscriptAutomapper::findRoom(const QString &name)
 {
-    // Non-interactive: rooms sharing a name are the same room.
+    QList<int> candidates;
     for (const Room &r : m_map->rooms) {
         if (r.name == name)
-            return r.id;
+            candidates.append(r.id);
     }
-    return -1;
+    if (candidates.isEmpty())
+        return -1;
+    if (candidates.size() == 1 || m_settings.assumeSameNameSameRoom)
+        return candidates.first();
+    // Ambiguous: let the controller decide (returns -1 to make a new room).
+    return m_controller ? m_controller->disambiguateRoom(name, candidates) : candidates.first();
 }
 
 bool TranscriptAutomapper::anyRoomIntersects(const QRectF &bounds, int exceptId) const
@@ -333,6 +339,127 @@ int TranscriptAutomapper::createRoomInDirection(int existingId, const QString &d
     return room.id;
 }
 
+int TranscriptAutomapper::roomInDirection(int fromId, const QString &dir) const
+{
+    const Room *from = m_map->roomById(fromId);
+    if (!from)
+        return -1;
+    int dx = 0;
+    int dy = 0;
+    directionVector(dir, dx, dy);
+    if (dx == 0 && dy == 0)
+        return -1;
+    const double newW = 96.0;
+    const double newH = 64.0;
+    const double deltaX = dx * (m_settings.preferredDistanceBetweenRooms + newW);
+    const double deltaY = dy * (m_settings.preferredDistanceBetweenRooms + newH);
+    const double g = m_settings.gridSize > 1 ? m_settings.gridSize : 32.0;
+    const double cx = from->x + from->w / 2.0 + deltaX;
+    const double cy = from->y + from->h / 2.0 + deltaY;
+    const QRectF cell(std::round((cx - newW / 2.0) / g) * g, std::round((cy - newH / 2.0) / g) * g,
+                      newW, newH);
+    for (const Room &r : m_map->rooms) {
+        if (r.id == fromId)
+            continue;
+        if (QRectF(r.x, r.y, r.w, r.h).intersects(cell))
+            return r.id;
+    }
+    return -1;
+}
+
+void TranscriptAutomapper::removeRoomById(int roomId)
+{
+    m_map->removeRoom(roomId); // also drops connections docked to it
+    m_map->reindex();
+}
+
+void TranscriptAutomapper::addExitStub(int roomId, const QString &dir)
+{
+    const Room *r = m_map->roomById(roomId);
+    if (!r)
+        return;
+    int dx = 0;
+    int dy = 0;
+    directionVector(dir, dx, dy);
+    if (dx == 0 && dy == 0)
+        return;
+    // Don't stub where a stub already exists.
+    const QString port = portFromVector(dx, dy);
+    for (const Connection &c : m_map->connections) {
+        bool dockHere = false;
+        bool hasFree = false;
+        for (const Vertex &v : c.vertices) {
+            if (v.docked && v.roomId == roomId && v.port == port)
+                dockHere = true;
+            if (!v.docked)
+                hasFree = true;
+        }
+        if (dockHere && hasFree)
+            return;
+    }
+    const double px = r->x + r->w * (dx > 0 ? 1.0 : dx < 0 ? 0.0 : 0.5);
+    const double py = r->y + r->h * (dy > 0 ? 1.0 : dy < 0 ? 0.0 : 0.5);
+    const double stub = m_settings.preferredDistanceBetweenRooms / 2.0 + 16.0;
+
+    Connection c;
+    c.id = m_map->nextConnectionId();
+    c.seq = m_map->nextSeq();
+    Vertex a;
+    a.index = 0;
+    a.docked = true;
+    a.roomId = roomId;
+    a.port = port;
+    Vertex b;
+    b.index = 1;
+    b.docked = false;
+    b.point = QPointF(px + dx * stub, py + dy * stub);
+    c.vertices << a << b;
+    m_map->connections.append(c);
+    ++m_connectionsAdded;
+}
+
+void TranscriptAutomapper::removeExitStub(int roomId, const QString &dir)
+{
+    int dx = 0;
+    int dy = 0;
+    directionVector(dir, dx, dy);
+    if (dx == 0 && dy == 0)
+        return;
+    const QString port = portFromVector(dx, dy);
+    for (int i = m_map->connections.size() - 1; i >= 0; --i) {
+        const Connection &c = m_map->connections.at(i);
+        bool dockHere = false;
+        bool hasFree = false;
+        for (const Vertex &v : c.vertices) {
+            if (v.docked && v.roomId == roomId && v.port == port)
+                dockHere = true;
+            if (!v.docked)
+                hasFree = true;
+        }
+        if (dockHere && hasFree) {
+            m_map->connections.removeAt(i);
+            return;
+        }
+    }
+}
+
+void TranscriptAutomapper::guessExitsFromDescription(int roomId, const QString &description)
+{
+    if (!m_settings.guessExits || description.isEmpty())
+        return;
+    static const QStringList dirWords = {"north",     "south",     "east",     "west",
+                                         "northeast", "northwest", "southeast", "southwest",
+                                         "up",        "down"};
+    const QString lower = description.toLower();
+    for (const QString &w : dirWords) {
+        if (lower.contains(QRegularExpression(QStringLiteral("\\b") + w + QStringLiteral("\\b")))) {
+            const QString dir = directionKeyForWord(w);
+            if (!dir.isEmpty() && roomInDirection(roomId, dir) < 0)
+                addExitStub(roomId, dir);
+        }
+    }
+}
+
 int TranscriptAutomapper::createRoomTeleport(const QString &name)
 {
     const double newW = 96.0;
@@ -382,6 +509,9 @@ void TranscriptAutomapper::connectRooms(int sourceId, const QString &dir, int ta
 {
     if (!m_map->roomById(sourceId) || !m_map->roomById(targetId) || sourceId == targetId)
         return;
+
+    // A real move supersedes any exit stub that pointed this way.
+    removeExitStub(sourceId, dir);
 
     int dx = 0;
     int dy = 0;
@@ -443,8 +573,24 @@ void TranscriptAutomapper::processTranscriptText(const QStringList &lines)
             if (roomId < 0) {
                 // new room
                 if (m_lastRoomId >= 0 && !m_lastMoveDir.isEmpty()) {
-                    roomId = createRoomInDirection(m_lastRoomId, m_lastMoveDir, roomName, line);
-                    connectRooms(m_lastRoomId, m_lastMoveDir, roomId);
+                    const int existingThere = roomInDirection(m_lastRoomId, m_lastMoveDir);
+                    if (existingThere >= 0 && existingThere != m_lastRoomId && m_controller) {
+                        // A different room already sits where we moved: ask.
+                        const AutomapController::SameDir choice =
+                            m_controller->sameDirection(m_lastRoomId, existingThere, m_lastMoveDir);
+                        if (choice == AutomapController::SameDir::KeepExisting) {
+                            connectRooms(m_lastRoomId, m_lastMoveDir, existingThere);
+                            roomId = existingThere;
+                        } else {
+                            if (choice == AutomapController::SameDir::KeepNew)
+                                removeRoomById(existingThere);
+                            roomId = createRoomInDirection(m_lastRoomId, m_lastMoveDir, roomName, line);
+                            connectRooms(m_lastRoomId, m_lastMoveDir, roomId);
+                        }
+                    } else {
+                        roomId = createRoomInDirection(m_lastRoomId, m_lastMoveDir, roomName, line);
+                        connectRooms(m_lastRoomId, m_lastMoveDir, roomId);
+                    }
                 } else {
                     if (m_firstRoom || m_gameName == roomName) {
                         // most likely the game title
@@ -476,6 +622,7 @@ void TranscriptAutomapper::processTranscriptText(const QStringList &lines)
                     if (r->description.isEmpty())
                         r->description = roomDescription;
                 }
+                guessExitsFromDescription(roomId, roomDescription);
             }
             m_lastMoveDir.clear();
         }
@@ -488,9 +635,9 @@ void TranscriptAutomapper::processPromptCommand(const QString &commandIn)
     m_lastMoveDir.clear();
     const QString command = commandIn;
 
-    // tb region <name>
-    if (command.toUpper().startsWith(QLatin1String("TB REGION"))) {
-        const QString regionName = command.mid(QStringLiteral("tb region").length()).trimmed();
+    // <region command> <name>  (default "tb region")
+    if (command.startsWith(m_settings.regionCommand, Qt::CaseInsensitive)) {
+        const QString regionName = command.mid(m_settings.regionCommand.length()).trimmed();
         if (!regionName.isEmpty() && m_lastRoomId >= 0) {
             if (!m_map->regionByName(regionName))
                 m_map->regions.append(
@@ -500,9 +647,9 @@ void TranscriptAutomapper::processPromptCommand(const QString &commandIn)
         }
         return;
     }
-    // tb see <object>
-    if (command.toUpper().startsWith(QLatin1String("TB SEE"))) {
-        const QString objectName = command.mid(QStringLiteral("tb see").length()).trimmed();
+    // <object command> <object>  (default "tb see")
+    if (command.startsWith(m_settings.objectCommand, Qt::CaseInsensitive)) {
+        const QString objectName = command.mid(m_settings.objectCommand.length()).trimmed();
         if (!objectName.isEmpty() && m_lastRoomId >= 0) {
             if (Room *r = m_map->roomById(m_lastRoomId)) {
                 QString text = r->objectsText;
@@ -563,10 +710,41 @@ void TranscriptAutomapper::processPromptCommand(const QString &commandIn)
         }
     }
 
-    // tb dotted / tb exit / tb noexit
+    // trypush <dir>: nudge the current room one step in a direction.
+    if (!words.isEmpty()
+        && words.first().compare(QLatin1String("trypush"), Qt::CaseInsensitive) == 0) {
+        if (words.size() > 1 && m_lastRoomId >= 0) {
+            const QString d = directionKeyForWord(words.at(1));
+            int dx = 0;
+            int dy = 0;
+            directionVector(d, dx, dy);
+            if ((dx != 0 || dy != 0)) {
+                if (Room *r = m_map->roomById(m_lastRoomId)) {
+                    const double gap = m_settings.preferredDistanceBetweenRooms;
+                    r->x += dx * (r->w + gap);
+                    r->y += dy * (r->h + gap);
+                }
+            }
+        }
+        return;
+    }
+
+    // tb dotted / tb exit <dir> / tb noexit <dir>
     if (!words.isEmpty() && words.first().compare(QLatin1String("tb"), Qt::CaseInsensitive) == 0) {
-        if (words.size() > 1 && words.at(1).compare(QLatin1String("dotted"), Qt::CaseInsensitive) == 0)
-            m_useDottedConnection = true;
+        if (words.size() > 1) {
+            const QString sub = words.at(1).toLower();
+            if (sub == QLatin1String("dotted")) {
+                m_useDottedConnection = true;
+            } else if (sub == QLatin1String("exit") && words.size() > 2 && m_lastRoomId >= 0) {
+                const QString d = directionKeyForWord(words.at(2));
+                if (!d.isEmpty())
+                    addExitStub(m_lastRoomId, d);
+            } else if (sub == QLatin1String("noexit") && words.size() > 2 && m_lastRoomId >= 0) {
+                const QString d = directionKeyForWord(words.at(2));
+                if (!d.isEmpty())
+                    removeExitStub(m_lastRoomId, d);
+            }
+        }
         return;
     }
 
@@ -578,32 +756,77 @@ void TranscriptAutomapper::processPromptCommand(const QString &commandIn)
         m_lastMoveDir = dir;
 }
 
-int TranscriptAutomapper::run(Map &map, const QStringList &lines)
+namespace {
+// The non-interactive default controller used by batch run().
+AutomapController &defaultController()
+{
+    static AutomapController controller;
+    return controller;
+}
+} // namespace
+
+void TranscriptAutomapper::begin(Map &map, AutomapController *controller)
 {
     m_map = &map;
+    m_controller = controller ? controller : &defaultController();
     m_lastRoomId = -1;
     m_lastMoveDir.clear();
     m_firstRoom = true;
     m_gameName.clear();
+    m_useDottedConnection = false;
+    m_buffer.clear();
+    m_pos = 0;
+    m_between.clear();
+    m_cancelled = false;
     m_roomsAdded = 0;
     m_connectionsAdded = 0;
+}
 
-    QStringList between;
-    for (const QString &line : lines) {
+bool TranscriptAutomapper::feed(const QStringList &lines, bool final)
+{
+    m_buffer += lines;
+    processBuffer(final);
+    if (m_map)
+        m_map->reindex();
+    return !m_cancelled;
+}
+
+void TranscriptAutomapper::processBuffer(bool final)
+{
+    while (m_pos < m_buffer.size()) {
+        if (m_cancelled)
+            return;
+        const QString line = m_buffer.at(m_pos);
         QString command;
         if (isPrompt(line, command)) {
-            processTranscriptText(between);
-            between.clear();
+            // Gate for single-stepping before each command.
+            if (m_controller && !m_controller->step()) {
+                m_cancelled = true;
+                return;
+            }
+            processTranscriptText(m_between);
+            m_between.clear();
             processPromptCommand(command);
         } else {
-            between.append(line);
+            m_between.append(line);
         }
+        ++m_pos;
     }
-    // Process any trailing text after the final prompt (the last room often has
-    // no prompt after it in a saved transcript).
-    processTranscriptText(between);
+    if (final) {
+        // The last room in a saved transcript often has no following prompt.
+        if (!m_between.isEmpty() && m_controller && !m_controller->step()) {
+            m_cancelled = true;
+            return;
+        }
+        processTranscriptText(m_between);
+        m_between.clear();
+    }
+}
 
-    map.reindex();
+int TranscriptAutomapper::run(Map &map, const QStringList &lines)
+{
+    begin(map, nullptr);
+    feed(lines, true);
     return m_roomsAdded;
 }
 

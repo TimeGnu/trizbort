@@ -55,21 +55,64 @@ namespace trizbort {
 
 struct AutomapSettings {
     bool assumeTwoWayConnections = true;
-    // Non-interactive import assumes rooms sharing a name are the same room,
-    // which avoids the disambiguation prompts the C# UI shows.
+    // When true (the non-interactive default), rooms sharing a name are taken to
+    // be the same room; when false the controller is asked to disambiguate.
     bool assumeSameNameSameRoom = true;
+    // Add dangling exit stubs for direction words found in a room's description.
+    bool guessExits = false;
     double preferredDistanceBetweenRooms = 64.0;
     double gridSize = 32.0;
+    // Customizable command words (the C# AutomapDialog options).
+    QString objectCommand = QStringLiteral("tb see");
+    QString regionCommand = QStringLiteral("tb region");
+};
+
+// Callbacks the automapper uses for interactive decisions and progress. The
+// default (base-class) behaviour is non-interactive, matching a batch import;
+// the GUI supplies a subclass that shows dialogs and gates single-stepping.
+// This mirrors the C# IAutomapCanvas / Automap interaction points.
+class AutomapController {
+public:
+    virtual ~AutomapController() = default;
+
+    enum class SameDir { KeepExisting, KeepNew, KeepBoth };
+
+    // A room name matched several existing rooms: return the chosen room id, or
+    // -1 to create a new room. Default: reuse the first candidate.
+    virtual int disambiguateRoom(const QString &name, const QList<int> &candidates)
+    {
+        Q_UNUSED(name);
+        return candidates.isEmpty() ? -1 : candidates.first();
+    }
+    // Moving `dir` from a room, a different room already occupies that spot.
+    // Default: keep both (place the new room and shift to make room).
+    virtual SameDir sameDirection(int fromRoomId, int existingRoomId, const QString &dir)
+    {
+        Q_UNUSED(fromRoomId);
+        Q_UNUSED(existingRoomId);
+        Q_UNUSED(dir);
+        return SameDir::KeepBoth;
+    }
+    // Gate invoked before each transcript command; return false to cancel.
+    virtual bool step() { return true; }
+    virtual void status(const QString &message) { Q_UNUSED(message); }
 };
 
 class TranscriptAutomapper {
 public:
     explicit TranscriptAutomapper(const AutomapSettings &settings = {});
 
-    // Apply the transcript to the map, mutating it in place. Returns the number
-    // of rooms added.
+    // Apply a whole transcript to the map in one shot (batch). Returns the
+    // number of rooms added. Uses the non-interactive default controller.
     int run(Map &map, const QStringList &lines);
     int run(Map &map, const QString &text);
+
+    // Incremental, controller-driven use (live automap / stepping):
+    //   begin() binds the map and controller and resets state;
+    //   feed() appends transcript lines and processes complete commands
+    //   (call with final=true for the last chunk); returns false if cancelled.
+    void begin(Map &map, AutomapController *controller);
+    bool feed(const QStringList &lines, bool final);
 
     int roomsAdded() const { return m_roomsAdded; }
     int connectionsAdded() const { return m_connectionsAdded; }
@@ -83,22 +126,38 @@ private:
     void processPromptCommand(const QString &command);
 
     // Canvas operations on the map (Canvas.Automap.cs).
-    int findRoom(const QString &name) const;
+    int findRoom(const QString &name);
     int createRoomInDirection(int existingId, const QString &dir, const QString &roomName,
                               const QString &line);
     int createRoomTeleport(const QString &name);
     void connectRooms(int sourceId, const QString &dir, int targetId);
     bool anyRoomIntersects(const QRectF &bounds, int exceptId) const;
     void shiftMap(const QRectF &origin, double dx, double dy);
+    // The id of a room already occupying the cell one step `dir` from fromId, or -1.
+    int roomInDirection(int fromId, const QString &dir) const;
+    void removeRoomById(int roomId);
+    // Exit stubs: a dangling connection out of a room in a direction.
+    void addExitStub(int roomId, const QString &dir);
+    void removeExitStub(int roomId, const QString &dir);
+    void guessExitsFromDescription(int roomId, const QString &description);
+    // Process one buffered transcript line (prompt or accumulating room text).
+    void processBuffer(bool final);
 
     AutomapSettings m_settings;
     Map *m_map = nullptr;
+    AutomapController *m_controller = nullptr;
 
     int m_lastRoomId = -1;
     QString m_lastMoveDir;   // empty => none
     bool m_firstRoom = true;
     QString m_gameName;
     bool m_useDottedConnection = false;
+
+    // Incremental parsing state.
+    QStringList m_buffer;    // all transcript lines fed so far
+    int m_pos = 0;           // next unprocessed line in m_buffer
+    QStringList m_between;   // lines accumulated since the last prompt
+    bool m_cancelled = false;
 
     int m_roomsAdded = 0;
     int m_connectionsAdded = 0;

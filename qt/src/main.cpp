@@ -56,7 +56,9 @@
 #include "MainWindow.h"
 #include "MapDocument.h"
 #include "MapRender.h"
+#include "AppSettings.h"
 #include "MapScene.h"
+#include "MapStatisticsDialog.h"
 #include "RoomItem.h"
 #include "SettingsDialog.h"
 #include "TranscriptAutomapper.h"
@@ -168,6 +170,18 @@ static int runSave(const QString &mapPath, const QString &outPath)
     return 0;
 }
 
+static int runStats(const QString &mapPath)
+{
+    trizbort::Map map;
+    QString error;
+    if (!trizbort::TrizbortReader::load(mapPath, map, &error)) {
+        QTextStream(stderr) << "load failed: " << error << Qt::endl;
+        return 1;
+    }
+    QTextStream(stdout) << trizbort::buildStatisticsReport(map) << Qt::endl;
+    return 0;
+}
+
 // Headless self-test for the GUI-independent editing API: build a small map,
 // round-trip it through the writer/reader, and export it. Prints PASS/FAIL.
 static int runEditSelftest()
@@ -230,6 +244,133 @@ static int runEditSelftest()
     reloaded.removeRoom(a);
     check(reloaded.rooms.size() == 1, "removeRoom left one room");
     check(reloaded.connections.isEmpty(), "removeRoom dropped its connection");
+
+    // Facing-port geometry used by Insert Room on Connection: a room presents
+    // the port on the side facing each neighbour, for any orientation.
+    {
+        Room mid;
+        mid.x = 200;
+        mid.y = 200;
+        mid.w = 96;
+        mid.h = 64;
+        const QPointF c(mid.x + mid.w / 2.0, mid.y + mid.h / 2.0);
+        check(MapScene::portTowards(mid, c + QPointF(300, 0)) == QLatin1String("e"),
+              "facing port east");
+        check(MapScene::portTowards(mid, c - QPointF(300, 0)) == QLatin1String("w"),
+              "facing port west");
+        check(MapScene::portTowards(mid, c + QPointF(0, 300)) == QLatin1String("s"),
+              "facing port south");
+        check(MapScene::portTowards(mid, c - QPointF(0, 300)) == QLatin1String("n"),
+              "facing port north");
+        check(MapScene::portTowards(mid, c + QPointF(300, 300)) == QLatin1String("se"),
+              "facing port southeast");
+    }
+
+    // Map statistics: connection/object/region breakdowns match the metrics.
+    {
+        Map sm;
+        const int r0 = sm.addRoom(0, 0);
+        const int r1 = sm.addRoom(0, -128);
+        const int r2 = sm.addRoom(160, 0);
+        if (Room *r = sm.roomById(r0)) {
+            r->name = QStringLiteral("Cellar");
+            r->isStartRoom = true;
+            r->isDark = true;
+            r->objectsText = QStringLiteral("a coin\na key");
+        }
+        if (Room *r = sm.roomById(r1))
+            r->name = QStringLiteral("Attic");
+        if (Room *r = sm.roomById(r2))
+            r->name = QStringLiteral("Hall");
+        sm.addConnection(r0, QStringLiteral("n"), r1, QStringLiteral("s"));
+        sm.connections.last().startText = QStringLiteral("up");
+        sm.connections.last().endText = QStringLiteral("down");
+        sm.addConnection(r0, QStringLiteral("e"), r2, QStringLiteral("w"));
+
+        const QString rep = buildStatisticsReport(sm);
+        check(rep.contains(QLatin1String("# of Rooms: 3")), "stats room count");
+        check(rep.contains(QLatin1String("# of Dark Rooms: 1")), "stats dark count");
+        check(rep.contains(QLatin1String("Start room = Cellar")), "stats start room");
+        check(rep.contains(QLatin1String("1 up-down connection\n")), "stats up-down singular");
+        check(rep.contains(QLatin1String("Total # Rooms with Objects: 1, 0 with 1, 1 with 2")),
+              "stats object breakdown");
+        check(rep.contains(QLatin1String("# of Connections: 2 total")), "stats connection total");
+    }
+
+    // Snap-to-element magnetism: a room within the snap distance of a point.
+    {
+        Map nm;
+        nm.addRoom(0, 0); // 96x64 at the origin
+        MapScene sc;
+        sc.setDocument(&nm);
+        const int rid = nm.rooms.first().id;
+        check(sc.roomNearestWithin(QPointF(10, 10), 16.0) == rid, "snap: point inside room");
+        check(sc.roomNearestWithin(QPointF(-8, 20), 16.0) == rid, "snap: point near room within range");
+        check(sc.roomNearestWithin(QPointF(-100, 20), 16.0) == -1, "snap: no room when far");
+    }
+
+    // Update-check version comparison (handles a leading "v", extra components,
+    // and pre-release suffixes).
+    check(MainWindow::compareVersionStrings(QStringLiteral("v1.9.0"), QStringLiteral("1.8.0.0")) > 0,
+          "version newer");
+    check(MainWindow::compareVersionStrings(QStringLiteral("1.8.0"), QStringLiteral("1.8.0.0")) == 0,
+          "version equal with trailing zeros");
+    check(MainWindow::compareVersionStrings(QStringLiteral("v1.7.5"), QStringLiteral("1.8.0.0")) < 0,
+          "version older");
+    check(MainWindow::compareVersionStrings(QStringLiteral("v2.0.0-beta"), QStringLiteral("1.8.0.0")) > 0,
+          "version newer ignoring pre-release suffix");
+
+    // Port-adjust detail: the same direction snaps to 4, 8, or 16 compass points.
+    {
+        Room room;
+        room.x = -48;
+        room.y = -32;
+        room.w = 96;
+        room.h = 64; // centre at the origin
+        const QPointF ne(100, -60);
+        AppSettings &appset = AppSettings::instance();
+        const int savedDetail = appset.portAdjustDetail;
+        appset.portAdjustDetail = 16;
+        check(MapScene::portTowards(room, ne) == QLatin1String("ene"), "port detail 16 -> ene");
+        appset.portAdjustDetail = 8;
+        check(MapScene::portTowards(room, ne) == QLatin1String("ne"), "port detail 8 -> ne");
+        appset.portAdjustDetail = 4;
+        check(MapScene::portTowards(room, ne) == QLatin1String("e"), "port detail 4 -> e");
+        appset.portAdjustDetail = savedDetail;
+    }
+
+    // Hand-drawn-global seeds a new room's hand-drawn flag.
+    {
+        AppSettings &appset = AppSettings::instance();
+        const bool savedHd = appset.handDrawnGlobal;
+        appset.handDrawnGlobal = true;
+        Map hm;
+        const int rid = hm.addRoom(0, 0);
+        check(hm.roomById(rid) && hm.roomById(rid)->handDrawn, "hand-drawn global seeds new rooms");
+        appset.handDrawnGlobal = false;
+        const int rid2 = hm.addRoom(200, 0);
+        check(hm.roomById(rid2) && !hm.roomById(rid2)->handDrawn,
+              "new rooms are not hand-drawn when the default is off");
+        appset.handDrawnGlobal = savedHd;
+    }
+
+    // TADS export follows the adv3Lite / adv3 application setting.
+    {
+        Map tm;
+        tm.addRoom(0, 0);
+        AppSettings &appset = AppSettings::instance();
+        const bool savedTads = appset.saveTadsToAdv3Lite;
+        appset.saveTadsToAdv3Lite = true;
+        auto e1 = makeExporter(QStringLiteral("tads"), tm, QStringLiteral("t.trizbort"));
+        const QString lite = e1 ? e1->exportToString() : QString();
+        appset.saveTadsToAdv3Lite = false;
+        auto e2 = makeExporter(QStringLiteral("tads"), tm, QStringLiteral("t.trizbort"));
+        const QString adv3 = e2 ? e2->exportToString() : QString();
+        check(lite.contains(QLatin1String("advlite.h")), "TADS adv3Lite header");
+        check(adv3.contains(QLatin1String("adv3.h")) && !adv3.contains(QLatin1String("advlite.h")),
+              "TADS adv3 header");
+        appset.saveTadsToAdv3Lite = savedTads;
+    }
 
     QFile::remove(path);
     out << (failures == 0 ? "edit-selftest: PASS" : "edit-selftest: FAIL") << Qt::endl;
@@ -514,6 +655,87 @@ static int runTranscriptSelftest()
     check(exporter && exporter->exportToString().contains(QLatin1String("West of House")),
           "automapped map exports");
 
+    // A dangling exit stub: one vertex docked to the room at `port`, one free.
+    auto stubsFrom = [](const Map &m, int roomId, const QString &port) {
+        int count = 0;
+        for (const Connection &c : m.connections) {
+            bool dockHere = false;
+            bool hasFree = false;
+            for (const Vertex &v : c.vertices) {
+                if (v.docked && v.roomId == roomId && v.port == port)
+                    dockHere = true;
+                if (!v.docked)
+                    hasFree = true;
+            }
+            if (dockHere && hasFree)
+                ++count;
+        }
+        return count;
+    };
+
+    // 'tb exit <dir>' adds a dangling stub; 'tb noexit <dir>' takes it away.
+    {
+        const QString t = QStringLiteral(
+            "Stub Game\n"
+            "\n"
+            "Kitchen\n"
+            "A cosy kitchen.\n"
+            "\n"
+            ">tb exit north\n"
+            ">tb exit east\n"
+            ">tb noexit north\n"
+            ">\n");
+        Map m;
+        TranscriptAutomapper mp;
+        mp.run(m, t);
+        check(m.rooms.size() == 1, "stub test: one room");
+        const int kitchen = m.rooms.isEmpty() ? -1 : m.rooms.first().id;
+        check(kitchen >= 0 && stubsFrom(m, kitchen, QStringLiteral("n")) == 0,
+              "tb noexit removed the north stub");
+        check(kitchen >= 0 && stubsFrom(m, kitchen, QStringLiteral("e")) == 1,
+              "tb exit east stub remains");
+    }
+
+    // 'trypush <dir>' nudges the current room a step in that direction.
+    {
+        const QString t = QStringLiteral(
+            "Push Game\n"
+            "\n"
+            "Hall\n"
+            "A long hall.\n"
+            "\n"
+            ">trypush east\n"
+            ">\n");
+        Map m;
+        TranscriptAutomapper mp;
+        mp.run(m, t);
+        check(m.rooms.size() == 1, "trypush test: one room");
+        if (!m.rooms.isEmpty())
+            check(m.rooms.first().x > 100.0, "trypush east moved the room right");
+    }
+
+    // guessExits: direction words in a description become dangling stubs.
+    {
+        const QString t = QStringLiteral(
+            "Guess Game\n"
+            "\n"
+            "Clearing\n"
+            "Paths lead north and east from this clearing.\n"
+            "\n"
+            ">\n");
+        AutomapSettings s;
+        s.guessExits = true;
+        Map m;
+        TranscriptAutomapper mp(s);
+        mp.run(m, t);
+        check(m.rooms.size() == 1, "guess test: one room");
+        const int clearing = m.rooms.isEmpty() ? -1 : m.rooms.first().id;
+        check(clearing >= 0 && stubsFrom(m, clearing, QStringLiteral("n")) == 1,
+              "guessed a north exit");
+        check(clearing >= 0 && stubsFrom(m, clearing, QStringLiteral("e")) == 1,
+              "guessed an east exit");
+    }
+
     out << (failures == 0 ? "transcript-selftest: PASS" : "transcript-selftest: FAIL") << Qt::endl;
     return failures == 0 ? 0 : 1;
 }
@@ -522,6 +744,8 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     QApplication::setApplicationName(QStringLiteral("Trizbort (Qt)"));
+    QApplication::setOrganizationName(QStringLiteral("Trizbort"));
+    QApplication::setApplicationVersion(QStringLiteral("1.8.0.0"));
 
     if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--edit-selftest"))
         return runEditSelftest();
@@ -542,6 +766,7 @@ int main(int argc, char *argv[])
     QString transcriptOut;
     QString exportFmt;
     QString exportOut;
+    bool statsRequested = false;
     static const struct {
         const char *flag;
         const char *fmt;
@@ -549,6 +774,7 @@ int main(int argc, char *argv[])
         {"--zil", "zil"},         {"--adventuron", "adventuron"}, {"--inform6", "inform6"},
         {"--inform7", "inform7"}, {"--tads", "tads"},             {"--alan", "alan"},
         {"--hugo", "hugo"},       {"--quest", "quest"},
+        {"--questrooms", "questrooms"},
     };
 
     const QStringList args = QApplication::arguments();
@@ -563,6 +789,10 @@ int main(int argc, char *argv[])
         }
         if (args.at(i) == QLatin1String("--save") && i + 1 < args.size()) {
             savePath = args.at(++i);
+            continue;
+        }
+        if (args.at(i) == QLatin1String("--stats")) {
+            statsRequested = true;
             continue;
         }
         if (args.at(i) == QLatin1String("--import-transcript") && i + 2 < args.size()) {
@@ -589,6 +819,14 @@ int main(int argc, char *argv[])
             return 2;
         }
         return runExport(exportFmt, mapPath, exportOut);
+    }
+
+    if (statsRequested) {
+        if (mapPath.isEmpty()) {
+            QTextStream(stderr) << "usage: trizbort-qt <map.trizbort> --stats" << Qt::endl;
+            return 2;
+        }
+        return runStats(mapPath);
     }
 
     if (!transcriptPath.isEmpty()) {

@@ -40,6 +40,8 @@
 
 #include "MapDocument.h"
 
+#include "AppSettings.h"
+
 namespace trizbort {
 
 // Default palette, fonts and geometry, matching Settings.Reset() in the C#.
@@ -180,6 +182,8 @@ int Map::addRoom(double x, double y)
     case RoomShape::Octagonal: r.octagonal = true; break;
     default: break;
     }
+    // New rooms inherit the application's global hand-drawn default.
+    r.handDrawn = AppSettings::instance().handDrawnGlobal;
     rooms.append(r);
     reindex();
     return r.id;

@@ -59,6 +59,19 @@ protected:
     void exportContent(QString &out) override;
     QString getExportName(const Room &room, std::optional<int> suffix) override;
     QString getExportName(const QString &displayName, std::optional<int> suffix) override;
+
+    // When false, the <asl>/<game> wrapper (and closing </asl>) are omitted,
+    // producing just the room/object body (the C# QuestRoomsExporter).
+    virtual bool includeWrapper() const { return true; }
+};
+
+// Quest export without the file header: just the room/object bodies.
+class QuestRoomsExporter : public QuestExporter {
+public:
+    using QuestExporter::QuestExporter;
+
+protected:
+    bool includeWrapper() const override { return false; }
 };
 
 } // namespace trizbort

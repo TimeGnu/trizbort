@@ -22,14 +22,19 @@
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
+#include <QFontDialog>
 #include <QFormLayout>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QPushButton>
+#include <QSet>
 #include <QTableWidget>
 #include <QTabWidget>
 #include <QVBoxLayout>
+
+#include "FontUtil.h"
 
 namespace trizbort {
 
@@ -64,13 +69,20 @@ SettingsDialog::SettingsDialog(const MapSettings &settings, const QList<Region> 
     , m_regions(regions)
 {
     setWindowTitle(tr("Map Settings"));
-    resize(460, 460);
+    resize(460, 480);
+
+    m_roomFont = m_settings.roomFont;
+    m_subtitleFont = m_settings.subtitleFont;
+    m_objectFont = m_settings.objectFont;
+    m_lineFont = m_settings.lineFont;
 
     auto *layout = new QVBoxLayout(this);
     auto *tabs = new QTabWidget(this);
     tabs->addTab(buildColorsTab(), tr("&Colours"));
     tabs->addTab(buildGridLinesTab(), tr("&Grid && Lines"));
     tabs->addTab(buildRoomsTab(), tr("&Rooms"));
+    tabs->addTab(buildFontsTab(), tr("&Fonts"));
+    tabs->addTab(buildAdvancedTab(), tr("Ad&vanced"));
     tabs->addTab(buildRegionsTab(), tr("Re&gions"));
     layout->addWidget(tabs);
 
@@ -165,6 +177,74 @@ QWidget *SettingsDialog::buildRoomsTab()
     return widget;
 }
 
+void SettingsDialog::setupFontButton(QPushButton *button, FontSpec *spec)
+{
+    auto refresh = [button, spec] {
+        const double size = spec->size > 0.0 ? spec->size : 12.0;
+        const QString family = spec->family.isEmpty() ? tr("(default)") : spec->family;
+        button->setText(tr("%1, %2 pt").arg(family).arg(size));
+        button->setFont(qfontFromSpec(*spec, 10.0));
+    };
+    refresh();
+    connect(button, &QPushButton::clicked, this, [this, spec, refresh] {
+        bool ok = false;
+        const QFont chosen = QFontDialog::getFont(&ok, qfontFromSpec(*spec, 12.0), this,
+                                                  tr("Choose Font"));
+        if (!ok)
+            return;
+        spec->family = chosen.family();
+        spec->size = chosen.pointSizeF() > 0 ? chosen.pointSizeF() : chosen.pixelSize();
+        spec->bold = chosen.bold();
+        spec->italic = chosen.italic();
+        spec->underline = chosen.underline();
+        spec->strikeout = chosen.strikeOut();
+        refresh();
+    });
+}
+
+QWidget *SettingsDialog::buildFontsTab()
+{
+    auto *widget = new QWidget;
+    auto *form = new QFormLayout(widget);
+    m_roomFontButton = new QPushButton(widget);
+    setupFontButton(m_roomFontButton, &m_roomFont);
+    form->addRow(tr("Room name font:"), m_roomFontButton);
+    m_subtitleFontButton = new QPushButton(widget);
+    setupFontButton(m_subtitleFontButton, &m_subtitleFont);
+    form->addRow(tr("Subtitle font:"), m_subtitleFontButton);
+    m_objectFontButton = new QPushButton(widget);
+    setupFontButton(m_objectFontButton, &m_objectFont);
+    form->addRow(tr("Object list font:"), m_objectFontButton);
+    m_lineFontButton = new QPushButton(widget);
+    setupFontButton(m_lineFontButton, &m_lineFont);
+    form->addRow(tr("Connection text font:"), m_lineFontButton);
+    return widget;
+}
+
+QWidget *SettingsDialog::buildAdvancedTab()
+{
+    auto *widget = new QWidget;
+    auto *form = new QFormLayout(widget);
+
+    m_handleSize = makeSpin(m_settings.handleSize, 64);
+    form->addRow(tr("Handle size:"), m_handleSize);
+    m_snapToElement = makeSpin(m_settings.snapToElementSize, 256);
+    form->addRow(tr("Snap-to-element distance:"), m_snapToElement);
+
+    m_docMargins = new QCheckBox(tr("Use document-specific margins"), widget);
+    m_docMargins->setChecked(m_settings.documentSpecificMargins);
+    form->addRow(QString(), m_docMargins);
+    m_hMargin = makeSpin(m_settings.horizontalMargin, 4096);
+    form->addRow(tr("Horizontal margin:"), m_hMargin);
+    m_vMargin = makeSpin(m_settings.verticalMargin, 4096);
+    form->addRow(tr("Vertical margin:"), m_vMargin);
+
+    m_wrapDashes = new QCheckBox(tr("Wrap text at dashes"), widget);
+    m_wrapDashes->setChecked(m_settings.wrapTextAtDashes);
+    form->addRow(QString(), m_wrapDashes);
+    return widget;
+}
+
 QWidget *SettingsDialog::buildRegionsTab()
 {
     auto *widget = new QWidget;
@@ -175,10 +255,14 @@ QWidget *SettingsDialog::buildRegionsTab()
     m_regionTable->horizontalHeader()->setStretchLastSection(false);
     m_regionTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
 
-    auto addRow = [this](const Region &r) {
+    auto addRow = [this](const Region &r, const QString &originalName) {
         const int row = m_regionTable->rowCount();
         m_regionTable->insertRow(row);
-        m_regionTable->setItem(row, 0, new QTableWidgetItem(r.name));
+        auto *nameItem = new QTableWidgetItem(r.name);
+        // Remember the name this row started with, so a rename can be detected
+        // and propagated to the rooms that use it.
+        nameItem->setData(Qt::UserRole, originalName);
+        m_regionTable->setItem(row, 0, nameItem);
         for (int col = 1; col <= 2; ++col) {
             auto *item = new QTableWidgetItem;
             item->setFlags(item->flags() & ~Qt::ItemIsEditable);
@@ -189,7 +273,7 @@ QWidget *SettingsDialog::buildRegionsTab()
         }
     };
     for (const Region &r : m_regions)
-        addRow(r);
+        addRow(r, r.name);
 
     connect(m_regionTable, &QTableWidget::cellDoubleClicked, this, [this](int row, int col) {
         if (col == 0)
@@ -216,7 +300,8 @@ QWidget *SettingsDialog::buildRegionsTab()
 
     connect(addButton, &QPushButton::clicked, this, [this, addRow] {
         addRow(Region{tr("New Region"), QColor(0, 0, 255), QColor(255, 255, 255), QString(),
-                      QString()});
+                      QString()},
+               QString());
     });
     connect(removeButton, &QPushButton::clicked, this, [this] {
         const int row = m_regionTable->currentRow();
@@ -251,7 +336,80 @@ MapSettings SettingsDialog::resultSettings() const
     s.objectListOffset = m_objectListOffset->value();
     s.connectionStalkLength = m_stalkLength->value();
     s.preferredDistanceBetweenRooms = m_preferredDistance->value();
+
+    s.roomFont = m_roomFont;
+    s.subtitleFont = m_subtitleFont;
+    s.objectFont = m_objectFont;
+    s.lineFont = m_lineFont;
+
+    if (m_handleSize)
+        s.handleSize = m_handleSize->value();
+    if (m_snapToElement)
+        s.snapToElementSize = m_snapToElement->value();
+    if (m_docMargins)
+        s.documentSpecificMargins = m_docMargins->isChecked();
+    if (m_hMargin)
+        s.horizontalMargin = m_hMargin->value();
+    if (m_vMargin)
+        s.verticalMargin = m_vMargin->value();
+    if (m_wrapDashes)
+        s.wrapTextAtDashes = m_wrapDashes->isChecked();
     return s;
+}
+
+void SettingsDialog::accept()
+{
+    // Validate region names: non-empty, unique, and free of the '_' and ':'
+    // characters the exporters reserve.
+    QSet<QString> seen;
+    for (int row = 0; row < m_regionTable->rowCount(); ++row) {
+        const QString name = m_regionTable->item(row, 0)->text().trimmed();
+        if (name.isEmpty()) {
+            QMessageBox::warning(this, tr("Invalid Region"), tr("Region names cannot be empty."));
+            return;
+        }
+        if (name.contains(QLatin1Char('_')) || name.contains(QLatin1Char(':'))) {
+            QMessageBox::warning(this, tr("Invalid Region"),
+                                 tr("Region name '%1' may not contain '_' or ':'.").arg(name));
+            return;
+        }
+        const QString key = name.toLower();
+        if (seen.contains(key)) {
+            QMessageBox::warning(this, tr("Invalid Region"),
+                                 tr("Region name '%1' is used more than once.").arg(name));
+            return;
+        }
+        seen.insert(key);
+    }
+    QDialog::accept();
+}
+
+QHash<QString, QString> SettingsDialog::regionRenames() const
+{
+    QHash<QString, QString> renames;
+    for (int row = 0; row < m_regionTable->rowCount(); ++row) {
+        const QString original = m_regionTable->item(row, 0)->data(Qt::UserRole).toString();
+        const QString current = m_regionTable->item(row, 0)->text().trimmed();
+        if (!original.isEmpty() && original != current)
+            renames.insert(original, current);
+    }
+    return renames;
+}
+
+QStringList SettingsDialog::removedRegionNames() const
+{
+    QSet<QString> present;
+    for (int row = 0; row < m_regionTable->rowCount(); ++row) {
+        const QString original = m_regionTable->item(row, 0)->data(Qt::UserRole).toString();
+        if (!original.isEmpty())
+            present.insert(original);
+    }
+    QStringList removed;
+    for (const Region &r : m_regions) {
+        if (r.name != kNoRegion && !present.contains(r.name))
+            removed << r.name;
+    }
+    return removed;
 }
 
 QList<Region> SettingsDialog::resultRegions() const

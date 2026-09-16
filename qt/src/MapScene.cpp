@@ -40,6 +40,7 @@
 
 #include "MapScene.h"
 
+#include <algorithm>
 #include <cmath>
 
 #include <QGraphicsLineItem>
@@ -47,6 +48,7 @@
 #include <QPainter>
 #include <QUndoStack>
 
+#include "AppSettings.h"
 #include "ConnectionItem.h"
 #include "EditCommands.h"
 #include "RoomItem.h"
@@ -67,29 +69,174 @@ double MapScene::gridSize() const
 
 QPointF MapScene::snap(const QPointF &p) const
 {
+    // Honour the document's snap-to-grid setting; when off, leave the point as
+    // given (previously it always snapped, ignoring the flag).
+    if (m_map && !m_map->settings.snapToGrid)
+        return p;
     const double g = gridSize();
     return QPointF(std::round(p.x() / g) * g, std::round(p.y() / g) * g);
 }
 
+namespace {
+
+// The compass index (0..15) used to place a port on an ellipse, matching
+// CompassPointHelper.getPointIntegerValue: East is 0 and the index advances
+// clockwise. Returns -1 for an unknown token.
+int ellipseCompassIndex(const QString &p)
+{
+    static const QHash<QString, int> kIndex = {
+        {"e", 0},  {"ese", 1}, {"se", 2},  {"sse", 3},
+        {"s", 4},  {"ssw", 5}, {"sw", 6},  {"wsw", 7},
+        {"w", 8},  {"wnw", 9}, {"nw", 10}, {"nnw", 11},
+        {"n", 12}, {"nne", 13},{"ne", 14}, {"ene", 15},
+    };
+    return kIndex.value(p, -1);
+}
+
+} // namespace
+
+QPointF MapScene::squareCorner(double x, double y, double w, double h, const QString &port)
+{
+    // Fractions of (w, h) for each of the sixteen compass ports on a rectangle,
+    // matching Rect.GetCorner (square branch).
+    double fx = 0.5, fy = 0.5;
+    const QString p = port.toLower();
+    if (p == QLatin1String("n"))        { fx = 0.5;  fy = 0.0;  }
+    else if (p == QLatin1String("nne")) { fx = 0.75; fy = 0.0;  }
+    else if (p == QLatin1String("ne"))  { fx = 1.0;  fy = 0.0;  }
+    else if (p == QLatin1String("ene")) { fx = 1.0;  fy = 0.25; }
+    else if (p == QLatin1String("e"))   { fx = 1.0;  fy = 0.5;  }
+    else if (p == QLatin1String("ese")) { fx = 1.0;  fy = 0.75; }
+    else if (p == QLatin1String("se"))  { fx = 1.0;  fy = 1.0;  }
+    else if (p == QLatin1String("sse")) { fx = 0.75; fy = 1.0;  }
+    else if (p == QLatin1String("s"))   { fx = 0.5;  fy = 1.0;  }
+    else if (p == QLatin1String("ssw")) { fx = 0.25; fy = 1.0;  }
+    else if (p == QLatin1String("sw"))  { fx = 0.0;  fy = 1.0;  }
+    else if (p == QLatin1String("wsw")) { fx = 0.0;  fy = 0.75; }
+    else if (p == QLatin1String("w"))   { fx = 0.0;  fy = 0.5;  }
+    else if (p == QLatin1String("wnw")) { fx = 0.0;  fy = 0.25; }
+    else if (p == QLatin1String("nw"))  { fx = 0.0;  fy = 0.0;  }
+    else if (p == QLatin1String("nnw")) { fx = 0.25; fy = 0.0;  }
+    // else: centre (fx = fy = 0.5), matching the C# unknown-port fallback.
+    return QPointF(x + w * fx, y + h * fy);
+}
+
 QPointF MapScene::portPoint(const Room &room, const QString &port)
 {
-    const double left = room.x;
-    const double top = room.y;
-    const double right = room.x + room.w;
-    const double bottom = room.y + room.h;
+    const double x = room.x;
+    const double y = room.y;
+    const double w = room.w;
+    const double h = room.h;
+    const QString p = port.toLower();
+
+    if (room.ellipse) {
+        const int i = ellipseCompassIndex(p);
+        if (i < 0)
+            return QPointF(x + w / 2.0, y + h / 2.0);
+        const double kPi = 3.14159265358979323846;
+        const double theta = i * (2.0 * kPi / 16.0);
+        return QPointF(x + w / 2.0 + (w / 2.0) * std::cos(theta),
+                       y + h / 2.0 + (h / 2.0) * std::sin(theta));
+    }
+
+    if (room.octagonal) {
+        // The four ordinals are chamfered to 1/8 insets; the rest lie on the
+        // bounding rectangle exactly as a square room's do.
+        if (p == QLatin1String("ne")) return {x + w * 7.0 / 8.0, y + h * 1.0 / 8.0};
+        if (p == QLatin1String("se")) return {x + w * 7.0 / 8.0, y + h * 7.0 / 8.0};
+        if (p == QLatin1String("sw")) return {x + w * 1.0 / 8.0, y + h * 7.0 / 8.0};
+        if (p == QLatin1String("nw")) return {x + w * 1.0 / 8.0, y + h * 1.0 / 8.0};
+    }
+
+    return squareCorner(x, y, w, h, p);
+}
+
+QPointF MapScene::portStalkPoint(const Room &room, const QString &port, double stalk)
+{
+    if (stalk <= 0.0)
+        return portPoint(room, port);
+
+    // Mirrors Room.GetPortStalkPosition: the inner corner is taken on the room
+    // itself, the outer corner on the room inflated by the stalk length, and the
+    // two are combined so the eight "half" ports run a straight stalk that stays
+    // perpendicular to the room edge.
+    const QPointF inner = squareCorner(room.x, room.y, room.w, room.h, port);
+    const QPointF outer = squareCorner(room.x - stalk, room.y - stalk,
+                                       room.w + 2.0 * stalk, room.h + 2.0 * stalk, port);
+    const QString p = port.toLower();
+    if (p == QLatin1String("ene") || p == QLatin1String("ese") ||
+        p == QLatin1String("wnw") || p == QLatin1String("wsw"))
+        return {outer.x(), inner.y()};
+    if (p == QLatin1String("nne") || p == QLatin1String("nnw") ||
+        p == QLatin1String("sse") || p == QLatin1String("ssw"))
+        return {inner.x(), outer.y()};
+    return outer;
+}
+
+QString MapScene::portTowards(const Room &room, const QPointF &target)
+{
+    static const char *const kPorts[16] = {"n",  "nne", "ne", "ene", "e",  "ese", "se", "sse",
+                                            "s",  "ssw", "sw", "wsw", "w",  "wnw", "nw", "nnw"};
     const double cx = room.x + room.w / 2.0;
     const double cy = room.y + room.h / 2.0;
+    const double dx = target.x() - cx;
+    const double dy = target.y() - cy;
+    if (dx == 0.0 && dy == 0.0)
+        return QStringLiteral("n");
 
-    const QString p = port.toLower();
-    if (p == QLatin1String("n"))  return {cx, top};
-    if (p == QLatin1String("s"))  return {cx, bottom};
-    if (p == QLatin1String("e"))  return {right, cy};
-    if (p == QLatin1String("w"))  return {left, cy};
-    if (p == QLatin1String("ne")) return {right, top};
-    if (p == QLatin1String("nw")) return {left, top};
-    if (p == QLatin1String("se")) return {right, bottom};
-    if (p == QLatin1String("sw")) return {left, bottom};
-    return {cx, cy};
+    // How many compass points to snap to (the C# PortAdjustDetail: 4/8/16).
+    int divisions = AppSettings::instance().portAdjustDetail;
+    if (divisions != 4 && divisions != 8)
+        divisions = 16;
+
+    // Angle clockwise from north (screen y grows downward), bucketed to the
+    // nearest of `divisions` evenly-spaced compass points.
+    static const double kTwoPi = 2.0 * 3.14159265358979323846;
+    double angle = std::atan2(dx, -dy);
+    if (angle < 0.0)
+        angle += kTwoPi;
+    const int bucket = static_cast<int>(std::llround(angle / (kTwoPi / divisions))) % divisions;
+    return QString::fromLatin1(kPorts[(bucket * (16 / divisions)) % 16]);
+}
+
+int MapScene::roomIdAt(const QPointF &scenePos) const
+{
+    if (RoomItem *item = roomItemAt(scenePos))
+        return item->roomId();
+    return -1;
+}
+
+int MapScene::roomNearestWithin(const QPointF &scenePos, double maxDist) const
+{
+    if (!m_map)
+        return -1;
+    int best = -1;
+    double bestDist = maxDist;
+    for (const Room &r : m_map->rooms) {
+        const QRectF rect(r.x, r.y, r.w, r.h);
+        // Distance from the point to the room rectangle (0 when inside).
+        const double dx = std::max({rect.left() - scenePos.x(), 0.0, scenePos.x() - rect.right()});
+        const double dy = std::max({rect.top() - scenePos.y(), 0.0, scenePos.y() - rect.bottom()});
+        const double dist = std::hypot(dx, dy);
+        if (dist <= bestDist) {
+            bestDist = dist;
+            best = r.id;
+        }
+    }
+    return best;
+}
+
+QVector<QPair<QLineF, int>> MapScene::connectionSegmentsExcept(int exceptId) const
+{
+    QVector<QPair<QLineF, int>> segs;
+    for (ConnectionItem *item : m_connItems) {
+        if (item->connId() == exceptId)
+            continue;
+        const QVector<QPointF> &pts = item->routePoints();
+        for (int i = 1; i < pts.size(); ++i)
+            segs.append({QLineF(pts.at(i - 1), pts.at(i)), item->connId()});
+    }
+    return segs;
 }
 
 void MapScene::setDocument(Map *map)
@@ -117,7 +264,20 @@ void MapScene::rebuild()
     }
     rebuildConnections();
 
-    QRectF bounds = itemsBoundingRect().adjusted(-400, -400, 400, 400);
+    // Give comfortable, balanced scrolling room around the content in BOTH
+    // axes. A map that is much wider than it is tall (or vice versa) would
+    // otherwise get almost no vertical (resp. horizontal) scroll range once
+    // fitted to the window: the scrollbar thumb then fills its whole track and
+    // the smallest drag snaps from one end to the other. Sizing the margin from
+    // the larger content dimension keeps the scroll range proportionate in both
+    // directions, so the thumb stays a sensible size and drags smoothly.
+    const QRectF content = itemsBoundingRect();
+    double margin = std::max(600.0, std::max(content.width(), content.height()));
+    // "Infinite" scroll bounds let the view roam far past the content, rather
+    // than clamping close to it (the C# InfiniteScrollBounds app setting).
+    if (AppSettings::instance().infiniteScrollBounds)
+        margin = std::max(margin, 100000.0);
+    QRectF bounds = content.adjusted(-margin, -margin, margin, margin);
     if (bounds.width() < 1200 || bounds.height() < 900)
         bounds = bounds.united(QRectF(bounds.center() - QPointF(600, 450), QSizeF(1200, 900)));
     setSceneRect(bounds);
@@ -158,6 +318,45 @@ void MapScene::refreshConnectionsFor(int roomId)
         if (touches)
             item->updateRoute();
     }
+}
+
+void MapScene::setValidation(const ValidationFlags &flags)
+{
+    m_validation = flags;
+    update(); // repaint so the red-X overlays appear/disappear
+}
+
+bool MapScene::roomInvalid(const Room &room) const
+{
+    if (!m_map)
+        return false;
+    if (m_validation.description && room.description.trimmed().isEmpty())
+        return true;
+    if (m_validation.subtitle && room.subtitle.trimmed().isEmpty())
+        return true;
+    if (m_validation.uniqueNames) {
+        int count = 0;
+        for (const Room &r : m_map->rooms)
+            if (r.name == room.name)
+                ++count;
+        if (count > 1)
+            return true;
+    }
+    if (m_validation.noDangling) {
+        for (const Connection &c : m_map->connections) {
+            bool touchesThis = false;
+            bool hasDangling = false;
+            for (const Vertex &v : c.vertices) {
+                if (v.docked && v.roomId == room.id)
+                    touchesThis = true;
+                if (!v.docked)
+                    hasDangling = true;
+            }
+            if (touchesThis && hasDangling)
+                return true;
+        }
+    }
+    return false;
 }
 
 void MapScene::refreshRoom(int roomId)
@@ -206,6 +405,50 @@ int MapScene::selectedRoomId() const
             return ri->roomId();
     }
     return -1;
+}
+
+QList<int> MapScene::selectedRoomIds() const
+{
+    QList<int> ids;
+    for (QGraphicsItem *item : selectedItems()) {
+        if (auto *ri = dynamic_cast<RoomItem *>(item))
+            ids.append(ri->roomId());
+    }
+    return ids;
+}
+
+QList<int> MapScene::selectedConnectionIds() const
+{
+    QList<int> ids;
+    for (QGraphicsItem *item : selectedItems()) {
+        if (auto *ci = dynamic_cast<ConnectionItem *>(item))
+            ids.append(ci->connId());
+    }
+    return ids;
+}
+
+void MapScene::selectAll()
+{
+    for (QGraphicsItem *item : items())
+        item->setSelected(true);
+}
+
+void MapScene::selectRoomsByIds(const QList<int> &ids)
+{
+    clearSelection();
+    for (int id : ids) {
+        if (RoomItem *item = m_roomItems.value(id, nullptr))
+            item->setSelected(true);
+    }
+}
+
+void MapScene::selectConnectionsByIds(const QList<int> &ids)
+{
+    clearSelection();
+    for (ConnectionItem *item : m_connItems) {
+        if (ids.contains(item->connId()))
+            item->setSelected(true);
+    }
 }
 
 int MapScene::addRoomAt(const QPointF &scenePos)
@@ -320,7 +563,7 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     // Snapshot the positions of the rooms about to be dragged, so the move can
     // be pushed as one undoable command on release.
     m_dragStartPos.clear();
-    if (event->button() == Qt::LeftButton && !m_connectMode && m_map) {
+    if (event->button() == Qt::LeftButton && !m_connectMode && !m_roomResizeActive && m_map) {
         for (QGraphicsItem *item : selectedItems()) {
             if (auto *ri = dynamic_cast<RoomItem *>(item)) {
                 if (const Room *r = m_map->roomById(ri->roomId()))
@@ -349,12 +592,20 @@ void MapScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         m_rubberLine = nullptr;
 
         RoomItem *target = roomItemAt(event->scenePos());
-        if (m_map && target && target->roomId() != m_connectFromRoom) {
+        if (m_map && target) {
             const Room *from = m_map->roomById(m_connectFromRoom);
             const Room *to = m_map->roomById(target->roomId());
             if (from && to) {
-                const QString portA = Map::portFacing(*from, *to);
-                const QString portB = Map::portFacing(*to, *from);
+                QString portA;
+                QString portB;
+                if (from->id == to->id) {
+                    // Self-loop: two adjacent top ports so the stalks bulge out.
+                    portA = QStringLiteral("nw");
+                    portB = QStringLiteral("ne");
+                } else {
+                    portA = Map::portFacing(*from, *to);
+                    portB = Map::portFacing(*to, *from);
+                }
                 if (m_undo) {
                     m_undo->push(
                         new AddConnectionCommand(this, from->id, portA, to->id, portB));

@@ -94,7 +94,9 @@ private:
 // in a compass direction, and connect the two. A single undoable step.
 class AddConnectedRoomCommand : public QUndoCommand {
 public:
-    AddConnectedRoomCommand(MapScene *scene, int fromRoomId, const QString &direction);
+    AddConnectedRoomCommand(MapScene *scene, int fromRoomId, const QString &direction,
+                            const QString &startLabel = QString(),
+                            const QString &endLabel = QString());
     void redo() override;
     void undo() override;
     bool valid() const { return m_valid; }

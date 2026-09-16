@@ -39,6 +39,8 @@ const QList<ExportFormat> &exportFormats()
         {QStringLiteral("alan"), QStringLiteral("Alan"), QStringLiteral("i")},
         {QStringLiteral("adventuron"), QStringLiteral("Adventuron"), QStringLiteral("adv")},
         {QStringLiteral("quest"), QStringLiteral("Quest 5"), QStringLiteral("aslx")},
+        {QStringLiteral("questrooms"), QStringLiteral("Quest 5 (rooms only)"),
+         QStringLiteral("aslx")},
     };
     return formats;
 }
@@ -61,6 +63,8 @@ std::unique_ptr<CodeExporter> makeExporter(const QString &fmt, const Map &map, c
         return std::make_unique<Inform7Exporter>(map, path);
     if (fmt == QLatin1String("quest"))
         return std::make_unique<QuestExporter>(map, path);
+    if (fmt == QLatin1String("questrooms"))
+        return std::make_unique<QuestRoomsExporter>(map, path);
     return nullptr;
 }
 

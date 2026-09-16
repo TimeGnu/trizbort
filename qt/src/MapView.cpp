@@ -55,11 +55,40 @@ MapView::MapView(QWidget *parent)
     setDragMode(QGraphicsView::RubberBandDrag);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     setResizeAnchor(QGraphicsView::AnchorViewCenter);
+
+    // Connections are long, thin items whose bounding rectangle is a large,
+    // mostly-empty diagonal band anchored at the scene origin (see
+    // ConnectionItem::boundingRect). Qt's default MinimalViewportUpdate mode
+    // scrolls by blitting the existing pixels and repainting only the newly
+    // exposed strip, driven by the scene's item index; that interacts poorly
+    // with such items and can leave connection lines unpainted until a
+    // transform change (a zoom step) forces a full redraw. Repainting the whole
+    // viewport on every scroll keeps the lines present and the scrolling smooth.
+    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 }
 
 void MapView::zoomIn() { scale(1.15, 1.15); }
 void MapView::zoomOut() { scale(1.0 / 1.15, 1.0 / 1.15); }
 void MapView::resetZoom() { resetTransform(); }
+
+void MapView::setZoomPercent(double percent)
+{
+    resetTransform();
+    const double f = percent / 100.0;
+    scale(f, f);
+}
+
+void MapView::microZoom(bool in)
+{
+    const double f = in ? 1.01 : 1.0 / 1.01;
+    scale(f, f);
+}
+
+void MapView::resetOrigin()
+{
+    resetTransform();
+    centerOn(0, 0);
+}
 
 void MapView::zoomToFit()
 {
@@ -70,7 +99,10 @@ void MapView::zoomToFit()
 void MapView::wheelEvent(QWheelEvent *event)
 {
     const double step = 1.15;
-    const double factor = (event->angleDelta().y() > 0) ? step : 1.0 / step;
+    bool zoomIn = event->angleDelta().y() > 0;
+    if (m_invertWheel)
+        zoomIn = !zoomIn;
+    const double factor = zoomIn ? step : 1.0 / step;
     scale(factor, factor);
     event->accept();
 }

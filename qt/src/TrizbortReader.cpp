@@ -470,19 +470,11 @@ void readSettings(QXmlStreamReader &xml, Map &out)
     }
 }
 
-} // namespace
-
-bool TrizbortReader::load(const QString &path, Map &out, QString *errorMessage)
+// Parse a document from an already-opened stream reader into out. `source` is a
+// human-readable label used in error messages.
+bool parseDocument(QXmlStreamReader &xml, Map &out, const QString &source, QString *errorMessage)
 {
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        if (errorMessage)
-            *errorMessage = QObject::tr("Cannot open %1: %2").arg(path, file.errorString());
-        return false;
-    }
-
     out.clear();
-    QXmlStreamReader xml(&file);
 
     // A document has exactly one root element: read it once, then descend.
     if (xml.readNextStartElement()) {
@@ -508,7 +500,7 @@ bool TrizbortReader::load(const QString &path, Map &out, QString *errorMessage)
     if (xml.hasError()) {
         if (errorMessage)
             *errorMessage = QObject::tr("Parse error in %1 (line %2): %3")
-                                .arg(path)
+                                .arg(source)
                                 .arg(xml.lineNumber())
                                 .arg(xml.errorString());
         out.clear();
@@ -522,6 +514,26 @@ bool TrizbortReader::load(const QString &path, Map &out, QString *errorMessage)
 
     out.reindex();
     return true;
+}
+
+} // namespace
+
+bool TrizbortReader::load(const QString &path, Map &out, QString *errorMessage)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        if (errorMessage)
+            *errorMessage = QObject::tr("Cannot open %1: %2").arg(path, file.errorString());
+        return false;
+    }
+    QXmlStreamReader xml(&file);
+    return parseDocument(xml, out, path, errorMessage);
+}
+
+bool TrizbortReader::loadFromString(const QString &xmlText, Map &out, QString *errorMessage)
+{
+    QXmlStreamReader xml(xmlText);
+    return parseDocument(xml, out, QObject::tr("clipboard"), errorMessage);
 }
 
 } // namespace trizbort

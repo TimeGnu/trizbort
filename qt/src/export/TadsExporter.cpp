@@ -40,12 +40,15 @@
 
 #include "TadsExporter.h"
 
+#include "../AppSettings.h"
+
 namespace trizbort {
 
 namespace {
 
-// The app default is adv3Lite; the golden corpus was generated with it.
-const bool kAdv3Lite = true;
+// The TADS target: adv3Lite (the app default, and how the golden corpus was
+// generated) or traditional adv3, per the application settings.
+bool adv3Lite() { return AppSettings::instance().saveTadsToAdv3Lite; }
 
 bool isNullOrWhitespace(const QString &s) { return s.trimmed().isEmpty(); }
 
@@ -143,7 +146,7 @@ void TadsExporter::exportHeader(QString &out, const QString &title, const QStrin
 
     wl(QStringLiteral("#charset \"us-ascii\""));
     wl();
-    if (kAdv3Lite) {
+    if (adv3Lite()) {
         wl(QStringLiteral("#include <tads.h>"));
         wl(QStringLiteral("#include \"advlite.h\""));
     } else {
@@ -172,7 +175,7 @@ void TadsExporter::exportContent(QString &out)
 {
     auto wl = [&out](const QString &s = QString()) { out += s; out += QLatin1Char('\n'); };
 
-    if (kAdv3Lite) {
+    if (adv3Lite()) {
         for (const ExportRegion *region : m_regionsInExportOrder) {
             wl(region->exportName + QStringLiteral(": Region"));
             wl(QStringLiteral(";"));
@@ -187,7 +190,7 @@ void TadsExporter::exportContent(QString &out)
         if (!location->room->description.isEmpty())
             wl(QStringLiteral("    ")
                + toTadsString(location->room->description, QLatin1Char('"')));
-        if (kAdv3Lite && location->room->region != QLatin1String("NoRegion"))
+        if (adv3Lite() && location->room->region != QLatin1String("NoRegion"))
             wl(QStringLiteral("    regions = [") + location->room->region + QLatin1Char(']'));
 
         bool anyExits = false;

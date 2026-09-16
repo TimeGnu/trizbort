@@ -21,7 +21,11 @@
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QFormLayout>
+#include <QHBoxLayout>
 #include <QLineEdit>
+#include <QPushButton>
+
+#include "ColorButton.h"
 
 namespace trizbort {
 
@@ -43,8 +47,16 @@ ConnectionDialog::ConnectionDialog(const Connection &connection, QWidget *parent
     m_style->setCurrentIndex(connection.style == ConnectionStyle::Dashed ? 1 : 0);
     form->addRow(tr("&Style:"), m_style);
 
+    m_colorButton = new ColorButton(this);
+    m_colorButton->setTitle(tr("Connection Colour"));
+    m_colorButton->setColor(connection.color);
+    form->addRow(tr("&Colour:"), m_colorButton);
+
     m_name = new QLineEdit(connection.name, this);
     form->addRow(tr("&Name:"), m_name);
+
+    m_description = new QLineEdit(connection.description, this);
+    form->addRow(tr("&Description:"), m_description);
 
     m_startText = new QLineEdit(connection.startText, this);
     form->addRow(tr("Start &text:"), m_startText);
@@ -54,6 +66,31 @@ ConnectionDialog::ConnectionDialog(const Connection &connection, QWidget *parent
 
     m_endText = new QLineEdit(connection.endText, this);
     form->addRow(tr("&End text:"), m_endText);
+
+    // Quick up/down/in/out labels: set the start/end text to a direction pair
+    // (the C# connection labels), which is what those connections render as.
+    auto *quick = new QWidget(this);
+    auto *quickLayout = new QHBoxLayout(quick);
+    quickLayout->setContentsMargins(0, 0, 0, 0);
+    const struct {
+        const char *label;
+        const char *start;
+        const char *end;
+    } kQuick[] = {{"Up/Down", "up", "down"},
+                  {"Down/Up", "down", "up"},
+                  {"In/Out", "in", "out"},
+                  {"Out/In", "out", "in"}};
+    for (const auto &q : kQuick) {
+        auto *btn = new QPushButton(tr(q.label), quick);
+        const QString s = QString::fromLatin1(q.start);
+        const QString e = QString::fromLatin1(q.end);
+        connect(btn, &QPushButton::clicked, this, [this, s, e] {
+            m_startText->setText(s);
+            m_endText->setText(e);
+        });
+        quickLayout->addWidget(btn);
+    }
+    form->addRow(tr("Quick &label:"), quick);
 
     m_door = new QCheckBox(tr("Has door"), this);
     m_door->setChecked(connection.hasDoor);
@@ -97,6 +134,8 @@ Connection ConnectionDialog::result() const
     c.flow = m_flow->currentIndex() == 1 ? ConnectionFlow::OneWay : ConnectionFlow::TwoWay;
     c.style = m_style->currentIndex() == 1 ? ConnectionStyle::Dashed : ConnectionStyle::Solid;
     c.name = m_name->text();
+    c.description = m_description->text();
+    c.color = m_colorButton->color();
     c.startText = m_startText->text();
     c.midText = m_midText->text();
     c.endText = m_endText->text();
