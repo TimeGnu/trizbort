@@ -50,6 +50,7 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
 #include <QMenu>
 #include <QHash>
 #include <QPainter>
@@ -559,6 +560,19 @@ void RoomItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
             painter->drawRect(QRectF(c.x() - hs / 2.0, c.y() - hs / 2.0, hs, hs));
         }
     }
+
+    // In connect mode, show the compass docking ports on the hovered room so the
+    // user can see (and pick) where a connection will attach — the C# drawPorts.
+    if (m_hovered && m_scene->connectMode()) {
+        const QStringList ports =
+            MapScene::portTokensForDetail(AppSettings::instance().portAdjustDetail);
+        painter->setPen(QPen(QColor(30, 120, 220), 1.0));
+        painter->setBrush(QColor(200, 225, 255));
+        for (const QString &t : ports) {
+            const QPointF wp = MapScene::portPoint(*room, t);
+            painter->drawEllipse(QPointF(wp.x() - room->x, wp.y() - room->y), 3.5, 3.5);
+        }
+    }
 }
 
 QVariant RoomItem::itemChange(GraphicsItemChange change, const QVariant &value)
@@ -618,6 +632,14 @@ int RoomItem::handleAt(const QPointF &localPos) const
     return -1;
 }
 
+void RoomItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    m_hovered = true;
+    if (m_scene->connectMode())
+        update();
+    QGraphicsItem::hoverEnterEvent(event);
+}
+
 void RoomItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
     const int h = handleAt(event->pos());
@@ -637,11 +659,30 @@ void RoomItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 void RoomItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     unsetCursor();
+    if (m_hovered && m_scene->connectMode())
+        update();
+    m_hovered = false;
     QGraphicsItem::hoverLeaveEvent(event);
 }
 
 void RoomItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    // Ctrl+click on a reference room jumps to (selects and reveals) the room it
+    // references, matching the C# Canvas.OnMouseClick behaviour.
+    if (event->button() == Qt::LeftButton && (event->modifiers() & Qt::ControlModifier)) {
+        const Room *r = m_scene->document() ? m_scene->document()->roomById(m_roomId) : nullptr;
+        if (r && r->referenceRoom >= 0) {
+            const int target = r->referenceRoom;
+            m_scene->selectRoomItem(target);
+            if (const Room *tr = m_scene->document()->roomById(target)) {
+                const QList<QGraphicsView *> views = m_scene->views();
+                if (!views.isEmpty())
+                    views.first()->ensureVisible(QRectF(tr->x, tr->y, tr->w, tr->h));
+            }
+            event->accept();
+            return;
+        }
+    }
     if (event->button() == Qt::LeftButton) {
         const int h = handleAt(event->pos());
         if (h >= 0) {

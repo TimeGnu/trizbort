@@ -45,6 +45,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QImage>
+#include <QKeyEvent>
 #include <QSettings>
 #include <QUndoStack>
 #include <QPainter>
@@ -506,6 +507,75 @@ static int runGuiSelftest(const QString &samplePath)
     return failures == 0 ? 0 : 1;
 }
 
+// Headless test for the canvas keyboard editing/navigation model and the port
+// helpers behind connect-mode docking ports. Drives the real key handlers.
+namespace trizbort {
+int runKeyboardSelftest()
+{
+    QTextStream out(stdout);
+    int failures = 0;
+    auto check = [&](bool ok, const char *what) {
+        if (!ok) {
+            out << "  FAIL: " << what << Qt::endl;
+            ++failures;
+        }
+    };
+
+    MainWindow win;
+    Map &map = win.m_map;
+    MapScene *scene = win.m_scene;
+    map.clear();
+    const int a = map.addRoom(0, 0);      // room A at the origin
+    const int b = map.addRoom(0, -128);   // room B one step north (y grows down)
+    map.addConnection(a, QStringLiteral("n"), b, QStringLiteral("s"));
+    scene->setDocument(&map);
+    win.m_undo.clear();
+
+    auto sendKey = [&](int key, Qt::KeyboardModifiers mods) {
+        QKeyEvent ev(QEvent::KeyPress, key, mods);
+        win.handleCanvasKey(&ev);
+    };
+
+    // Arrow key nudges the selected room by one grid step.
+    scene->selectRoomItem(a);
+    const double x0 = map.roomById(a)->x;
+    sendKey(Qt::Key_Right, Qt::NoModifier);
+    check(map.roomById(a) && map.roomById(a)->x == x0 + map.settings.gridSize,
+          "arrow nudges the selected room by a grid step");
+
+    // Ctrl+Alt+arrow resizes the room.
+    scene->selectRoomItem(a);
+    const double w0 = map.roomById(a)->w;
+    sendKey(Qt::Key_Right, Qt::ControlModifier | Qt::AltModifier);
+    check(map.roomById(a)->w == w0 + map.settings.gridSize, "Ctrl+Alt+arrow resizes the room");
+
+    // Ctrl+arrow follows the connection to the room in that direction.
+    scene->selectRoomItem(a);
+    sendKey(Qt::Key_Up, Qt::ControlModifier);
+    check(scene->selectedRoomId() == b, "Ctrl+arrow follows a connection to the next room");
+
+    // Ctrl+arrow with no connection that way adds a new connected room.
+    const int roomsBefore = map.rooms.size();
+    scene->selectRoomItem(b);
+    sendKey(Qt::Key_Up, Qt::ControlModifier);
+    check(map.rooms.size() == roomsBefore + 1, "Ctrl+arrow adds a connected room when none exists");
+
+    // Port helpers behind connect-mode docking ports.
+    check(MapScene::portTokensForDetail(4).size() == 4 &&
+              MapScene::portTokensForDetail(8).size() == 8 &&
+              MapScene::portTokensForDetail(16).size() == 16,
+          "portTokensForDetail returns 4/8/16 ports");
+    if (const Room *ra = map.roomById(a)) {
+        const QPointF north(ra->x + ra->w / 2.0, ra->y - 20);
+        check(MapScene::nearestPort(*ra, north, 8) == QLatin1String("n"),
+              "nearestPort picks the north port above the room");
+    }
+
+    out << (failures == 0 ? "keyboard-selftest: PASS" : "keyboard-selftest: FAIL") << Qt::endl;
+    return failures == 0 ? 0 : 1;
+}
+} // namespace trizbort
+
 // Headless test for the undo/redo command classes.
 static int runUndoSelftest()
 {
@@ -812,6 +882,8 @@ int main(int argc, char *argv[])
         return runAutomapSelftest();
     if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--undo-selftest"))
         return runUndoSelftest();
+    if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--keyboard-selftest"))
+        return trizbort::runKeyboardSelftest();
     if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--gui-selftest"))
         return runGuiSelftest(argc >= 3 ? QString::fromLocal8Bit(argv[2]) : QString());
 

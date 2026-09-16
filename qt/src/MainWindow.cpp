@@ -61,6 +61,7 @@
 #include <QFileSystemWatcher>
 #include <QFormLayout>
 #include <QInputDialog>
+#include <QKeyEvent>
 #include <QKeySequence>
 #include <QDoubleSpinBox>
 #include <QFontComboBox>
@@ -112,6 +113,9 @@ MainWindow::MainWindow(QWidget *parent)
     m_scene = new MapScene(this);
     m_view = new MapView(this);
     m_view->setScene(m_scene);
+    // Intercept canvas key presses (arrows, keypad) for the C# keyboard-editing
+    // and navigation model before the view scrolls.
+    m_view->installEventFilter(this);
     setCentralWidget(m_view);
 
     // Minimap overview in a dockable panel (hidden until the user shows it).
@@ -254,15 +258,14 @@ void MainWindow::createActions()
         const char *dir;
         QKeySequence shortcut;
     };
+    // These items add a room in a direction (click). The arrow chords are
+    // reserved for the keyboard-navigation model in eventFilter: Ctrl+arrow
+    // navigates-or-adds and Ctrl+Alt+arrow resizes, matching the C# canvas.
     const Dir dirs[] = {
-        {"North", "n", QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_Up)},
-        {"South", "s", QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_Down)},
-        {"East", "e", QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_Right)},
-        {"West", "w", QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_Left)},
-        {"North-East", "ne", QKeySequence()},
-        {"North-West", "nw", QKeySequence()},
-        {"South-East", "se", QKeySequence()},
-        {"South-West", "sw", QKeySequence()},
+        {"North", "n", QKeySequence()},      {"South", "s", QKeySequence()},
+        {"East", "e", QKeySequence()},       {"West", "w", QKeySequence()},
+        {"North-East", "ne", QKeySequence()}, {"North-West", "nw", QKeySequence()},
+        {"South-East", "se", QKeySequence()}, {"South-West", "sw", QKeySequence()},
     };
     for (const Dir &d : dirs) {
         const QString dir = QString::fromLatin1(d.dir);
@@ -1172,6 +1175,263 @@ void MainWindow::addConnectedRoomLabeled(const QString &placementDir, const QStr
     const int newId = cmd->newRoomId();
     m_undo.push(cmd);
     statusBar()->showMessage(tr("Added room %1 (%2)").arg(newId).arg(displayName));
+}
+
+namespace {
+
+// The eight compass directions in clockwise order, for ±45° rotation.
+const char *const kCompassRing[8] = {"n", "ne", "e", "se", "s", "sw", "w", "nw"};
+
+int compassIndex(const QString &dir)
+{
+    for (int i = 0; i < 8; ++i)
+        if (dir == QLatin1String(kCompassRing[i]))
+            return i;
+    return -1;
+}
+
+QString rotateCompass(const QString &dir, int steps)
+{
+    const int i = compassIndex(dir);
+    if (i < 0)
+        return dir;
+    return QLatin1String(kCompassRing[((i + steps) % 8 + 8) % 8]);
+}
+
+// A unit step in map coordinates for a compass token (y grows downward).
+QPointF dirStep(const QString &dir)
+{
+    double dx = 0, dy = 0;
+    if (dir.contains(QLatin1Char('n'))) dy = -1;
+    if (dir.contains(QLatin1Char('s'))) dy = 1;
+    if (dir.contains(QLatin1Char('e'))) dx = 1;
+    if (dir.contains(QLatin1Char('w'))) dx = -1;
+    return QPointF(dx, dy);
+}
+
+// Compass token for a key press: arrows give cardinals; keypad keys add the
+// diagonals (and cover both NumLock states, e.g. Key_8 or Key_Up == north).
+QString compassFromKey(int key, bool keypad)
+{
+    switch (key) {
+    case Qt::Key_Up:    return QStringLiteral("n");
+    case Qt::Key_Down:  return QStringLiteral("s");
+    case Qt::Key_Left:  return QStringLiteral("w");
+    case Qt::Key_Right: return QStringLiteral("e");
+    default: break;
+    }
+    if (keypad) {
+        switch (key) {
+        case Qt::Key_8: return QStringLiteral("n");
+        case Qt::Key_2: return QStringLiteral("s");
+        case Qt::Key_4: return QStringLiteral("w");
+        case Qt::Key_6: return QStringLiteral("e");
+        case Qt::Key_7: case Qt::Key_Home:     return QStringLiteral("nw");
+        case Qt::Key_9: case Qt::Key_PageUp:   return QStringLiteral("ne");
+        case Qt::Key_1: case Qt::Key_End:      return QStringLiteral("sw");
+        case Qt::Key_3: case Qt::Key_PageDown: return QStringLiteral("se");
+        default: break;
+        }
+    }
+    return QString();
+}
+
+Qt::KeyboardModifier parseKeypadModifier(const QString &name)
+{
+    const QString n = name.toLower();
+    if (n == QLatin1String("control")) return Qt::ControlModifier;
+    if (n == QLatin1String("alt")) return Qt::AltModifier;
+    if (n == QLatin1String("shift")) return Qt::ShiftModifier;
+    return Qt::NoModifier;
+}
+
+} // namespace
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj == m_view && event->type() == QEvent::KeyPress) {
+        if (handleCanvasKey(static_cast<QKeyEvent *>(event)))
+            return true;
+    }
+    return QMainWindow::eventFilter(obj, event);
+}
+
+bool MainWindow::handleCanvasKey(QKeyEvent *event)
+{
+    const bool keypad = event->modifiers() & Qt::KeypadModifier;
+    const QString dir = compassFromKey(event->key(), keypad);
+    if (dir.isEmpty())
+        return false;
+
+    const Qt::KeyboardModifiers mods =
+        event->modifiers() & (Qt::ControlModifier | Qt::AltModifier | Qt::ShiftModifier);
+    const bool ctrl = mods & Qt::ControlModifier;
+    const bool alt = mods & Qt::AltModifier;
+    const bool shift = mods & Qt::ShiftModifier;
+
+    auto followTo = [this](const QString &d) {
+        const int r = roomThroughConnection(m_scene->selectedRoomId(), d);
+        if (r >= 0) {
+            m_scene->selectRoomItem(r);
+            if (const Room *rr = m_map.roomById(r))
+                m_view->ensureVisible(QRectF(rr->x, rr->y, rr->w, rr->h));
+        }
+    };
+
+    if (keypad) {
+        // Numeric-keypad navigation (diagonals included). Shift follows a
+        // connection; otherwise navigate, creating/stubbing per the map's
+        // keypad modifiers.
+        if (shift) {
+            followTo(dir);
+            return true;
+        }
+        const Qt::KeyboardModifier createMod =
+            parseKeypadModifier(m_map.settings.keypadCreationModifier);
+        const Qt::KeyboardModifier unexpMod =
+            parseKeypadModifier(m_map.settings.keypadUnexploredModifier);
+        const bool create = createMod != Qt::NoModifier && (mods & createMod);
+        const bool unexplored = unexpMod != Qt::NoModifier && (mods & unexpMod);
+        navigateOrAdd(dir, create, unexplored);
+        return true;
+    }
+
+    // Plain arrow keys (cardinals only).
+    if (ctrl && alt) {
+        keyboardResizeRooms(dir);
+        return true;
+    }
+    if (ctrl) {
+        navigateOrAdd(dir, /*allowCreate=*/true, /*unexploredStub=*/false);
+        return true;
+    }
+    if (shift) {
+        followTo(dir);
+        return true;
+    }
+
+    // No modifier: nudge the selection, or scroll the view when nothing is
+    // selected.
+    if (m_scene->selectedRoomIds().isEmpty()) {
+        const QPointF s = dirStep(dir);
+        auto *hb = m_view->horizontalScrollBar();
+        auto *vb = m_view->verticalScrollBar();
+        hb->setValue(hb->value() + int(s.x()) * (m_view->viewport()->width() / 10));
+        vb->setValue(vb->value() + int(s.y()) * (m_view->viewport()->height() / 10));
+        return true;
+    }
+    const double delta = m_map.settings.snapToGrid ? m_map.settings.gridSize : 2.0;
+    const QPointF s = dirStep(dir);
+    nudgeSelection(s.x() * delta, s.y() * delta);
+    return true;
+}
+
+int MainWindow::roomThroughConnection(int roomId, const QString &dir) const
+{
+    if (roomId < 0)
+        return -1;
+    // Try the exact direction, then 45° either side (the C# approximate match).
+    const QString tries[3] = {dir, rotateCompass(dir, -1), rotateCompass(dir, 1)};
+    for (const QString &d : tries) {
+        for (const Connection &c : m_map.connections) {
+            bool fromHere = false;
+            for (const Vertex &v : c.vertices) {
+                if (v.docked && v.roomId == roomId && v.port.toLower() == d) {
+                    fromHere = true;
+                    break;
+                }
+            }
+            if (!fromHere)
+                continue;
+            for (const Vertex &v : c.vertices)
+                if (v.docked && v.roomId != roomId)
+                    return v.roomId;
+        }
+    }
+    return -1;
+}
+
+void MainWindow::nudgeSelection(double dx, double dy)
+{
+    const QList<int> rooms = m_scene->selectedRoomIds();
+    QList<RoomMove> moves;
+    for (int id : rooms) {
+        const Room *r = m_map.roomById(id);
+        if (!r)
+            continue;
+        moves.append({id, QPointF(r->x, r->y), QPointF(r->x + dx, r->y + dy)});
+    }
+    if (!moves.isEmpty())
+        m_undo.push(new MoveRoomsCommand(m_scene, moves));
+}
+
+void MainWindow::keyboardResizeRooms(const QString &dir)
+{
+    const double delta = m_map.settings.snapToGrid ? m_map.settings.gridSize : 2.0;
+    const double grid = m_map.settings.gridSize;
+    applyToSelectedRooms(tr("Resize Room"), [dir, delta, grid](Room &r) {
+        if (dir == QLatin1String("w")) {
+            if (r.w - delta >= grid)
+                r.w -= delta;
+        } else if (dir == QLatin1String("e")) {
+            r.w += delta;
+        } else if (dir == QLatin1String("n")) {
+            if (r.h - delta >= grid)
+                r.h -= delta;
+        } else if (dir == QLatin1String("s")) {
+            r.h += delta;
+        }
+    });
+}
+
+void MainWindow::navigateOrAdd(const QString &dir, bool allowCreate, bool unexploredStub)
+{
+    const int sel = m_scene->selectedRoomId();
+    if (sel < 0) {
+        statusBar()->showMessage(tr("Select a room first."));
+        return;
+    }
+    const int target = roomThroughConnection(sel, dir);
+    if (target >= 0) {
+        m_scene->selectRoomItem(target);
+        if (const Room *rr = m_map.roomById(target))
+            m_view->ensureVisible(QRectF(rr->x, rr->y, rr->w, rr->h));
+        return;
+    }
+    if (allowCreate)
+        addConnectedRoom(dir);
+    else if (unexploredStub)
+        addUnexploredExit(sel, dir);
+}
+
+void MainWindow::addUnexploredExit(int roomId, const QString &dir)
+{
+    const Room *r = m_map.roomById(roomId);
+    if (!r)
+        return;
+    Connection c;
+    c.id = m_map.nextConnectionId();
+    c.seq = m_map.nextSeq();
+    c.style = m_scene->newConnectionStyle();
+    c.flow = m_scene->newConnectionFlow();
+    Vertex a;
+    a.index = 0;
+    a.docked = true;
+    a.roomId = roomId;
+    a.port = dir;
+    const QPointF start = MapScene::portPoint(*r, dir);
+    const QPointF step = dirStep(dir);
+    const double dist = m_map.settings.preferredDistanceBetweenRooms;
+    Vertex b;
+    b.index = 1;
+    b.docked = false;
+    b.point = QPointF(start.x() + step.x() * dist, start.y() + step.y() * dist);
+    c.vertices << a << b;
+
+    ReplaceContentCommand::Content before{m_map.rooms, m_map.connections, m_map.regions};
+    ReplaceContentCommand::Content after = before;
+    after.connections.append(c);
+    m_undo.push(new ReplaceContentCommand(m_scene, before, after, tr("Add Unexplored Exit")));
 }
 
 void MainWindow::deleteSelection()

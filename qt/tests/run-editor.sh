@@ -34,6 +34,10 @@ out=$("$BIN" --undo-selftest 2>/dev/null) || fail=1
 echo "$out"
 echo "$out" | grep -q "undo-selftest: PASS" || fail=1
 
+out=$("$BIN" --keyboard-selftest 2>/dev/null) || fail=1
+echo "$out"
+echo "$out" | grep -q "keyboard-selftest: PASS" || fail=1
+
 out=$("$BIN" --automap-selftest 2>/dev/null) || fail=1
 echo "$out"
 echo "$out" | grep -q "automap-selftest: PASS" || fail=1

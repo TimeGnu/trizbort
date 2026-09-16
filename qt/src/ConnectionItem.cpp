@@ -216,6 +216,7 @@ ConnectionItem::ConnectionItem(MapScene *scene, int connId)
     , m_connId(connId)
 {
     setFlags(ItemIsSelectable);
+    setAcceptHoverEvents(true);
     setZValue(-1);
     updateRoute();
 }
@@ -322,7 +323,13 @@ void ConnectionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, 
     if (c.style == ConnectionStyle::Dashed)
         pen.setStyle(Qt::DashLine);
     if (isSelected()) {
-        pen.setColor(QColor(30, 120, 220));
+        QColor sel = map->settings.colors[ColorSelectedLine];
+        pen.setColor(sel.isValid() ? sel : QColor(30, 120, 220));
+        pen.setWidthF(3.0);
+    } else if (m_hover) {
+        // Hover highlight in the palette's hover-line colour (C# HoverLine pen).
+        QColor hov = map->settings.colors[ColorHoverLine];
+        pen.setColor(hov.isValid() ? hov : QColor(0, 150, 0));
         pen.setWidthF(3.0);
     }
 
@@ -640,6 +647,20 @@ void ConnectionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     m_scene->activateConnection(m_connId);
     event->accept();
+}
+
+void ConnectionItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    m_hover = true;
+    update();
+    QGraphicsItem::hoverEnterEvent(event);
+}
+
+void ConnectionItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    m_hover = false;
+    update();
+    QGraphicsItem::hoverLeaveEvent(event);
 }
 
 void ConnectionItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
