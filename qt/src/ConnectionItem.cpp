@@ -305,7 +305,8 @@ void ConnectionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, 
     }
 
     // Start / mid / end text labels, drawn in the line font and line-text colour.
-    if (!c.startText.isEmpty() || !c.midText.isEmpty() || !c.endText.isEmpty()) {
+    if (m_scene->textVisible() &&
+        (!c.startText.isEmpty() || !c.midText.isEmpty() || !c.endText.isEmpty())) {
         const QFont lineFont = qfontFromSpec(map->settings.lineFont, 9.0);
         QColor textColor = map->settings.colors[ColorLineText];
         if (!textColor.isValid())

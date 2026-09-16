@@ -519,7 +519,8 @@ void RoomItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
         painter->drawPath(path);
     }
 
-    drawRoomText(painter, *map, *room, rect);
+    if (m_scene->textVisible())
+        drawRoomText(painter, *map, *room, rect);
 
     // Validation: a red X across rooms that fail the active validation rules.
     if (m_scene->roomInvalid(*room)) {

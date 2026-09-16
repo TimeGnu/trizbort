@@ -142,6 +142,14 @@ public:
     ValidationFlags validation() const { return m_validation; }
     bool roomInvalid(const Room &room) const;
 
+    // Toggle drawing of room/connection text (View > Toggle Text).
+    void setTextVisible(bool visible)
+    {
+        m_textVisible = visible;
+        update();
+    }
+    bool textVisible() const { return m_textVisible; }
+
     // Refresh a single room's visuals and the connections touching it.
     void refreshRoom(int roomId);
     // Re-route and repaint one connection after its properties changed.
@@ -170,6 +178,7 @@ private:
 
     bool m_connectMode = false;
     bool m_roomResizeActive = false;
+    bool m_textVisible = true;
     ConnectionStyle m_newConnStyle = ConnectionStyle::Solid;
     ConnectionFlow m_newConnFlow = ConnectionFlow::TwoWay;
     ValidationFlags m_validation;

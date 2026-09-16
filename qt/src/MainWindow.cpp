@@ -48,6 +48,7 @@
 #include <QClipboard>
 #include <QCloseEvent>
 #include <QDateTime>
+#include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QDockWidget>
 #include <QFileDialog>
@@ -67,6 +68,7 @@
 #include <QSet>
 #include <QSettings>
 #include <QTimer>
+#include <QUrl>
 #include <QPlainTextEdit>
 #include <QStatusBar>
 #include <QToolBar>
@@ -405,6 +407,15 @@ void MainWindow::createActions()
         dlg.exec();
     });
     toolsMenu->addSeparator();
+    toolsMenu->addAction(tr("&Restore Default Map Settings"), this, [this] {
+        if (QMessageBox::question(this, tr("Restore Defaults"),
+                                  tr("Reset all map appearance settings to their defaults?")) !=
+            QMessageBox::Yes)
+            return;
+        m_undo.push(new EditSettingsCommand(m_scene, m_map.settings, m_map.regions, MapSettings(),
+                                            m_map.regions));
+    });
+    toolsMenu->addSeparator();
     toolsMenu->addAction(tr("&Application Settings…"), this, &MainWindow::showAppSettings);
 
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
@@ -447,11 +458,39 @@ void MainWindow::createActions()
                                             m_map.regions));
     });
     viewMenu->addSeparator();
+    auto *textAct = viewMenu->addAction(tr("Show &Text"));
+    textAct->setCheckable(true);
+    textAct->setChecked(true);
+    textAct->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F4));
+    connect(textAct, &QAction::triggered, this,
+            [this](bool on) { m_scene->setTextVisible(on); });
     if (m_minimapDock) {
         QAction *mm = m_minimapDock->toggleViewAction();
         mm->setText(tr("Mini &Map"));
         viewMenu->addAction(mm);
     }
+
+    // --- Help menu ---
+    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
+    helpMenu->addAction(tr("Online &Help"), QKeySequence::HelpContents, this, [this] {
+        QDesktopServices::openUrl(QUrl(QStringLiteral("https://www.trizbort.com/")));
+    });
+    helpMenu->addAction(tr("Check for &Updates"), this, [this] {
+        QDesktopServices::openUrl(
+            QUrl(QStringLiteral("https://github.com/TimeGnu/trizbort/releases")));
+    });
+    helpMenu->addSeparator();
+    helpMenu->addAction(tr("&About Trizbort (Qt)…"), this, [this] {
+        QMessageBox::about(
+            this, tr("About Trizbort (Qt)"),
+            tr("<h3>Trizbort (Qt) %1</h3>"
+               "<p>A from-scratch C++/Qt reimplementation of Trizbort, the "
+               "interactive-fiction mapper.</p>"
+               "<p>GNU GPL v3 or later. Based on the MIT-licensed C# Trizbort by "
+               "Genstein and Jason Lautzenheiser.</p>"
+               "<p><a href=\"https://www.trizbort.com/\">trizbort.com</a></p>")
+                .arg(QApplication::applicationVersion()));
+    });
 
     toolBar->addAction(newAct);
     toolBar->addAction(openAct);
