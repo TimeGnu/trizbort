@@ -24,6 +24,7 @@
 #include <QPainter>
 #include <QPdfWriter>
 
+#include "AppSettings.h"
 #include "MapScene.h"
 
 namespace trizbort {
@@ -35,12 +36,18 @@ QRectF contentRect(QGraphicsScene &scene, const Map &map)
     QRectF r = scene.itemsBoundingRect();
     if (r.isEmpty())
         r = QRectF(0, 0, 200, 200);
-    // Honour document-specific page margins when set; otherwise a small default
-    // gutter so nothing is clipped at the edge.
+    // Honour document-specific page margins when set; else the application's
+    // general margins when enabled; otherwise a small default gutter so nothing
+    // is clipped at the edge.
     if (map.settings.documentSpecificMargins) {
         const double hm = map.settings.horizontalMargin;
         const double vm = map.settings.verticalMargin;
         return r.adjusted(-hm, -vm, hm, vm);
+    }
+    const AppSettings &app = AppSettings::instance();
+    if (app.specifyGenMargins) {
+        return r.adjusted(-app.genHorizontalMargin, -app.genVerticalMargin, app.genHorizontalMargin,
+                          app.genVerticalMargin);
     }
     return r.adjusted(-24, -24, 24, 24);
 }

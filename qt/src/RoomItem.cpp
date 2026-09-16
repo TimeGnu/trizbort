@@ -58,6 +58,7 @@
 #include <QRegularExpression>
 #include <QUndoStack>
 
+#include "AppSettings.h"
 #include "EditCommands.h"
 #include "FontUtil.h"
 #include "MapScene.h"
@@ -400,17 +401,26 @@ void RoomItem::syncFromModel()
     setPos(room->x, room->y);
     m_applyingModel = false;
 
-    // Hover tooltip: name, subtitle, description and object list.
+    // Hover tooltip: name, subtitle, and — per the application settings — the
+    // description and object list (optionally truncated).
+    const AppSettings &app = AppSettings::instance();
     QString tip = room->name.isEmpty() ? QObject::tr("(unnamed room)") : room->name;
     if (!room->subtitle.isEmpty())
         tip += QLatin1Char('\n') + room->subtitle;
-    if (!room->description.trimmed().isEmpty())
-        tip += QStringLiteral("\n\n") + room->description.trimmed();
-    QString objs = room->objectsText;
-    objs.remove(QRegularExpression(QStringLiteral("\\[[^\\]\\[]*\\]")));
-    objs = objs.trimmed();
-    if (!objs.isEmpty())
-        tip += QObject::tr("\n\nObjects:\n") + objs;
+    if (app.showDescriptionsInTooltips && !room->description.trimmed().isEmpty()) {
+        QString desc = room->description.trimmed();
+        if (app.limitRoomDescriptionChars && app.roomDescriptionChars > 0
+            && desc.length() > app.roomDescriptionChars)
+            desc = desc.left(app.roomDescriptionChars).trimmed() + QStringLiteral("…");
+        tip += QStringLiteral("\n\n") + desc;
+    }
+    if (app.showObjectsInTooltips) {
+        QString objs = room->objectsText;
+        objs.remove(QRegularExpression(QStringLiteral("\\[[^\\]\\[]*\\]")));
+        objs = objs.trimmed();
+        if (!objs.isEmpty())
+            tip += QObject::tr("\n\nObjects:\n") + objs;
+    }
     setToolTip(tip);
     update();
 }

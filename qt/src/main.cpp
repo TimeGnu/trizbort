@@ -56,6 +56,7 @@
 #include "MainWindow.h"
 #include "MapDocument.h"
 #include "MapRender.h"
+#include "AppSettings.h"
 #include "MapScene.h"
 #include "MapStatisticsDialog.h"
 #include "RoomItem.h"
@@ -318,6 +319,58 @@ static int runEditSelftest()
           "version older");
     check(MainWindow::compareVersionStrings(QStringLiteral("v2.0.0-beta"), QStringLiteral("1.8.0.0")) > 0,
           "version newer ignoring pre-release suffix");
+
+    // Port-adjust detail: the same direction snaps to 4, 8, or 16 compass points.
+    {
+        Room room;
+        room.x = -48;
+        room.y = -32;
+        room.w = 96;
+        room.h = 64; // centre at the origin
+        const QPointF ne(100, -60);
+        AppSettings &appset = AppSettings::instance();
+        const int savedDetail = appset.portAdjustDetail;
+        appset.portAdjustDetail = 16;
+        check(MapScene::portTowards(room, ne) == QLatin1String("ene"), "port detail 16 -> ene");
+        appset.portAdjustDetail = 8;
+        check(MapScene::portTowards(room, ne) == QLatin1String("ne"), "port detail 8 -> ne");
+        appset.portAdjustDetail = 4;
+        check(MapScene::portTowards(room, ne) == QLatin1String("e"), "port detail 4 -> e");
+        appset.portAdjustDetail = savedDetail;
+    }
+
+    // Hand-drawn-global seeds a new room's hand-drawn flag.
+    {
+        AppSettings &appset = AppSettings::instance();
+        const bool savedHd = appset.handDrawnGlobal;
+        appset.handDrawnGlobal = true;
+        Map hm;
+        const int rid = hm.addRoom(0, 0);
+        check(hm.roomById(rid) && hm.roomById(rid)->handDrawn, "hand-drawn global seeds new rooms");
+        appset.handDrawnGlobal = false;
+        const int rid2 = hm.addRoom(200, 0);
+        check(hm.roomById(rid2) && !hm.roomById(rid2)->handDrawn,
+              "new rooms are not hand-drawn when the default is off");
+        appset.handDrawnGlobal = savedHd;
+    }
+
+    // TADS export follows the adv3Lite / adv3 application setting.
+    {
+        Map tm;
+        tm.addRoom(0, 0);
+        AppSettings &appset = AppSettings::instance();
+        const bool savedTads = appset.saveTadsToAdv3Lite;
+        appset.saveTadsToAdv3Lite = true;
+        auto e1 = makeExporter(QStringLiteral("tads"), tm, QStringLiteral("t.trizbort"));
+        const QString lite = e1 ? e1->exportToString() : QString();
+        appset.saveTadsToAdv3Lite = false;
+        auto e2 = makeExporter(QStringLiteral("tads"), tm, QStringLiteral("t.trizbort"));
+        const QString adv3 = e2 ? e2->exportToString() : QString();
+        check(lite.contains(QLatin1String("advlite.h")), "TADS adv3Lite header");
+        check(adv3.contains(QLatin1String("adv3.h")) && !adv3.contains(QLatin1String("advlite.h")),
+              "TADS adv3 header");
+        appset.saveTadsToAdv3Lite = savedTads;
+    }
 
     QFile::remove(path);
     out << (failures == 0 ? "edit-selftest: PASS" : "edit-selftest: FAIL") << Qt::endl;

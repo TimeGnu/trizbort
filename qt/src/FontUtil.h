@@ -20,6 +20,7 @@
 
 #include <QFont>
 
+#include "AppSettings.h"
 #include "MapDocument.h"
 
 namespace trizbort {
@@ -34,6 +35,8 @@ inline QFont qfontFromSpec(const FontSpec &spec, double fallbackPointSize)
     QFont font;
     if (!spec.family.isEmpty())
         font.setFamily(spec.family);
+    else if (!AppSettings::instance().defaultFontName.isEmpty())
+        font.setFamily(AppSettings::instance().defaultFontName); // the app-wide default family
     font.setPointSizeF(spec.size > 0.0 ? spec.size : fallbackPointSize);
     font.setBold(spec.bold);
     font.setItalic(spec.italic);

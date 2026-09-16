@@ -53,6 +53,7 @@
 #include <QPolygonF>
 #include <QUndoStack>
 
+#include "AppSettings.h"
 #include "EditCommands.h"
 #include "FontUtil.h"
 #include "MapScene.h"
@@ -198,12 +199,19 @@ void ConnectionItem::updateRoute()
             m_points.append(sp);
     }
 
-    // Hover tooltip: name, a door marker, and description.
+    // Hover tooltip: name, a door marker, and — per the application settings —
+    // the description (optionally truncated).
+    const AppSettings &app = AppSettings::instance();
     QString tip = c.name.isEmpty() ? QObject::tr("Connection") : c.name;
     if (c.hasDoor)
         tip += QObject::tr(" (Door)");
-    if (!c.description.trimmed().isEmpty())
-        tip += QLatin1Char('\n') + c.description.trimmed();
+    if (app.showDescriptionsInTooltips && !c.description.trimmed().isEmpty()) {
+        QString desc = c.description.trimmed();
+        if (app.limitConnectionDescriptionChars && app.connectionDescriptionChars > 0
+            && desc.length() > app.connectionDescriptionChars)
+            desc = desc.left(app.connectionDescriptionChars).trimmed() + QStringLiteral("…");
+        tip += QLatin1Char('\n') + desc;
+    }
     setToolTip(tip);
     update();
 }

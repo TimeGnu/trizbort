@@ -48,6 +48,7 @@
 #include <QPainter>
 #include <QUndoStack>
 
+#include "AppSettings.h"
 #include "ConnectionItem.h"
 #include "EditCommands.h"
 #include "RoomItem.h"
@@ -174,23 +175,28 @@ QPointF MapScene::portStalkPoint(const Room &room, const QString &port, double s
 
 QString MapScene::portTowards(const Room &room, const QPointF &target)
 {
+    static const char *const kPorts[16] = {"n",  "nne", "ne", "ene", "e",  "ese", "se", "sse",
+                                            "s",  "ssw", "sw", "wsw", "w",  "wnw", "nw", "nnw"};
     const double cx = room.x + room.w / 2.0;
     const double cy = room.y + room.h / 2.0;
     const double dx = target.x() - cx;
     const double dy = target.y() - cy;
-    // Compare against the diagonal so ordinals win only when clearly diagonal.
-    const double ax = std::abs(dx);
-    const double ay = std::abs(dy);
-    const bool diag = (ax > ay * 0.4142 && ay > ax * 0.4142);
-    if (diag) {
-        if (dx >= 0 && dy < 0) return QStringLiteral("ne");
-        if (dx >= 0 && dy >= 0) return QStringLiteral("se");
-        if (dx < 0 && dy < 0) return QStringLiteral("nw");
-        return QStringLiteral("sw");
-    }
-    if (ax >= ay)
-        return dx >= 0 ? QStringLiteral("e") : QStringLiteral("w");
-    return dy >= 0 ? QStringLiteral("s") : QStringLiteral("n");
+    if (dx == 0.0 && dy == 0.0)
+        return QStringLiteral("n");
+
+    // How many compass points to snap to (the C# PortAdjustDetail: 4/8/16).
+    int divisions = AppSettings::instance().portAdjustDetail;
+    if (divisions != 4 && divisions != 8)
+        divisions = 16;
+
+    // Angle clockwise from north (screen y grows downward), bucketed to the
+    // nearest of `divisions` evenly-spaced compass points.
+    static const double kTwoPi = 2.0 * 3.14159265358979323846;
+    double angle = std::atan2(dx, -dy);
+    if (angle < 0.0)
+        angle += kTwoPi;
+    const int bucket = static_cast<int>(std::llround(angle / (kTwoPi / divisions))) % divisions;
+    return QString::fromLatin1(kPorts[(bucket * (16 / divisions)) % 16]);
 }
 
 int MapScene::roomIdAt(const QPointF &scenePos) const
@@ -266,7 +272,11 @@ void MapScene::rebuild()
     // the larger content dimension keeps the scroll range proportionate in both
     // directions, so the thumb stays a sensible size and drags smoothly.
     const QRectF content = itemsBoundingRect();
-    const double margin = std::max(600.0, std::max(content.width(), content.height()));
+    double margin = std::max(600.0, std::max(content.width(), content.height()));
+    // "Infinite" scroll bounds let the view roam far past the content, rather
+    // than clamping close to it (the C# InfiniteScrollBounds app setting).
+    if (AppSettings::instance().infiniteScrollBounds)
+        margin = std::max(margin, 100000.0);
     QRectF bounds = content.adjusted(-margin, -margin, margin, margin);
     if (bounds.width() < 1200 || bounds.height() < 900)
         bounds = bounds.united(QRectF(bounds.center() - QPointF(600, 450), QSizeF(1200, 900)));

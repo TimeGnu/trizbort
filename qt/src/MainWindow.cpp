@@ -61,7 +61,10 @@
 #include <QFormLayout>
 #include <QInputDialog>
 #include <QKeySequence>
+#include <QDoubleSpinBox>
+#include <QFontComboBox>
 #include <QLabel>
+#include <QSpinBox>
 #include <QLineEdit>
 #include <QScrollBar>
 #include <QHash>
@@ -81,6 +84,7 @@
 #include <QStatusBar>
 #include <QToolBar>
 
+#include "AppSettings.h"
 #include "AutomapGui.h"
 #include "ConnectionDialog.h"
 #include "EditCommands.h"
@@ -1931,6 +1935,29 @@ void MainWindow::loadPreferences()
     m_smartSaveImage = s.value(QStringLiteral("smartSave/image"), true).toBool();
     m_smartSaveImageFormat =
         s.value(QStringLiteral("smartSave/imageFormat"), QStringLiteral("png")).toString();
+
+    // Application-wide settings read by rendering code (tooltips, hand-drawn
+    // default, port granularity, general margins, default font).
+    AppSettings &app = AppSettings::instance();
+    app.showObjectsInTooltips = s.value(QStringLiteral("tooltips/showObjects"), true).toBool();
+    app.showDescriptionsInTooltips =
+        s.value(QStringLiteral("tooltips/showDescriptions"), true).toBool();
+    app.limitRoomDescriptionChars =
+        s.value(QStringLiteral("tooltips/limitRoomChars"), false).toBool();
+    app.roomDescriptionChars = s.value(QStringLiteral("tooltips/roomChars"), 50).toInt();
+    app.limitConnectionDescriptionChars =
+        s.value(QStringLiteral("tooltips/limitConnectionChars"), false).toBool();
+    app.connectionDescriptionChars = s.value(QStringLiteral("tooltips/connectionChars"), 50).toInt();
+    app.handDrawnGlobal = s.value(QStringLiteral("handDrawnGlobal"), false).toBool();
+    app.portAdjustDetail = s.value(QStringLiteral("portAdjustDetail"), 16).toInt();
+    app.defaultFontName =
+        s.value(QStringLiteral("defaultFontName"), QStringLiteral("Arial")).toString();
+    app.specifyGenMargins = s.value(QStringLiteral("genMargins/enabled"), false).toBool();
+    app.genHorizontalMargin = s.value(QStringLiteral("genMargins/horizontal"), 0.0).toDouble();
+    app.genVerticalMargin = s.value(QStringLiteral("genMargins/vertical"), 0.0).toDouble();
+    app.infiniteScrollBounds = s.value(QStringLiteral("infiniteScrollBounds"), false).toBool();
+    app.saveTadsToAdv3Lite = s.value(QStringLiteral("saveTadsToAdv3Lite"), true).toBool();
+
     const QByteArray geometry = s.value(QStringLiteral("windowGeometry")).toByteArray();
     if (!geometry.isEmpty())
         restoreGeometry(geometry);
@@ -1946,6 +1973,23 @@ void MainWindow::savePreferences()
     s.setValue(QStringLiteral("smartSave/pdf"), m_smartSavePdf);
     s.setValue(QStringLiteral("smartSave/image"), m_smartSaveImage);
     s.setValue(QStringLiteral("smartSave/imageFormat"), m_smartSaveImageFormat);
+
+    const AppSettings &app = AppSettings::instance();
+    s.setValue(QStringLiteral("tooltips/showObjects"), app.showObjectsInTooltips);
+    s.setValue(QStringLiteral("tooltips/showDescriptions"), app.showDescriptionsInTooltips);
+    s.setValue(QStringLiteral("tooltips/limitRoomChars"), app.limitRoomDescriptionChars);
+    s.setValue(QStringLiteral("tooltips/roomChars"), app.roomDescriptionChars);
+    s.setValue(QStringLiteral("tooltips/limitConnectionChars"), app.limitConnectionDescriptionChars);
+    s.setValue(QStringLiteral("tooltips/connectionChars"), app.connectionDescriptionChars);
+    s.setValue(QStringLiteral("handDrawnGlobal"), app.handDrawnGlobal);
+    s.setValue(QStringLiteral("portAdjustDetail"), app.portAdjustDetail);
+    s.setValue(QStringLiteral("defaultFontName"), app.defaultFontName);
+    s.setValue(QStringLiteral("genMargins/enabled"), app.specifyGenMargins);
+    s.setValue(QStringLiteral("genMargins/horizontal"), app.genHorizontalMargin);
+    s.setValue(QStringLiteral("genMargins/vertical"), app.genVerticalMargin);
+    s.setValue(QStringLiteral("infiniteScrollBounds"), app.infiniteScrollBounds);
+    s.setValue(QStringLiteral("saveTadsToAdv3Lite"), app.saveTadsToAdv3Lite);
+
     s.setValue(QStringLiteral("windowGeometry"), saveGeometry());
 }
 
@@ -2022,6 +2066,82 @@ void MainWindow::showAppSettings()
     connect(ssImage, &QCheckBox::toggled, ssFormat, &QComboBox::setEnabled);
     form->addRow(tr("Smart Save image &format:"), ssFormat);
 
+    AppSettings &app = AppSettings::instance();
+    auto sectionLabel = [&](const QString &text) {
+        auto *label = new QLabel(QStringLiteral("<b>%1</b>").arg(text), &dialog);
+        form->addRow(label);
+    };
+
+    // Tooltips.
+    sectionLabel(tr("Tooltips"));
+    auto *ttObjects = new QCheckBox(tr("Show objects in tooltips"), &dialog);
+    ttObjects->setChecked(app.showObjectsInTooltips);
+    form->addRow(ttObjects);
+    auto *ttDesc = new QCheckBox(tr("Show descriptions in tooltips"), &dialog);
+    ttDesc->setChecked(app.showDescriptionsInTooltips);
+    form->addRow(ttDesc);
+    auto *ttRoomLimit = new QCheckBox(tr("Limit room description length"), &dialog);
+    ttRoomLimit->setChecked(app.limitRoomDescriptionChars);
+    form->addRow(ttRoomLimit);
+    auto *ttRoomChars = new QSpinBox(&dialog);
+    ttRoomChars->setRange(1, 10000);
+    ttRoomChars->setValue(app.roomDescriptionChars);
+    ttRoomChars->setEnabled(app.limitRoomDescriptionChars);
+    connect(ttRoomLimit, &QCheckBox::toggled, ttRoomChars, &QSpinBox::setEnabled);
+    form->addRow(tr("Room description characters:"), ttRoomChars);
+    auto *ttConnLimit = new QCheckBox(tr("Limit connection description length"), &dialog);
+    ttConnLimit->setChecked(app.limitConnectionDescriptionChars);
+    form->addRow(ttConnLimit);
+    auto *ttConnChars = new QSpinBox(&dialog);
+    ttConnChars->setRange(1, 10000);
+    ttConnChars->setValue(app.connectionDescriptionChars);
+    ttConnChars->setEnabled(app.limitConnectionDescriptionChars);
+    connect(ttConnLimit, &QCheckBox::toggled, ttConnChars, &QSpinBox::setEnabled);
+    form->addRow(tr("Connection description characters:"), ttConnChars);
+
+    // Rendering.
+    sectionLabel(tr("Rendering"));
+    auto *handDrawn = new QCheckBox(tr("New rooms are hand-drawn by default"), &dialog);
+    handDrawn->setChecked(app.handDrawnGlobal);
+    form->addRow(handDrawn);
+    auto *portDetail = new QComboBox(&dialog);
+    portDetail->addItem(tr("NSEW (4)"), 4);
+    portDetail->addItem(tr("Diagonals (8)"), 8);
+    portDetail->addItem(tr("All ports (16)"), 16);
+    portDetail->setCurrentIndex(app.portAdjustDetail == 4 ? 0 : app.portAdjustDetail == 8 ? 1 : 2);
+    form->addRow(tr("Port adjustment &detail:"), portDetail);
+    auto *defaultFont = new QFontComboBox(&dialog);
+    if (!app.defaultFontName.isEmpty())
+        defaultFont->setCurrentFont(QFont(app.defaultFontName));
+    form->addRow(tr("Default &font:"), defaultFont);
+    auto *infScroll = new QCheckBox(tr("Allow scrolling far beyond the map"), &dialog);
+    infScroll->setChecked(app.infiniteScrollBounds);
+    form->addRow(infScroll);
+
+    // Export.
+    sectionLabel(tr("Export"));
+    auto *tadsLite = new QCheckBox(tr("Export TADS 3 for adv3Lite (off: traditional adv3)"), &dialog);
+    tadsLite->setChecked(app.saveTadsToAdv3Lite);
+    form->addRow(tadsLite);
+
+    // General export margins (used when a document has no margins of its own).
+    sectionLabel(tr("General export margins"));
+    auto *genMargins = new QCheckBox(tr("Use general export margins"), &dialog);
+    genMargins->setChecked(app.specifyGenMargins);
+    form->addRow(genMargins);
+    auto *genH = new QDoubleSpinBox(&dialog);
+    genH->setRange(0, 100000);
+    genH->setValue(app.genHorizontalMargin);
+    genH->setEnabled(app.specifyGenMargins);
+    auto *genV = new QDoubleSpinBox(&dialog);
+    genV->setRange(0, 100000);
+    genV->setValue(app.genVerticalMargin);
+    genV->setEnabled(app.specifyGenMargins);
+    connect(genMargins, &QCheckBox::toggled, genH, &QDoubleSpinBox::setEnabled);
+    connect(genMargins, &QCheckBox::toggled, genV, &QDoubleSpinBox::setEnabled);
+    form->addRow(tr("Horizontal margin:"), genH);
+    form->addRow(tr("Vertical margin:"), genV);
+
     auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
     connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
@@ -2035,9 +2155,29 @@ void MainWindow::showAppSettings()
     m_smartSavePdf = ssPdf->isChecked();
     m_smartSaveImage = ssImage->isChecked();
     m_smartSaveImageFormat = ssFormat->currentText();
+
+    app.showObjectsInTooltips = ttObjects->isChecked();
+    app.showDescriptionsInTooltips = ttDesc->isChecked();
+    app.limitRoomDescriptionChars = ttRoomLimit->isChecked();
+    app.roomDescriptionChars = ttRoomChars->value();
+    app.limitConnectionDescriptionChars = ttConnLimit->isChecked();
+    app.connectionDescriptionChars = ttConnChars->value();
+    app.handDrawnGlobal = handDrawn->isChecked();
+    app.portAdjustDetail = portDetail->currentData().toInt();
+    app.defaultFontName = defaultFont->currentFont().family();
+    app.specifyGenMargins = genMargins->isChecked();
+    app.genHorizontalMargin = genH->value();
+    app.genVerticalMargin = genV->value();
+    app.infiniteScrollBounds = infScroll->isChecked();
+    app.saveTadsToAdv3Lite = tadsLite->isChecked();
+
     m_view->setInvertWheelZoom(m_invertWheel);
     updateTitle();
     savePreferences();
+    // Tooltips and scroll bounds are derived when the scene is (re)built;
+    // rebuild so the new settings take effect immediately.
+    if (m_scene)
+        m_scene->setDocument(&m_map);
 }
 
 void MainWindow::editMapProperties()
