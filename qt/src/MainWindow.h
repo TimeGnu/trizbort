@@ -190,6 +190,9 @@ private:
     bool m_smartSavePdf = true;
     bool m_smartSaveImage = true;
     QString m_smartSaveImageFormat = QStringLiteral("png");
+    // When true, image/PDF exports render at 100% (1 unit per pixel); when false
+    // they render at the current view zoom (the C# SaveAt100 app setting).
+    bool m_saveAt100 = true;
 };
 
 } // namespace trizbort

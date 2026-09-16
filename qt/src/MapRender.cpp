@@ -60,7 +60,7 @@ QColor canvas(const Map &map)
 
 } // namespace
 
-bool renderMapToImage(const Map &map, const QString &path, QString *errorMessage)
+bool renderMapToImage(const Map &map, const QString &path, QString *errorMessage, double scale)
 {
     // Render off a copy with the grid suppressed, so the export is clean.
     Map copy = map;
@@ -69,14 +69,16 @@ bool renderMapToImage(const Map &map, const QString &path, QString *errorMessage
     scene.setDocument(&copy);
 
     const QRectF bounds = contentRect(scene, copy);
-    const QSize size = bounds.size().toSize();
+    if (!(scale > 0.0))
+        scale = 1.0;
+    const QSize size = (bounds.size() * scale).toSize();
     QImage image(size, QImage::Format_ARGB32);
     image.fill(canvas(copy));
     {
         QPainter painter(&image);
         painter.setRenderHint(QPainter::Antialiasing, true);
         painter.setRenderHint(QPainter::TextAntialiasing, true);
-        scene.render(&painter, QRectF(QPointF(0, 0), bounds.size()), bounds);
+        scene.render(&painter, QRectF(QPointF(0, 0), image.size()), bounds);
     }
     if (!image.save(path)) {
         if (errorMessage)

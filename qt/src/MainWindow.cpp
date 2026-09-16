@@ -53,6 +53,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QRegularExpression>
+#include <QDialog>
 #include <QDialogButtonBox>
 #include <QDockWidget>
 #include <QFileDialog>
@@ -80,6 +81,7 @@
 #include <QSettings>
 #include <QTimer>
 #include <QUrl>
+#include <QVBoxLayout>
 #include <QPlainTextEdit>
 #include <QStatusBar>
 #include <QToolBar>
@@ -517,15 +519,40 @@ void MainWindow::createActions()
     helpMenu->addAction(tr("Check for &Updates"), this, &MainWindow::checkForUpdates);
     helpMenu->addSeparator();
     helpMenu->addAction(tr("&About Trizbort (Qt)…"), this, [this] {
-        QMessageBox::about(
-            this, tr("About Trizbort (Qt)"),
-            tr("<h3>Trizbort (Qt) %1</h3>"
-               "<p>A from-scratch C++/Qt reimplementation of Trizbort, the "
-               "interactive-fiction mapper.</p>"
+        // A structured About dialog (rather than a bare message box), mirroring
+        // the C# AboutDialog: title, version, description, credits and a link.
+        QDialog dialog(this);
+        dialog.setWindowTitle(tr("About Trizbort (Qt)"));
+        auto *layout = new QVBoxLayout(&dialog);
+
+        auto *heading = new QLabel(tr("<h2>Trizbort (Qt)</h2>"), &dialog);
+        heading->setTextFormat(Qt::RichText);
+        layout->addWidget(heading);
+
+        auto *version =
+            new QLabel(tr("Version %1").arg(QApplication::applicationVersion()), &dialog);
+        layout->addWidget(version);
+
+        auto *body = new QLabel(
+            tr("<p>A from-scratch C++/Qt reimplementation of Trizbort, the "
+               "interactive-fiction mapper, putting GNU/Linux first.</p>"
                "<p>GNU GPL v3 or later. Based on the MIT-licensed C# Trizbort by "
-               "Genstein and Jason Lautzenheiser.</p>"
-               "<p><a href=\"https://www.trizbort.com/\">trizbort.com</a></p>")
-                .arg(QApplication::applicationVersion()));
+               "Genstein and Jason Lautzenheiser.</p>"),
+            &dialog);
+        body->setTextFormat(Qt::RichText);
+        body->setWordWrap(true);
+        layout->addWidget(body);
+
+        auto *link = new QLabel(
+            tr("<a href=\"https://www.trizbort.com/\">trizbort.com</a>"), &dialog);
+        link->setTextFormat(Qt::RichText);
+        link->setOpenExternalLinks(true);
+        layout->addWidget(link);
+
+        auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok, &dialog);
+        connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+        layout->addWidget(buttons);
+        dialog.exec();
     });
 
     toolBar->addAction(newAct);
@@ -854,7 +881,8 @@ void MainWindow::exportImage()
         suffix != QLatin1String("jpeg") && suffix != QLatin1String("bmp"))
         path += QStringLiteral(".png");
     QString error;
-    if (!renderMapToImage(m_map, path, &error))
+    const double scale = m_saveAt100 ? 1.0 : m_view->transform().m11();
+    if (!renderMapToImage(m_map, path, &error, scale))
         QMessageBox::warning(this, tr("Export Failed"), error);
     else
         statusBar()->showMessage(tr("Exported %1").arg(QFileInfo(path).fileName()));
@@ -1892,7 +1920,8 @@ void MainWindow::smartSave()
     if (m_smartSaveImage) {
         const QString fmt = m_smartSaveImageFormat.isEmpty() ? QStringLiteral("png")
                                                              : m_smartSaveImageFormat.toLower();
-        if (renderMapToImage(m_map, base + QLatin1Char('.') + fmt, &error))
+        const double scale = m_saveAt100 ? 1.0 : m_view->transform().m11();
+        if (renderMapToImage(m_map, base + QLatin1Char('.') + fmt, &error, scale))
             saved << fmt.toUpper();
         else
             ok = false;
@@ -1930,9 +1959,19 @@ void MainWindow::reloadFromDisk()
 {
     if (m_filePath.isEmpty() || !QFile::exists(m_filePath))
         return;
-    if (!m_undo.isClean()) {
-        statusBar()->showMessage(
-            tr("The file changed on disk; unsaved changes were kept (not reloaded)."));
+    // Prompt like the C# TrizbortFileWatcher, warning first when a reload would
+    // throw away unsaved edits, and letting the user discard-and-reload or keep
+    // their version.
+    const bool dirty = !m_undo.isClean();
+    const QString msg =
+        dirty ? tr("This map has been modified by another program.\n\nReloading will discard "
+                   "your unsaved changes. Do you want to reload it?")
+              : tr("This map has been modified by another program. Do you want to reload it?");
+    const auto answer =
+        QMessageBox::question(this, tr("Reload Map?"), msg, QMessageBox::Yes | QMessageBox::No,
+                              dirty ? QMessageBox::No : QMessageBox::Yes);
+    if (answer != QMessageBox::Yes) {
+        statusBar()->showMessage(tr("The file changed on disk; kept your version."));
         return;
     }
     const QString path = m_filePath;
@@ -1952,6 +1991,7 @@ void MainWindow::loadPreferences()
     m_smartSaveImage = s.value(QStringLiteral("smartSave/image"), true).toBool();
     m_smartSaveImageFormat =
         s.value(QStringLiteral("smartSave/imageFormat"), QStringLiteral("png")).toString();
+    m_saveAt100 = s.value(QStringLiteral("saveImagesAt100"), true).toBool();
 
     // Application-wide settings read by rendering code (tooltips, hand-drawn
     // default, port granularity, general margins, default font).
@@ -1990,6 +2030,7 @@ void MainWindow::savePreferences()
     s.setValue(QStringLiteral("smartSave/pdf"), m_smartSavePdf);
     s.setValue(QStringLiteral("smartSave/image"), m_smartSaveImage);
     s.setValue(QStringLiteral("smartSave/imageFormat"), m_smartSaveImageFormat);
+    s.setValue(QStringLiteral("saveImagesAt100"), m_saveAt100);
 
     const AppSettings &app = AppSettings::instance();
     s.setValue(QStringLiteral("tooltips/showObjects"), app.showObjectsInTooltips);
@@ -2083,6 +2124,12 @@ void MainWindow::showAppSettings()
     connect(ssImage, &QCheckBox::toggled, ssFormat, &QComboBox::setEnabled);
     form->addRow(tr("Smart Save image &format:"), ssFormat);
 
+    auto *saveAt100 = new QCheckBox(tr("Save images at 100%"), &dialog);
+    saveAt100->setChecked(m_saveAt100);
+    saveAt100->setToolTip(
+        tr("When off, exported images use the current view zoom instead of 100%."));
+    form->addRow(saveAt100);
+
     AppSettings &app = AppSettings::instance();
     auto sectionLabel = [&](const QString &text) {
         auto *label = new QLabel(QStringLiteral("<b>%1</b>").arg(text), &dialog);
@@ -2172,6 +2219,7 @@ void MainWindow::showAppSettings()
     m_smartSavePdf = ssPdf->isChecked();
     m_smartSaveImage = ssImage->isChecked();
     m_smartSaveImageFormat = ssFormat->currentText();
+    m_saveAt100 = saveAt100->isChecked();
 
     app.showObjectsInTooltips = ttObjects->isChecked();
     app.showDescriptionsInTooltips = ttDesc->isChecked();
