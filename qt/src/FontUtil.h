@@ -25,19 +25,20 @@
 
 namespace trizbort {
 
-// Build a QFont from a stored FontSpec, applying the family, point size and
-// style flags. When the spec carries no family or a non-positive size (an
-// unspecified font), the given fallback point size and the default UI family
-// are used instead. Sizes are treated as points, matching the C# GDI fonts the
-// .trizbort format stores.
-inline QFont qfontFromSpec(const FontSpec &spec, double fallbackPointSize)
+// Build a QFont from a stored FontSpec, applying the family, size and style
+// flags. When the spec carries no family or a non-positive size (an unspecified
+// font), the given fallback size and the default UI family are used instead.
+// The .trizbort format stores C# GDI font sizes in GraphicsUnit.World, i.e. map
+// units (== pixels at 1:1), so the size is applied with setPixelSize; using
+// point sizes would render text ~33% larger and overflow small rooms.
+inline QFont qfontFromSpec(const FontSpec &spec, double fallbackSize)
 {
     QFont font;
     if (!spec.family.isEmpty())
         font.setFamily(spec.family);
     else if (!AppSettings::instance().defaultFontName.isEmpty())
         font.setFamily(AppSettings::instance().defaultFontName); // the app-wide default family
-    font.setPointSizeF(spec.size > 0.0 ? spec.size : fallbackPointSize);
+    font.setPixelSize(qRound(spec.size > 0.0 ? spec.size : fallbackSize));
     font.setBold(spec.bold);
     font.setItalic(spec.italic);
     font.setUnderline(spec.underline);
