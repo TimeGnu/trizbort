@@ -44,9 +44,11 @@
 #include <cmath>
 #include <random>
 
+#include <QCursor>
 #include <QFont>
 #include <QFontMetricsF>
 #include <QGraphicsSceneContextMenuEvent>
+#include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneMouseEvent>
 #include <QMenu>
 #include <QHash>
@@ -54,7 +56,9 @@
 #include <QPainterPath>
 #include <QPolygonF>
 #include <QRegularExpression>
+#include <QUndoStack>
 
+#include "EditCommands.h"
 #include "FontUtil.h"
 #include "MapScene.h"
 
@@ -99,6 +103,23 @@ void addHandDrawnEdge(QPainterPath &path, const QPointF &a, const QPointF &b, st
 std::mt19937 handDrawnRng(const Room &room)
 {
     return std::mt19937(static_cast<unsigned>(qHash(room.name)) ^ 0x9e3779b9u);
+}
+
+// Local-coordinate centre of resize handle i (0=N,1=NE,2=E,3=SE,4=S,5=SW,6=W,
+// 7=NW) on a room of the given size.
+QPointF handlePoint(int i, double w, double h)
+{
+    switch (i) {
+    case 0: return {w / 2.0, 0};
+    case 1: return {w, 0};
+    case 2: return {w, h / 2.0};
+    case 3: return {w, h};
+    case 4: return {w / 2.0, h};
+    case 5: return {0, h};
+    case 6: return {0, h / 2.0};
+    case 7: return {0, 0};
+    default: return {0, 0};
+    }
 }
 
 // The text colour a region contributes for room names (invalid if unknown).
@@ -360,6 +381,7 @@ RoomItem::RoomItem(MapScene *scene, int roomId)
     , m_roomId(roomId)
 {
     setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges);
+    setAcceptHoverEvents(true); // for resize-handle cursors
     setZValue(0);
     syncFromModel();
 }
@@ -507,12 +529,21 @@ void RoomItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
         painter->drawLine(rect.topRight(), rect.bottomLeft());
     }
 
-    // Selection highlight: a gold outline following the room shape.
+    // Selection highlight: a gold outline following the room shape, plus the
+    // eight compass resize handles.
     if (isSelected()) {
         const QPainterPath sel = buildRoomPath(*room, rect.adjusted(-5, -5, 5, 5));
         painter->setPen(QPen(QColor(255, 215, 0), 2.0));
         painter->setBrush(Qt::NoBrush);
         painter->drawPath(sel);
+
+        const double hs = handleSize();
+        painter->setPen(QPen(QColor(80, 80, 80), 1.0));
+        painter->setBrush(QColor(255, 255, 255));
+        for (int i = 0; i < 8; ++i) {
+            const QPointF c = handlePoint(i, m_w, m_h);
+            painter->drawRect(QRectF(c.x() - hs / 2.0, c.y() - hs / 2.0, hs, hs));
+        }
     }
 }
 
@@ -550,6 +581,166 @@ void RoomItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     else if (chosen == deleteAct)
         m_scene->deleteSelection();
     event->accept();
+}
+
+double RoomItem::handleSize() const
+{
+    if (const Map *map = m_scene ? m_scene->document() : nullptr)
+        if (map->settings.handleSize > 1.0)
+            return map->settings.handleSize;
+    return 10.0;
+}
+
+int RoomItem::handleAt(const QPointF &localPos) const
+{
+    if (!isSelected())
+        return -1;
+    const double tol = handleSize() / 2.0 + 2.0;
+    for (int i = 0; i < 8; ++i) {
+        const QPointF c = handlePoint(i, m_w, m_h);
+        if (std::abs(localPos.x() - c.x()) <= tol && std::abs(localPos.y() - c.y()) <= tol)
+            return i;
+    }
+    return -1;
+}
+
+void RoomItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
+{
+    const int h = handleAt(event->pos());
+    if (h == 0 || h == 4)
+        setCursor(Qt::SizeVerCursor);
+    else if (h == 2 || h == 6)
+        setCursor(Qt::SizeHorCursor);
+    else if (h == 1 || h == 5)
+        setCursor(Qt::SizeBDiagCursor);
+    else if (h == 3 || h == 7)
+        setCursor(Qt::SizeFDiagCursor);
+    else
+        unsetCursor();
+    QGraphicsItem::hoverMoveEvent(event);
+}
+
+void RoomItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    unsetCursor();
+    QGraphicsItem::hoverLeaveEvent(event);
+}
+
+void RoomItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        const int h = handleAt(event->pos());
+        if (h >= 0) {
+            m_resizeHandle = h;
+            m_resizeStartScene = event->scenePos();
+            if (const Room *r = m_scene->document()->roomById(m_roomId)) {
+                m_startX = r->x;
+                m_startY = r->y;
+                m_startW = r->w;
+                m_startH = r->h;
+            }
+            m_scene->setRoomResizeActive(true); // suppress the move-undo snapshot
+            event->accept();
+            return;
+        }
+    }
+    QGraphicsItem::mousePressEvent(event);
+}
+
+void RoomItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (m_resizeHandle >= 0) {
+        const int i = m_resizeHandle;
+        const QPointF d = event->scenePos() - m_resizeStartScene;
+        double x = m_startX, y = m_startY, w = m_startW, h = m_startH;
+        if (i == 1 || i == 2 || i == 3)
+            w = m_startW + d.x(); // right edge
+        if (i == 5 || i == 6 || i == 7) {
+            x = m_startX + d.x();
+            w = m_startW - d.x(); // left edge
+        }
+        if (i == 3 || i == 4 || i == 5)
+            h = m_startH + d.y(); // bottom edge
+        if (i == 0 || i == 1 || i == 7) {
+            y = m_startY + d.y();
+            h = m_startH - d.y(); // top edge
+        }
+        const double minS = 16.0;
+        const bool left = (i == 5 || i == 6 || i == 7);
+        const bool top = (i == 0 || i == 1 || i == 7);
+        if (w < minS) {
+            if (left)
+                x = m_startX + m_startW - minS;
+            w = minS;
+        }
+        if (h < minS) {
+            if (top)
+                y = m_startY + m_startH - minS;
+            h = minS;
+        }
+        if (Room *r = m_scene->document()->roomById(m_roomId)) {
+            r->x = x;
+            r->y = y;
+            r->w = w;
+            r->h = h;
+            m_w = w;
+            m_h = h;
+            m_applyingModel = true;
+            prepareGeometryChange();
+            setPos(x, y);
+            m_applyingModel = false;
+            update();
+            m_scene->refreshConnectionsFor(m_roomId);
+        }
+        event->accept();
+        return;
+    }
+    QGraphicsItem::mouseMoveEvent(event);
+}
+
+void RoomItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (m_resizeHandle >= 0) {
+        m_resizeHandle = -1;
+        m_scene->setRoomResizeActive(false);
+        Room *r = m_scene->document() ? m_scene->document()->roomById(m_roomId) : nullptr;
+        if (r) {
+            // Snap the edges to the grid if snapping is on.
+            if (m_scene->document()->settings.snapToGrid) {
+                const double g = m_scene->gridSize();
+                const double nx = std::round(r->x / g) * g;
+                const double ny = std::round(r->y / g) * g;
+                const double nr = std::round((r->x + r->w) / g) * g;
+                const double nb = std::round((r->y + r->h) / g) * g;
+                r->x = nx;
+                r->y = ny;
+                r->w = std::max(g, nr - nx);
+                r->h = std::max(g, nb - ny);
+                m_w = r->w;
+                m_h = r->h;
+                m_applyingModel = true;
+                prepareGeometryChange();
+                setPos(r->x, r->y);
+                m_applyingModel = false;
+                update();
+                m_scene->refreshConnectionsFor(m_roomId);
+            }
+            Room before = *r;
+            before.x = m_startX;
+            before.y = m_startY;
+            before.w = m_startW;
+            before.h = m_startH;
+            const Room after = *r;
+            if (m_scene->undoStack() &&
+                (after.x != before.x || after.y != before.y || after.w != before.w ||
+                 after.h != before.h)) {
+                m_scene->undoStack()->push(new EditRoomCommand(m_scene, m_roomId, before, after));
+            }
+        }
+        event->accept();
+        return;
+    }
+    QGraphicsItem::mouseReleaseEvent(event);
 }
 
 } // namespace trizbort

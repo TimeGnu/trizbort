@@ -116,6 +116,11 @@ public:
 
     // Called by RoomItem while dragging: persist the new position and reroute.
     void roomMovedTo(int roomId, const QPointF &topLeft);
+    // While a room is being resized by its handle, the scene must not treat the
+    // drag as a move (which would push a spurious MoveRoomsCommand).
+    void setRoomResizeActive(bool active) { m_roomResizeActive = active; }
+    // Re-route the connections docked to a room (used during a resize drag).
+    void refreshConnectionsFor(int roomId);
     // Called by items on double-click.
     void activateRoom(int roomId);
     void activateConnection(int connId);
@@ -151,7 +156,6 @@ protected:
 
 private:
     void rebuildConnections();
-    void refreshConnectionsFor(int roomId);
     RoomItem *roomItemAt(const QPointF &scenePos) const;
     void emitSelectionSummary();
 
@@ -160,6 +164,7 @@ private:
     QList<ConnectionItem *> m_connItems;
 
     bool m_connectMode = false;
+    bool m_roomResizeActive = false;
     ConnectionStyle m_newConnStyle = ConnectionStyle::Solid;
     ConnectionFlow m_newConnFlow = ConnectionFlow::TwoWay;
     ValidationFlags m_validation;

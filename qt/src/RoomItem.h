@@ -71,13 +71,26 @@ protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+    void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
+    double handleSize() const;
+    // Index 0..7 of the resize handle under a local point, or -1.
+    int handleAt(const QPointF &localPos) const;
+
     MapScene *m_scene;
     int m_roomId;
     double m_w = 96.0;
     double m_h = 64.0;
     bool m_applyingModel = false; // guard against feedback while syncing
+
+    int m_resizeHandle = -1;      // active resize handle, or -1
+    QPointF m_resizeStartScene;   // scene pos where the resize drag began
+    double m_startX = 0, m_startY = 0, m_startW = 0, m_startH = 0;
 };
 
 } // namespace trizbort

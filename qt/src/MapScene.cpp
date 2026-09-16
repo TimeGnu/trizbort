@@ -492,7 +492,7 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     // Snapshot the positions of the rooms about to be dragged, so the move can
     // be pushed as one undoable command on release.
     m_dragStartPos.clear();
-    if (event->button() == Qt::LeftButton && !m_connectMode && m_map) {
+    if (event->button() == Qt::LeftButton && !m_connectMode && !m_roomResizeActive && m_map) {
         for (QGraphicsItem *item : selectedItems()) {
             if (auto *ri = dynamic_cast<RoomItem *>(item)) {
                 if (const Room *r = m_map->roomById(ri->roomId()))
