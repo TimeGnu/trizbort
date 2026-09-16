@@ -265,6 +265,37 @@ static int runEditSelftest()
               "facing port southeast");
     }
 
+    // Map statistics: connection/object/region breakdowns match the metrics.
+    {
+        Map sm;
+        const int r0 = sm.addRoom(0, 0);
+        const int r1 = sm.addRoom(0, -128);
+        const int r2 = sm.addRoom(160, 0);
+        if (Room *r = sm.roomById(r0)) {
+            r->name = QStringLiteral("Cellar");
+            r->isStartRoom = true;
+            r->isDark = true;
+            r->objectsText = QStringLiteral("a coin\na key");
+        }
+        if (Room *r = sm.roomById(r1))
+            r->name = QStringLiteral("Attic");
+        if (Room *r = sm.roomById(r2))
+            r->name = QStringLiteral("Hall");
+        sm.addConnection(r0, QStringLiteral("n"), r1, QStringLiteral("s"));
+        sm.connections.last().startText = QStringLiteral("up");
+        sm.connections.last().endText = QStringLiteral("down");
+        sm.addConnection(r0, QStringLiteral("e"), r2, QStringLiteral("w"));
+
+        const QString rep = buildStatisticsReport(sm);
+        check(rep.contains(QLatin1String("# of Rooms: 3")), "stats room count");
+        check(rep.contains(QLatin1String("# of Dark Rooms: 1")), "stats dark count");
+        check(rep.contains(QLatin1String("Start room = Cellar")), "stats start room");
+        check(rep.contains(QLatin1String("1 up-down connection\n")), "stats up-down singular");
+        check(rep.contains(QLatin1String("Total # Rooms with Objects: 1, 0 with 1, 1 with 2")),
+              "stats object breakdown");
+        check(rep.contains(QLatin1String("# of Connections: 2 total")), "stats connection total");
+    }
+
     QFile::remove(path);
     out << (failures == 0 ? "edit-selftest: PASS" : "edit-selftest: FAIL") << Qt::endl;
     return failures == 0 ? 0 : 1;
