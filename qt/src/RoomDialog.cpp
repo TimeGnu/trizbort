@@ -106,9 +106,12 @@ RoomDialog::RoomDialog(const Map &map, const Room &room, QWidget *parent)
     const struct {
         const char *label;
         const char *token;
-    } kPositions[] = {{"South", "s"},     {"South-East", "se"}, {"East", "e"},
-                      {"North-East", "ne"}, {"North", "n"},     {"North-West", "nw"},
-                      {"West", "w"},        {"South-West", "sw"}};
+    } kPositions[] = {{"South", "s"},       {"South-East", "se"}, {"East", "e"},
+                      {"North-East", "ne"}, {"North", "n"},       {"North-West", "nw"},
+                      {"West", "w"},        {"South-West", "sw"},
+                      // "Centre" is CompassPoint.WestSouthWest in the C# dialog:
+                      // the list is drawn inside the room, below the name.
+                      {"Centre", "wsw"}};
     for (const auto &p : kPositions)
         m_objectsPosition->addItem(tr(p.label), QString::fromLatin1(p.token));
     {
@@ -123,6 +126,27 @@ RoomDialog::RoomDialog(const Map &map, const Room &room, QWidget *parent)
         m_objectsPosition->setCurrentIndex(idx);
     }
     form->addRow(tr("Objects &position:"), m_objectsPosition);
+
+    // Custom pixel offset applied on top of the compass anchor (C#
+    // ObjectsCustomPosition + Right/Down).
+    m_objectsCustom = new QCheckBox(tr("Custom offset"), general);
+    m_objectsCustom->setChecked(room.objectsPosition.custom);
+    form->addRow(QString(), m_objectsCustom);
+    m_objectsRight = new QSpinBox(general);
+    m_objectsRight->setRange(-9999, 9999);
+    m_objectsRight->setValue(room.objectsPosition.customRight);
+    form->addRow(tr("Offset ri&ght:"), m_objectsRight);
+    m_objectsDown = new QSpinBox(general);
+    m_objectsDown->setRange(-9999, 9999);
+    m_objectsDown->setValue(room.objectsPosition.customDown);
+    form->addRow(tr("Offset do&wn:"), m_objectsDown);
+    auto syncCustom = [this] {
+        const bool on = m_objectsCustom->isChecked();
+        m_objectsRight->setEnabled(on);
+        m_objectsDown->setEnabled(on);
+    };
+    connect(m_objectsCustom, &QCheckBox::toggled, this, syncCustom);
+    syncCustom();
 
     m_dark = new QCheckBox(tr("Dark"), general);
     m_dark->setChecked(room.isDark);
@@ -152,11 +176,65 @@ RoomDialog::RoomDialog(const Map &map, const Room &room, QWidget *parent)
     m_shape->setCurrentIndex(shapeIndex);
     aform->addRow(tr("S&hape:"), m_shape);
 
-    m_cornerRadius = new QSpinBox(appearance);
-    m_cornerRadius->setRange(0, 30);
-    m_cornerRadius->setValue(qRound(std::max({room.cornerTopLeft, room.cornerTopRight,
-                                              room.cornerBottomLeft, room.cornerBottomRight})));
-    aform->addRow(tr("Corner &radius:"), m_cornerRadius);
+    // Hand-drawn edges apply to straight-edged (square) rooms only, matching
+    // the C# dialog which enables the checkbox for that shape.
+    m_handDrawn = new QCheckBox(tr("Hand-drawn edges"), appearance);
+    m_handDrawn->setChecked(room.handDrawn);
+    aform->addRow(QString(), m_handDrawn);
+
+    // Four independent corner radii with an "all equal" toggle, mirroring the
+    // C# per-corner spinners + chkCornersSame (used by the Rounded shape).
+    m_cornersEqual = new QCheckBox(tr("Make all corners equal"), appearance);
+    m_cornersEqual->setChecked(room.allCornersEqual);
+    aform->addRow(QString(), m_cornersEqual);
+    auto makeCorner = [&](double v) {
+        auto *s = new QSpinBox(appearance);
+        s->setRange(0, 30);
+        s->setValue(qRound(v));
+        return s;
+    };
+    m_cornerTL = makeCorner(room.cornerTopLeft);
+    m_cornerTR = makeCorner(room.cornerTopRight);
+    m_cornerBL = makeCorner(room.cornerBottomLeft);
+    m_cornerBR = makeCorner(room.cornerBottomRight);
+    aform->addRow(tr("Corner: top-&left:"), m_cornerTL);
+    aform->addRow(tr("top-r&ight:"), m_cornerTR);
+    aform->addRow(tr("bottom-l&eft:"), m_cornerBL);
+    aform->addRow(tr("bottom-ri&ght:"), m_cornerBR);
+
+    // When "all equal" is on, the other three follow the top-left value and are
+    // disabled; the shape combo enables corners for Rounded and hand-drawn for
+    // Square, as the C# draw-type change handler does.
+    auto syncCornersEqual = [this] {
+        const bool eq = m_cornersEqual->isChecked();
+        if (eq) {
+            const int v = m_cornerTL->value();
+            m_cornerTR->setValue(v);
+            m_cornerBL->setValue(v);
+            m_cornerBR->setValue(v);
+        }
+        const bool rounded = (m_shape->currentIndex() == 1);
+        m_cornerTL->setEnabled(rounded);
+        m_cornerTR->setEnabled(rounded && !eq);
+        m_cornerBL->setEnabled(rounded && !eq);
+        m_cornerBR->setEnabled(rounded && !eq);
+        m_cornersEqual->setEnabled(rounded);
+    };
+    connect(m_cornersEqual, &QCheckBox::toggled, this, syncCornersEqual);
+    connect(m_cornerTL, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int v) {
+        if (m_cornersEqual->isChecked()) {
+            m_cornerTR->setValue(v);
+            m_cornerBL->setValue(v);
+            m_cornerBR->setValue(v);
+        }
+    });
+    connect(m_shape, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            [this, syncCornersEqual] {
+                m_handDrawn->setEnabled(m_shape->currentIndex() == 0); // straight edges only
+                syncCornersEqual();
+            });
+    m_handDrawn->setEnabled(m_shape->currentIndex() == 0);
+    syncCornersEqual();
 
     m_border = new QComboBox(appearance);
     for (const char *style : kBorderStyles)
@@ -234,6 +312,9 @@ Room RoomDialog::result() const
     objects.replace(QLatin1String("\r\n"), QLatin1String("\n"));
     r.objectsText = objects;
     r.objectsPosition.at = m_objectsPosition->currentData().toString();
+    r.objectsPosition.custom = m_objectsCustom->isChecked();
+    r.objectsPosition.customRight = m_objectsRight->value();
+    r.objectsPosition.customDown = m_objectsDown->value();
 
     r.isDark = m_dark->isChecked();
     r.isStartRoom = m_start->isChecked();
@@ -246,10 +327,13 @@ Room RoomDialog::result() const
     case 3: r.octagonal = true; break;
     default: break;
     }
+    r.handDrawn = m_handDrawn->isChecked();
 
-    const double radius = m_cornerRadius->value();
-    r.allCornersEqual = true;
-    r.cornerTopLeft = r.cornerTopRight = r.cornerBottomLeft = r.cornerBottomRight = radius;
+    r.allCornersEqual = m_cornersEqual->isChecked();
+    r.cornerTopLeft = m_cornerTL->value();
+    r.cornerTopRight = m_cornerTR->value();
+    r.cornerBottomLeft = m_cornerBL->value();
+    r.cornerBottomRight = m_cornerBR->value();
 
     r.borderStyle = m_border->currentText();
     r.fill = m_fillButton->color();
