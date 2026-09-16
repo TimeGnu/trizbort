@@ -925,6 +925,8 @@ void MainWindow::startLiveAutomap()
     AutomapSettings settings;
     settings.assumeTwoWayConnections = s.value(QStringLiteral("automap/twoWay"), true).toBool();
     settings.assumeSameNameSameRoom = s.value(QStringLiteral("automap/sameName"), true).toBool();
+    settings.verboseTranscript = s.value(QStringLiteral("automap/verbose"), true).toBool();
+    settings.continueTranscript = s.value(QStringLiteral("automap/continue"), false).toBool();
     settings.guessExits = s.value(QStringLiteral("automap/guessExits"), false).toBool();
     settings.objectCommand =
         s.value(QStringLiteral("automap/objectCommand"), QStringLiteral("tb see")).toString();
@@ -944,6 +946,8 @@ void MainWindow::startLiveAutomap()
     settings = dialog.settings();
     s.setValue(QStringLiteral("automap/twoWay"), settings.assumeTwoWayConnections);
     s.setValue(QStringLiteral("automap/sameName"), settings.assumeSameNameSameRoom);
+    s.setValue(QStringLiteral("automap/verbose"), settings.verboseTranscript);
+    s.setValue(QStringLiteral("automap/continue"), settings.continueTranscript);
     s.setValue(QStringLiteral("automap/guessExits"), settings.guessExits);
     s.setValue(QStringLiteral("automap/objectCommand"), settings.objectCommand);
     s.setValue(QStringLiteral("automap/regionCommand"), settings.regionCommand);
@@ -953,6 +957,19 @@ void MainWindow::startLiveAutomap()
     m_automapPath = path;
     m_automapSize = -1;
     m_automapFedLines = 0;
+    // "Start from the end": treat whatever is already in the transcript as
+    // already seen, so only moves played after this point are mapped (the C#
+    // ContinueTranscript option).
+    if (settings.continueTranscript) {
+        QFile existing(path);
+        if (existing.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QString text = QString::fromUtf8(existing.readAll());
+            text.replace(QLatin1String("\r\n"), QLatin1String("\n"));
+            text.replace(QLatin1Char('\r'), QLatin1Char('\n'));
+            m_automapFedLines = text.split(QLatin1Char('\n')).size();
+            m_automapSize = existing.size();
+        }
+    }
     m_automapping = true;
 
     m_automapController = new GuiAutomapController(this);
