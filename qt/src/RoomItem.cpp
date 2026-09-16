@@ -51,6 +51,7 @@
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
+#include <QLinearGradient>
 #include <QMenu>
 #include <QHash>
 #include <QPainter>
@@ -554,10 +555,15 @@ void RoomItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
 
         const double hs = handleSize();
         painter->setPen(QPen(QColor(80, 80, 80), 1.0));
-        painter->setBrush(QColor(255, 255, 255));
         for (int i = 0; i < 8; ++i) {
             const QPointF c = handlePoint(i, m_w, m_h);
-            painter->drawRect(QRectF(c.x() - hs / 2.0, c.y() - hs / 2.0, hs, hs));
+            const QRectF hr(c.x() - hs / 2.0, c.y() - hs / 2.0, hs, hs);
+            // Light-cyan-to-steel-blue gradient, matching the C# resize handles.
+            QLinearGradient g(hr.topLeft(), hr.bottomRight());
+            g.setColorAt(0.0, QColor(224, 255, 255));
+            g.setColorAt(1.0, QColor(70, 130, 180));
+            painter->setBrush(g);
+            painter->drawRect(hr);
         }
     }
 

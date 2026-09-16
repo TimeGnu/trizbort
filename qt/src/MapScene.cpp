@@ -705,11 +705,22 @@ void MapScene::drawBackground(QPainter *painter, const QRectF &rect)
         painter->drawLine(QPointF(rect.left(), y), QPointF(rect.right(), y));
 
     if (m_map->settings.showOrigin) {
-        QPen originPen(QColor(200, 160, 160));
+        // A small "+" spanning one grid step each way from the origin (as the C#
+        // Canvas draws it), tinted canvas:smallText 3:1, not a full crosshair.
+        QColor canvas = m_map->canvasColor();
+        if (!canvas.isValid())
+            canvas = QColor(Qt::white);
+        QColor small = m_map->settings.colors[ColorSmallText];
+        if (!small.isValid())
+            small = QColor(60, 60, 60);
+        const QColor originColor((3 * canvas.red() + small.red()) / 4,
+                                 (3 * canvas.green() + small.green()) / 4,
+                                 (3 * canvas.blue() + small.blue()) / 4);
+        QPen originPen(originColor);
         originPen.setWidthF(0.0);
         painter->setPen(originPen);
-        painter->drawLine(QPointF(0, rect.top()), QPointF(0, rect.bottom()));
-        painter->drawLine(QPointF(rect.left(), 0), QPointF(rect.right(), 0));
+        painter->drawLine(QPointF(-g, 0), QPointF(g, 0));
+        painter->drawLine(QPointF(0, -g), QPointF(0, g));
     }
 }
 

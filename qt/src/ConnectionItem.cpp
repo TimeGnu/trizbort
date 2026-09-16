@@ -320,8 +320,10 @@ void ConnectionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, 
 
     QPen pen(color);
     pen.setWidthF(2.0);
+    // C# renders a "dashed" connection with a dotted pen (Palette.DashedLinePen
+    // uses DashStyle.Dot), so match that rather than drawing long dashes.
     if (c.style == ConnectionStyle::Dashed)
-        pen.setStyle(Qt::DashLine);
+        pen.setStyle(Qt::DotLine);
     if (isSelected()) {
         QColor sel = map->settings.colors[ColorSelectedLine];
         pen.setColor(sel.isValid() ? sel : QColor(30, 120, 220));
