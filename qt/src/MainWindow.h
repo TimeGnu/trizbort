@@ -98,6 +98,7 @@ private:
     void applyToSelectedConnections(const QString &label,
                                     const std::function<void(Connection &)> &fn);
     void reverseSelectedConnections();
+    void rotateSelectedConnectors(bool source);
     void setStartOrEndRoom(bool start);
     void setSelectedRoomShape(int shape); // 0 square,1 rounded,2 ellipse,3 octagonal
     void joinSelectedRooms();

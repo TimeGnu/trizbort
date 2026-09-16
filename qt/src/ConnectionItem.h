@@ -44,6 +44,8 @@
 #include <QGraphicsItem>
 #include <QVector>
 
+#include "MapDocument.h"
+
 namespace trizbort {
 
 class MapScene;
@@ -62,14 +64,27 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget) override;
 
+    // Insert a free waypoint at a scene point (used from the context menu).
+    void addWaypointAt(const QPointF &scenePos);
+
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
+    // Scene-space points of the connection's vertices (endpoints + waypoints),
+    // in index order; used to draw and hit-test the editing handles.
+    QVector<QPointF> vertexHandlePoints() const;
+    int vertexHandleAt(const QPointF &localPos) const;
+
     MapScene *m_scene;
     int m_connId;
     QVector<QPointF> m_points;
+    int m_dragVertex = -1;      // index of the vertex being dragged, or -1
+    Connection m_dragBefore;    // snapshot for the undo command
 };
 
 } // namespace trizbort

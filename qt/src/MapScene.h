@@ -101,6 +101,11 @@ public:
     // A room's port point on its plain bounding rectangle (no shape awareness).
     static QPointF squareCorner(double x, double y, double w, double h,
                                 const QString &port);
+    // The 8-way compass port on a room that best faces a scene point.
+    static QString portTowards(const Room &room, const QPointF &target);
+
+    // The id of the room whose outline contains a scene point, or -1.
+    int roomIdAt(const QPointF &scenePos) const;
 
     // Editing entry points used by the window's actions.
     int addRoomAt(const QPointF &scenePos);   // returns new room id

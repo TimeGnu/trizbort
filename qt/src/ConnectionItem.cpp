@@ -51,7 +51,9 @@
 #include <QPainterPath>
 #include <QPainterPathStroker>
 #include <QPolygonF>
+#include <QUndoStack>
 
+#include "EditCommands.h"
 #include "FontUtil.h"
 #include "MapScene.h"
 
@@ -331,6 +333,180 @@ void ConnectionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, 
             drawConnectionLabel(painter, mid, QPointF(0, 1), c.midText, lineFont, textColor, off);
         }
     }
+
+    // Editing handles at each vertex when selected: a solid dot for a docked
+    // endpoint, a hollow dot for a free waypoint.
+    if (isSelected()) {
+        const QVector<QPointF> handles = vertexHandlePoints();
+        QList<Vertex> sorted = c.vertices;
+        std::sort(sorted.begin(), sorted.end(),
+                  [](const Vertex &a, const Vertex &b) { return a.index < b.index; });
+        for (int i = 0; i < handles.size(); ++i) {
+            const bool docked = (i < sorted.size()) ? sorted.at(i).docked : true;
+            painter->setPen(QPen(QColor(30, 120, 220), 1.5));
+            painter->setBrush(docked ? QBrush(QColor(30, 120, 220)) : QBrush(Qt::white));
+            painter->drawEllipse(handles.at(i), 4.0, 4.0);
+        }
+    }
+}
+
+QVector<QPointF> ConnectionItem::vertexHandlePoints() const
+{
+    QVector<QPointF> pts;
+    const Map *map = m_scene->document();
+    if (!map)
+        return pts;
+    const int idx = map->connectionIndex(m_connId);
+    if (idx < 0)
+        return pts;
+    QList<Vertex> vertices = map->connections.at(idx).vertices;
+    std::sort(vertices.begin(), vertices.end(),
+              [](const Vertex &a, const Vertex &b) { return a.index < b.index; });
+    for (const Vertex &v : vertices) {
+        if (v.docked) {
+            if (const Room *room = map->roomById(v.roomId))
+                pts.append(MapScene::portPoint(*room, v.port));
+            else
+                pts.append(v.point);
+        } else {
+            pts.append(v.point);
+        }
+    }
+    return pts;
+}
+
+int ConnectionItem::vertexHandleAt(const QPointF &localPos) const
+{
+    const QVector<QPointF> pts = vertexHandlePoints();
+    for (int i = 0; i < pts.size(); ++i) {
+        const QPointF d = localPos - pts.at(i);
+        if (std::hypot(d.x(), d.y()) <= 7.0)
+            return i;
+    }
+    return -1;
+}
+
+void ConnectionItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (isSelected() && event->button() == Qt::LeftButton) {
+        const int v = vertexHandleAt(event->pos());
+        if (v >= 0) {
+            Map *map = m_scene->document();
+            const int idx = map ? map->connectionIndex(m_connId) : -1;
+            if (idx >= 0) {
+                Connection &c = map->connections[idx];
+                std::sort(c.vertices.begin(), c.vertices.end(),
+                          [](const Vertex &a, const Vertex &b) { return a.index < b.index; });
+                for (int i = 0; i < c.vertices.size(); ++i)
+                    c.vertices[i].index = i;
+                m_dragVertex = v;
+                m_dragBefore = c;
+                event->accept();
+                return;
+            }
+        }
+    }
+    QGraphicsItem::mousePressEvent(event);
+}
+
+void ConnectionItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (m_dragVertex >= 0) {
+        Map *map = m_scene->document();
+        const int idx = map ? map->connectionIndex(m_connId) : -1;
+        if (idx >= 0 && m_dragVertex < map->connections.at(idx).vertices.size()) {
+            Vertex &v = map->connections[idx].vertices[m_dragVertex];
+            v.docked = false; // free while dragging; may re-dock on release
+            v.point = event->scenePos();
+            updateRoute();
+        }
+        event->accept();
+        return;
+    }
+    QGraphicsItem::mouseMoveEvent(event);
+}
+
+void ConnectionItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (m_dragVertex >= 0) {
+        const int dragged = m_dragVertex;
+        m_dragVertex = -1;
+        Map *map = m_scene->document();
+        const int idx = map ? map->connectionIndex(m_connId) : -1;
+        if (idx >= 0 && dragged < map->connections.at(idx).vertices.size()) {
+            Connection &c = map->connections[idx];
+            Vertex &v = c.vertices[dragged];
+            const bool isEndpoint = (dragged == 0 || dragged == c.vertices.size() - 1);
+            const int roomId = m_scene->roomIdAt(event->scenePos());
+            if (isEndpoint && roomId >= 0) {
+                // Re-dock the endpoint onto the room's port facing the next vertex.
+                const int otherIdx = (dragged == 0) ? 1 : dragged - 1;
+                QPointF towards = event->scenePos();
+                const QVector<QPointF> pts = vertexHandlePoints();
+                if (otherIdx >= 0 && otherIdx < pts.size())
+                    towards = pts.at(otherIdx);
+                if (const Room *r = map->roomById(roomId)) {
+                    v.docked = true;
+                    v.roomId = roomId;
+                    v.port = MapScene::portTowards(*r, towards);
+                }
+            } else {
+                v.docked = false;
+                v.point = event->scenePos();
+            }
+            const Connection after = c;
+            if (m_scene->undoStack())
+                m_scene->undoStack()->push(
+                    new EditConnectionCommand(m_scene, m_connId, m_dragBefore, after));
+            updateRoute();
+        }
+        event->accept();
+        return;
+    }
+    QGraphicsItem::mouseReleaseEvent(event);
+}
+
+void ConnectionItem::addWaypointAt(const QPointF &scenePos)
+{
+    Map *map = m_scene->document();
+    const int idx = map ? map->connectionIndex(m_connId) : -1;
+    if (idx < 0)
+        return;
+    Connection before = map->connections.at(idx);
+    Connection &c = map->connections[idx];
+    std::sort(c.vertices.begin(), c.vertices.end(),
+              [](const Vertex &a, const Vertex &b) { return a.index < b.index; });
+
+    // Find the segment closest to the click and insert the new vertex into it.
+    const QVector<QPointF> pts = vertexHandlePoints();
+    int insertAfter = 0;
+    double best = 1e18;
+    for (int i = 0; i + 1 < pts.size(); ++i) {
+        const QPointF a = pts.at(i);
+        const QPointF b = pts.at(i + 1);
+        const QPointF ab = b - a;
+        const double len2 = ab.x() * ab.x() + ab.y() * ab.y();
+        double t = 0.0;
+        if (len2 > 1e-9)
+            t = std::clamp(QPointF::dotProduct(scenePos - a, ab) / len2, 0.0, 1.0);
+        const QPointF proj = a + ab * t;
+        const QPointF d = scenePos - proj;
+        const double dist = std::hypot(d.x(), d.y());
+        if (dist < best) {
+            best = dist;
+            insertAfter = i;
+        }
+    }
+    Vertex nv;
+    nv.docked = false;
+    nv.point = scenePos;
+    c.vertices.insert(insertAfter + 1, nv);
+    for (int i = 0; i < c.vertices.size(); ++i)
+        c.vertices[i].index = i;
+    const Connection after = c;
+    if (m_scene->undoStack())
+        m_scene->undoStack()->push(new EditConnectionCommand(m_scene, m_connId, before, after));
+    updateRoute();
 }
 
 void ConnectionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
@@ -348,10 +524,13 @@ void ConnectionItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     }
     QMenu menu;
     QAction *editAct = menu.addAction(QObject::tr("Edit…"));
+    QAction *waypointAct = menu.addAction(QObject::tr("Add Waypoint Here"));
     QAction *deleteAct = menu.addAction(QObject::tr("Delete"));
     QAction *chosen = menu.exec(event->screenPos());
     if (chosen == editAct)
         m_scene->activateConnection(m_connId);
+    else if (chosen == waypointAct)
+        addWaypointAt(event->scenePos());
     else if (chosen == deleteAct)
         m_scene->deleteSelection();
     event->accept();

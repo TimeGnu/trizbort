@@ -172,6 +172,34 @@ QPointF MapScene::portStalkPoint(const Room &room, const QString &port, double s
     return outer;
 }
 
+QString MapScene::portTowards(const Room &room, const QPointF &target)
+{
+    const double cx = room.x + room.w / 2.0;
+    const double cy = room.y + room.h / 2.0;
+    const double dx = target.x() - cx;
+    const double dy = target.y() - cy;
+    // Compare against the diagonal so ordinals win only when clearly diagonal.
+    const double ax = std::abs(dx);
+    const double ay = std::abs(dy);
+    const bool diag = (ax > ay * 0.4142 && ay > ax * 0.4142);
+    if (diag) {
+        if (dx >= 0 && dy < 0) return QStringLiteral("ne");
+        if (dx >= 0 && dy >= 0) return QStringLiteral("se");
+        if (dx < 0 && dy < 0) return QStringLiteral("nw");
+        return QStringLiteral("sw");
+    }
+    if (ax >= ay)
+        return dx >= 0 ? QStringLiteral("e") : QStringLiteral("w");
+    return dy >= 0 ? QStringLiteral("s") : QStringLiteral("n");
+}
+
+int MapScene::roomIdAt(const QPointF &scenePos) const
+{
+    if (RoomItem *item = roomItemAt(scenePos))
+        return item->roomId();
+    return -1;
+}
+
 void MapScene::setDocument(Map *map)
 {
     m_map = map;

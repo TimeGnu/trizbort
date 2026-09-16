@@ -305,6 +305,10 @@ void MainWindow::createActions()
     QMenu *connMenu = menuBar()->addMenu(tr("&Connections"));
     connMenu->addAction(tr("Re&verse"), QKeySequence(Qt::Key_V), this,
                         &MainWindow::reverseSelectedConnections);
+    connMenu->addAction(tr("Rotate &Source Port"), QKeySequence(Qt::Key_BracketLeft), this,
+                        [this] { rotateSelectedConnectors(true); });
+    connMenu->addAction(tr("Rotate &Target Port"), QKeySequence(Qt::Key_BracketRight), this,
+                        [this] { rotateSelectedConnectors(false); });
     QMenu *styleMenu = connMenu->addMenu(tr("&Line Style"));
     styleMenu->addAction(tr("&Solid"), this, [this] {
         applyToSelectedConnections(tr("Solid Line"),
@@ -888,6 +892,33 @@ void MainWindow::reverseSelectedConnections()
             c.vertices[i].index = i;
         std::swap(c.startText, c.endText);
     });
+}
+
+void MainWindow::rotateSelectedConnectors(bool source)
+{
+    static const char *const kPorts[] = {"n",  "nne", "ne", "ene", "e",  "ese", "se", "sse",
+                                         "s",  "ssw", "sw", "wsw", "w",  "wnw", "nw", "nnw"};
+    applyToSelectedConnections(source ? tr("Rotate Source Port") : tr("Rotate Target Port"),
+                               [source](Connection &c) {
+                                   if (c.vertices.isEmpty())
+                                       return;
+                                   std::sort(c.vertices.begin(), c.vertices.end(),
+                                             [](const Vertex &a, const Vertex &b) {
+                                                 return a.index < b.index;
+                                             });
+                                   for (int i = 0; i < c.vertices.size(); ++i)
+                                       c.vertices[i].index = i;
+                                   Vertex &v = source ? c.vertices.first() : c.vertices.last();
+                                   if (!v.docked)
+                                       return;
+                                   int cur = 0;
+                                   for (int k = 0; k < 16; ++k)
+                                       if (v.port.toLower() == QLatin1String(kPorts[k])) {
+                                           cur = k;
+                                           break;
+                                       }
+                                   v.port = QString::fromLatin1(kPorts[(cur + 1) % 16]);
+                               });
 }
 
 void MainWindow::setStartOrEndRoom(bool start)
