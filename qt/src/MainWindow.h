@@ -176,9 +176,6 @@ private:
     bool m_loadLastOnStart = false;
     bool m_showFullPath = false;
     bool m_invertWheel = false;
-
-    Room m_copiedColors;            // colour set captured by Copy Colour
-    bool m_hasCopiedColors = false;
 };
 
 } // namespace trizbort

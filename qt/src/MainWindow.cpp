@@ -1405,7 +1405,61 @@ void MainWindow::changeSelectedRegion()
 
 namespace {
 const char *const kTrizbortMime = "application/x-trizbort";
+const char *const kTrizbortColorsMime = "application/x-trizbort-colors";
+
+// A colour set copied by Copy Colour, serialized to the system clipboard so it
+// survives across windows and app instances (the C# CopyColorsObj on the
+// clipboard). Colours are #AARRGGBB, or empty for "inherit the default".
+QString colorToken(const QColor &c)
+{
+    return c.isValid() ? c.name(QColor::HexArgb) : QString();
 }
+
+QString serializeRoomColors(const Room &r)
+{
+    QStringList lines;
+    lines << QStringLiteral("trizbort-colors 1");
+    lines << QStringLiteral("fill=") + colorToken(r.fill);
+    lines << QStringLiteral("secondFill=") + colorToken(r.secondFill);
+    lines << QStringLiteral("secondFillLocation=") + r.secondFillLocation;
+    lines << QStringLiteral("border=") + colorToken(r.border);
+    lines << QStringLiteral("largeText=") + colorToken(r.largeText);
+    lines << QStringLiteral("subtitleColor=") + colorToken(r.subtitleColor);
+    lines << QStringLiteral("smallText=") + colorToken(r.smallText);
+    return lines.join(QLatin1Char('\n'));
+}
+
+// Parse a colour set; returns false unless the leading marker is present.
+bool parseRoomColors(const QString &text, Room &out)
+{
+    const QStringList lines = text.split(QLatin1Char('\n'));
+    if (lines.isEmpty() || !lines.first().startsWith(QLatin1String("trizbort-colors")))
+        return false;
+    auto colorFrom = [](const QString &v) { return v.isEmpty() ? QColor() : QColor(v); };
+    for (const QString &line : lines) {
+        const int eq = line.indexOf(QLatin1Char('='));
+        if (eq < 0)
+            continue;
+        const QString key = line.left(eq);
+        const QString val = line.mid(eq + 1);
+        if (key == QLatin1String("fill"))
+            out.fill = colorFrom(val);
+        else if (key == QLatin1String("secondFill"))
+            out.secondFill = colorFrom(val);
+        else if (key == QLatin1String("secondFillLocation"))
+            out.secondFillLocation = val.isEmpty() ? QStringLiteral("Bottom") : val;
+        else if (key == QLatin1String("border"))
+            out.border = colorFrom(val);
+        else if (key == QLatin1String("largeText"))
+            out.largeText = colorFrom(val);
+        else if (key == QLatin1String("subtitleColor"))
+            out.subtitleColor = colorFrom(val);
+        else if (key == QLatin1String("smallText"))
+            out.smallText = colorFrom(val);
+    }
+    return true;
+}
+} // namespace
 
 void MainWindow::copySelection()
 {
@@ -1545,18 +1599,28 @@ void MainWindow::copyColor()
         statusBar()->showMessage(tr("Select a room to copy its colours."));
         return;
     }
-    m_copiedColors = *r;
-    m_hasCopiedColors = true;
+    const QString text = serializeRoomColors(*r);
+    auto *mime = new QMimeData;
+    mime->setData(QString::fromLatin1(kTrizbortColorsMime), text.toUtf8());
+    mime->setText(text);
+    QApplication::clipboard()->setMimeData(mime);
     statusBar()->showMessage(tr("Copied colours. Select rooms and use Paste Colour (Ctrl+Alt+V)."));
 }
 
 void MainWindow::pasteColor()
 {
-    if (!m_hasCopiedColors) {
+    const QMimeData *mime = QApplication::clipboard()->mimeData();
+    QString text;
+    if (mime && mime->hasFormat(QString::fromLatin1(kTrizbortColorsMime)))
+        text = QString::fromUtf8(mime->data(QString::fromLatin1(kTrizbortColorsMime)));
+    else if (mime && mime->hasText())
+        text = mime->text();
+
+    Room src;
+    if (!parseRoomColors(text, src)) {
         statusBar()->showMessage(tr("Copy a room's colours first (Ctrl+Alt+C)."));
         return;
     }
-    const Room src = m_copiedColors;
     applyToSelectedRooms(tr("Paste Colour"), [src](Room &r) {
         r.fill = src.fill;
         r.secondFill = src.secondFill;
