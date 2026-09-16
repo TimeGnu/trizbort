@@ -1,0 +1,11 @@
+#!/usr/bin/make -f
+# Build the Qt/C++ Trizbort (the CMake project lives in qt/).
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+%:
+	dh $@ --sourcedirectory=qt --buildsystem=cmake
+
+# The upstream test suite (qt/tests/*.sh) needs a Qt platform plugin and is run
+# separately; there are no CTest tests to run here.
+override_dh_auto_test:

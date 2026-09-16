@@ -1,0 +1,29 @@
+Source: trizbort-qt
+Section: graphics
+Priority: optional
+Maintainer: Jason Self <j@jxself.org>
+Build-Depends:
+ debhelper-compat (= 13),
+ cmake,
+ qt6-base-dev
+Standards-Version: 4.7.2
+Homepage: https://www.trizbort.com/
+Rules-Requires-Root: no
+Vcs-Git: https://github.com/TimeGnu/trizbort.git
+Vcs-Browser: https://github.com/TimeGnu/trizbort
+
+Package: trizbort-qt
+Architecture: any
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends}
+Description: map maker for interactive fiction
+ Trizbort (Qt) is a cross-platform reimplementation of Trizbort, a mapper for
+ interactive fiction and text adventures. It draws rooms and the connections
+ between them, annotates them with descriptions and objects, and exports the
+ map as source code for many interactive-fiction systems (ZIL, Inform 6 and 7,
+ TADS 3, Hugo, Alan, Quest and Adventuron) or as a PDF or image.
+ .
+ It can also build a map automatically from a play-session transcript,
+ following the player's movements, and it reads and writes the .trizbort file
+ format used by the original Trizbort.
