@@ -278,6 +278,8 @@ void drawRoomText(QPainter *painter, const Map &map, const Room &room, const QRe
         nameText = QObject::tr("To");
         subtitleText = ref ? ref->name : QString();
     }
+    nameText = applyDashWrapping(nameText, map.settings.wrapTextAtDashes);
+    subtitleText = applyDashWrapping(subtitleText, map.settings.wrapTextAtDashes);
 
     if (textBounds.width() > 0 && textBounds.height() > 0 && !nameText.isEmpty()) {
         QColor nameColor = room.largeText.isValid() ? room.largeText
@@ -317,13 +319,14 @@ void drawRoomText(QPainter *painter, const Map &map, const Room &room, const QRe
     objs = objs.trimmed();
     if (objs.isEmpty())
         return;
+    objs = applyDashWrapping(objs, map.settings.wrapTextAtDashes);
 
     const double off = map.settings.objectListOffset;
     QColor objColor = room.smallText.isValid() ? room.smallText
                                                : map.settings.colors[ColorSmallText];
     if (!objColor.isValid())
         objColor = QColor(60, 60, 60);
-    const QFont objFont = qfontFromSpec(map.settings.objectFont, 9.0);
+    const QFont objFont = qfontFromSpec(map.settings.objectFont, 11.0);
     painter->setFont(objFont);
     painter->setPen(objColor);
     const QFontMetricsF ofm(objFont);

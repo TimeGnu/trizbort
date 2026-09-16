@@ -45,6 +45,23 @@ inline QFont qfontFromSpec(const FontSpec &spec, double fallbackPointSize)
     return font;
 }
 
+// Honour the map's "wrap text at dashes" setting when laying out canvas text,
+// mirroring TextBlock.cs. Qt's word wrap only guarantees breaks at whitespace,
+// so this rewrites the break behaviour around hyphen-minus while keeping the
+// exact glyph: with wrapping on, a zero-width space (U+200B) after each hyphen
+// adds a break opportunity there; with it off, a word joiner (U+2060) removes
+// one. Like the C# original, this only applies to single-line text (text with
+// explicit newlines is drawn as authored).
+inline QString applyDashWrapping(const QString &text, bool wrapAtDashes)
+{
+    if (!text.contains(QLatin1Char('-')) || text.contains(QLatin1Char('\n')))
+        return text;
+    QString out = text;
+    out.replace(QLatin1Char('-'),
+                wrapAtDashes ? QStringLiteral("-​") : QStringLiteral("-⁠"));
+    return out;
+}
+
 } // namespace trizbort
 
 #endif // TRIZBORT_FONTUTIL_H
