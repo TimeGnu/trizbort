@@ -45,6 +45,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QClipboard>
 #include <QCloseEvent>
 #include <QDateTime>
@@ -1729,19 +1730,51 @@ void MainWindow::backupMap()
 
 void MainWindow::smartSave()
 {
+    // With neither artifact enabled there's nothing to smart-save (the C#
+    // "your settings are set to not save anything" case).
+    if (!m_smartSavePdf && !m_smartSaveImage) {
+        QMessageBox::information(
+            this, tr("Smart Save"),
+            tr("Smart Save is set to write neither a PDF nor an image. Turn one on in "
+               "Application Settings first."));
+        return;
+    }
+
+    // The project must be saved to a file before we can place the artifacts
+    // next to it.
     if (m_filePath.isEmpty()) {
         if (!saveAs())
             return;
     } else if (!save()) {
         return;
     }
+    if (m_filePath.isEmpty())
+        return;
+
     const QFileInfo fi(m_filePath);
     const QString base = fi.absolutePath() + QLatin1Char('/') + fi.completeBaseName();
+    QStringList saved;
     QString error;
-    bool ok = renderMapToPdf(m_map, base + QStringLiteral(".pdf"), &error);
-    ok = renderMapToImage(m_map, base + QStringLiteral(".png"), &error) && ok;
-    statusBar()->showMessage(ok ? tr("Smart-saved the map, a PDF and a PNG.")
-                                : tr("Smart save error: %1").arg(error));
+    bool ok = true;
+    if (m_smartSavePdf) {
+        if (renderMapToPdf(m_map, base + QStringLiteral(".pdf"), &error))
+            saved << QStringLiteral("PDF");
+        else
+            ok = false;
+    }
+    if (m_smartSaveImage) {
+        const QString fmt = m_smartSaveImageFormat.isEmpty() ? QStringLiteral("png")
+                                                             : m_smartSaveImageFormat.toLower();
+        if (renderMapToImage(m_map, base + QLatin1Char('.') + fmt, &error))
+            saved << fmt.toUpper();
+        else
+            ok = false;
+    }
+
+    if (!ok)
+        statusBar()->showMessage(tr("Smart save error: %1").arg(error));
+    else
+        statusBar()->showMessage(tr("Smart-saved the map and %1.").arg(saved.join(QStringLiteral(", "))));
 }
 
 void MainWindow::setWatchedFile(const QString &path)
@@ -1788,6 +1821,10 @@ void MainWindow::loadPreferences()
     m_loadLastOnStart = s.value(QStringLiteral("loadLastOnStart"), false).toBool();
     m_showFullPath = s.value(QStringLiteral("showFullPathInTitle"), false).toBool();
     m_invertWheel = s.value(QStringLiteral("invertWheelZoom"), false).toBool();
+    m_smartSavePdf = s.value(QStringLiteral("smartSave/pdf"), true).toBool();
+    m_smartSaveImage = s.value(QStringLiteral("smartSave/image"), true).toBool();
+    m_smartSaveImageFormat =
+        s.value(QStringLiteral("smartSave/imageFormat"), QStringLiteral("png")).toString();
     const QByteArray geometry = s.value(QStringLiteral("windowGeometry")).toByteArray();
     if (!geometry.isEmpty())
         restoreGeometry(geometry);
@@ -1800,6 +1837,9 @@ void MainWindow::savePreferences()
     s.setValue(QStringLiteral("loadLastOnStart"), m_loadLastOnStart);
     s.setValue(QStringLiteral("showFullPathInTitle"), m_showFullPath);
     s.setValue(QStringLiteral("invertWheelZoom"), m_invertWheel);
+    s.setValue(QStringLiteral("smartSave/pdf"), m_smartSavePdf);
+    s.setValue(QStringLiteral("smartSave/image"), m_smartSaveImage);
+    s.setValue(QStringLiteral("smartSave/imageFormat"), m_smartSaveImageFormat);
     s.setValue(QStringLiteral("windowGeometry"), saveGeometry());
 }
 
@@ -1862,6 +1902,20 @@ void MainWindow::showAppSettings()
     fullPath->setChecked(m_showFullPath);
     form->addRow(fullPath);
 
+    // Smart Save: choose which artifacts to write next to the project.
+    auto *ssPdf = new QCheckBox(tr("Smart Save writes a PDF"), &dialog);
+    ssPdf->setChecked(m_smartSavePdf);
+    form->addRow(ssPdf);
+    auto *ssImage = new QCheckBox(tr("Smart Save writes an image"), &dialog);
+    ssImage->setChecked(m_smartSaveImage);
+    form->addRow(ssImage);
+    auto *ssFormat = new QComboBox(&dialog);
+    ssFormat->addItems({QStringLiteral("png"), QStringLiteral("jpg"), QStringLiteral("bmp")});
+    ssFormat->setCurrentText(m_smartSaveImageFormat.toLower());
+    ssFormat->setEnabled(m_smartSaveImage);
+    connect(ssImage, &QCheckBox::toggled, ssFormat, &QComboBox::setEnabled);
+    form->addRow(tr("Smart Save image &format:"), ssFormat);
+
     auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
     connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
@@ -1872,6 +1926,9 @@ void MainWindow::showAppSettings()
     m_invertWheel = invert->isChecked();
     m_loadLastOnStart = loadLast->isChecked();
     m_showFullPath = fullPath->isChecked();
+    m_smartSavePdf = ssPdf->isChecked();
+    m_smartSaveImage = ssImage->isChecked();
+    m_smartSaveImageFormat = ssFormat->currentText();
     m_view->setInvertWheelZoom(m_invertWheel);
     updateTitle();
     savePreferences();

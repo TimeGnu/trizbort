@@ -176,6 +176,12 @@ private:
     bool m_loadLastOnStart = false;
     bool m_showFullPath = false;
     bool m_invertWheel = false;
+
+    // Smart Save: which artifacts to write alongside the project (the C#
+    // SaveToPDF / SaveToImage app settings), and the image format to use.
+    bool m_smartSavePdf = true;
+    bool m_smartSaveImage = true;
+    QString m_smartSaveImageFormat = QStringLiteral("png");
 };
 
 } // namespace trizbort
