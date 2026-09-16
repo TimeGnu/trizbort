@@ -74,10 +74,6 @@ public:
 
     bool loadFile(const QString &path);
 
-    // Compare two dotted version strings ("v1.9", "1.8.0.0"): -1/0/1. Public and
-    // static so the update check's comparison can be unit-tested.
-    static int compareVersionStrings(const QString &a, const QString &b);
-
 protected:
     void closeEvent(QCloseEvent *event) override;
     // Keyboard editing/navigation on the canvas (the C# Canvas key handlers):
@@ -143,10 +139,6 @@ private:
     void paste();
     void copyColor();
     void pasteColor();
-
-    // Query the fork's GitHub releases feed and report whether a newer version
-    // is available (the C# Check-for-Updates).
-    void checkForUpdates();
 
     // Export / file helpers.
     void exportToClipboard(const QString &format);

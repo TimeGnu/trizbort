@@ -50,9 +50,6 @@
 #include <QCloseEvent>
 #include <QDateTime>
 #include <QDesktopServices>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QRegularExpression>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDockWidget>
@@ -519,7 +516,6 @@ void MainWindow::createActions()
     helpMenu->addAction(tr("Online &Help"), QKeySequence::HelpContents, this, [this] {
         QDesktopServices::openUrl(QUrl(QStringLiteral("https://www.trizbort.com/")));
     });
-    helpMenu->addAction(tr("Check for &Updates"), this, &MainWindow::checkForUpdates);
     helpMenu->addSeparator();
     helpMenu->addAction(tr("&About Trizbort (Qt)…"), this, [this] {
         // A structured About dialog (rather than a bare message box), mirroring
@@ -642,112 +638,6 @@ void MainWindow::openFromUrl()
     updateTitle();
     m_view->zoomToFit();
     statusBar()->showMessage(tr("Opened map from %1").arg(url));
-}
-
-namespace {
-// The leading dotted-number run of a version/tag, minus any "v" prefix or
-// "-beta"-style suffix, split into integer components.
-QList<int> versionParts(const QString &v)
-{
-    QString s = v.trimmed();
-    if (s.startsWith(QLatin1Char('v'), Qt::CaseInsensitive))
-        s = s.mid(1);
-    static const QRegularExpression re(QStringLiteral("^[0-9]+(?:\\.[0-9]+)*"));
-    const QRegularExpressionMatch m = re.match(s);
-    if (m.hasMatch())
-        s = m.captured(0);
-    QList<int> parts;
-    const QStringList pieces = s.split(QLatin1Char('.'), Qt::SkipEmptyParts);
-    for (const QString &p : pieces)
-        parts << p.toInt();
-    return parts;
-}
-
-QString cleanVersion(const QString &v)
-{
-    QString s = v.trimmed();
-    if (s.startsWith(QLatin1Char('v'), Qt::CaseInsensitive))
-        s = s.mid(1);
-    return s;
-}
-} // namespace
-
-int MainWindow::compareVersionStrings(const QString &a, const QString &b)
-{
-    const QList<int> pa = versionParts(a);
-    const QList<int> pb = versionParts(b);
-    const int n = std::max(pa.size(), pb.size());
-    for (int i = 0; i < n; ++i) {
-        const int x = i < pa.size() ? pa.at(i) : 0;
-        const int y = i < pb.size() ? pb.at(i) : 0;
-        if (x != y)
-            return x < y ? -1 : 1;
-    }
-    return 0;
-}
-
-void MainWindow::checkForUpdates()
-{
-    const QString releasesUrl = QStringLiteral("https://github.com/TimeGnu/trizbort/releases");
-
-    QNetworkAccessManager manager;
-    QNetworkRequest request{QUrl(
-        QStringLiteral("https://api.github.com/repos/TimeGnu/trizbort/releases/latest"))};
-    request.setRawHeader("Accept", "application/vnd.github+json");
-    request.setHeader(QNetworkRequest::UserAgentHeader, QStringLiteral("Trizbort-Qt"));
-    request.setAttribute(QNetworkRequest::RedirectPolicyAttribute,
-                         QNetworkRequest::NoLessSafeRedirectPolicy);
-    QNetworkReply *reply = manager.get(request);
-    QEventLoop loop;
-    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    statusBar()->showMessage(tr("Checking for updates…"));
-    loop.exec();
-    QApplication::restoreOverrideCursor();
-
-    if (reply->error() != QNetworkReply::NoError) {
-        const QString err = reply->errorString();
-        reply->deleteLater();
-        statusBar()->clearMessage();
-        const auto choice = QMessageBox::warning(
-            this, tr("Check for Updates"),
-            tr("Couldn't reach the update server:\n%1\n\nOpen the releases page in your browser?")
-                .arg(err),
-            QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-        if (choice == QMessageBox::Yes)
-            QDesktopServices::openUrl(QUrl(releasesUrl));
-        return;
-    }
-
-    const QByteArray body = reply->readAll();
-    reply->deleteLater();
-    statusBar()->clearMessage();
-
-    const QJsonObject obj = QJsonDocument::fromJson(body).object();
-    const QString tag = obj.value(QStringLiteral("tag_name")).toString();
-    const QString htmlUrl = obj.value(QStringLiteral("html_url")).toString();
-    const QString current = QApplication::applicationVersion();
-
-    if (tag.isEmpty()) {
-        QMessageBox::information(
-            this, tr("Check for Updates"),
-            tr("No published release was found. You are running version %1.").arg(current));
-        return;
-    }
-
-    if (compareVersionStrings(tag, current) > 0) {
-        const auto choice = QMessageBox::question(
-            this, tr("Update Available"),
-            tr("Trizbort %1 is available. You are running %2.\n\nOpen the download page?")
-                .arg(cleanVersion(tag), current),
-            QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-        if (choice == QMessageBox::Yes)
-            QDesktopServices::openUrl(QUrl(htmlUrl.isEmpty() ? releasesUrl : htmlUrl));
-    } else {
-        QMessageBox::information(
-            this, tr("Check for Updates"),
-            tr("You are running the latest version (%1).").arg(current));
-    }
 }
 
 bool MainWindow::loadFile(const QString &path)
