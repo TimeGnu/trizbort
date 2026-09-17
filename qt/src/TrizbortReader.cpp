@@ -100,7 +100,24 @@ void readObjects(QXmlStreamReader &xml, Room &r)
     r.objectsText = text;
 }
 
-Room readRoom(QXmlStreamReader &xml)
+// Files older than 1.5.8.3 stored roomFill="#FFFFFF" to mean "no fill"; such a
+// room's colours are all ignored on load, exactly as Room.cs does for that
+// version range.
+bool isPreColorFixVersion(const QString &version)
+{
+    if (version.isEmpty())
+        return false;
+    const QStringList parts = version.split(QLatin1Char('.'));
+    const int target[4] = {1, 5, 8, 3};
+    for (int i = 0; i < 4; ++i) {
+        const int v = i < parts.size() ? parts.at(i).toInt() : 0;
+        if (v != target[i])
+            return v < target[i];
+    }
+    return false; // exactly 1.5.8.3 => already fixed
+}
+
+Room readRoom(QXmlStreamReader &xml, bool legacyWhiteFillQuirk)
 {
     const QXmlStreamAttributes a = xml.attributes();
     Room r;
@@ -140,17 +157,22 @@ Room readRoom(QXmlStreamReader &xml)
     r.isStartRoom = toBool(attr(a, "isStartRoom"));
     r.isEndRoom = toBool(attr(a, "isEndRoom"));
 
-    r.fill = parseTrizbortColor(attr(a, "roomFill"));
-    r.secondFill = parseTrizbortColor(attr(a, "secondFill"));
-    if (a.hasAttribute(QLatin1String("secondFillLocation"))) {
-        const QString loc = attr(a, "secondFillLocation");
-        if (!loc.isEmpty())
-            r.secondFillLocation = loc;
+    // For pre-1.5.8.3 files a white roomFill means "no colours": leave every
+    // room colour at its inherited default (Room.cs:1145-1151).
+    if (!(legacyWhiteFillQuirk &&
+          attr(a, "roomFill") == QLatin1String("#FFFFFF"))) {
+        r.fill = parseTrizbortColor(attr(a, "roomFill"));
+        r.secondFill = parseTrizbortColor(attr(a, "secondFill"));
+        if (a.hasAttribute(QLatin1String("secondFillLocation"))) {
+            const QString loc = attr(a, "secondFillLocation");
+            if (!loc.isEmpty())
+                r.secondFillLocation = loc;
+        }
+        r.border = parseTrizbortColor(attr(a, "roomBorder"));
+        r.largeText = parseTrizbortColor(attr(a, "roomLargeText"));
+        r.subtitleColor = parseTrizbortColor(attr(a, "roomSubtitleColor"));
+        r.smallText = parseTrizbortColor(attr(a, "roomSmallText"));
     }
-    r.border = parseTrizbortColor(attr(a, "roomBorder"));
-    r.largeText = parseTrizbortColor(attr(a, "roomLargeText"));
-    r.subtitleColor = parseTrizbortColor(attr(a, "roomSubtitleColor"));
-    r.smallText = parseTrizbortColor(attr(a, "roomSmallText"));
 
     if (a.hasAttribute(QLatin1String("ZOrder")))
         r.zOrder = attr(a, "ZOrder").toInt();
@@ -233,10 +255,11 @@ void readInfo(QXmlStreamReader &xml, Map &out)
 void readMap(QXmlStreamReader &xml, Map &out)
 {
     int seq = 0;
+    const bool legacyWhiteFill = isPreColorFixVersion(out.version);
     while (xml.readNextStartElement()) {
         const auto n = xml.name();
         if (n == QLatin1String("room")) {
-            Room r = readRoom(xml);
+            Room r = readRoom(xml, legacyWhiteFill);
             r.seq = ++seq;
             out.rooms.append(r);
         } else if (n == QLatin1String("line")) {

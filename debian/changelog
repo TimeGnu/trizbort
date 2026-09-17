@@ -1,0 +1,5 @@
+trizbort-qt (0.1-1) unstable; urgency=medium
+
+  * Initial Debian packaging of the Qt/C++ reimplementation of Trizbort.
+
+ -- Jason Self <j@jxself.org>  Wed, 16 Sep 2026 13:24:00 +0000

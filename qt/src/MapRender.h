@@ -26,7 +26,11 @@
 // canvas uses (minus the grid). Used by the File > Export menu and the CLI.
 namespace trizbort {
 
-bool renderMapToImage(const Map &map, const QString &path, QString *errorMessage = nullptr);
+// scale multiplies the output resolution: 1.0 renders the map at 100% (one map
+// unit per pixel), matching the "Save images at 100%" behaviour; the GUI passes
+// the current view zoom instead when that option is off.
+bool renderMapToImage(const Map &map, const QString &path, QString *errorMessage = nullptr,
+                      double scale = 1.0);
 bool renderMapToPdf(const Map &map, const QString &path, QString *errorMessage = nullptr);
 
 } // namespace trizbort

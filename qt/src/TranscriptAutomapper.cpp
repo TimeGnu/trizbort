@@ -253,7 +253,11 @@ int TranscriptAutomapper::findRoom(const QString &name)
     }
     if (candidates.isEmpty())
         return -1;
-    if (candidates.size() == 1 || m_settings.assumeSameNameSameRoom)
+    // A single match is always the same room. A terse (non-verbose) transcript
+    // has no descriptions to tell rooms apart, so same-named rooms are taken to
+    // be the same room without asking (mirrors Automap.cs).
+    if (candidates.size() == 1 || m_settings.assumeSameNameSameRoom ||
+        !m_settings.verboseTranscript)
         return candidates.first();
     // Ambiguous: let the controller decide (returns -1 to make a new room).
     return m_controller ? m_controller->disambiguateRoom(name, candidates) : candidates.first();

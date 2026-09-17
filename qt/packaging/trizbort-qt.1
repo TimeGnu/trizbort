@@ -1,0 +1,75 @@
+.\" Copyright (c) 2026 Jason Self <j@jxself.org>
+.\" GNU GPL v3 or later.
+.TH TRIZBORT\-QT 1 "2026" "trizbort\-qt" "User Commands"
+.SH NAME
+trizbort\-qt \- map maker for interactive fiction and text adventures
+.SH SYNOPSIS
+.B trizbort\-qt
+.RI [ map.trizbort ]
+.br
+.B trizbort\-qt
+.I map.trizbort
+.B \-\-save
+.I out.trizbort
+.br
+.B trizbort\-qt
+.I map.trizbort
+.BR \-\-zil | \-\-inform6 | \-\-inform7 | \-\-tads | \-\-hugo | \-\-alan | \-\-quest | \-\-adventuron
+.I out
+.br
+.B trizbort\-qt
+.I map.trizbort
+.BR \-\-render " " \fIout.png\fR " | " \-\-pdf " " \fIout.pdf\fR " | " \-\-stats
+.br
+.B trizbort\-qt \-\-import\-transcript
+.I play.txt out.trizbort
+.SH DESCRIPTION
+.B trizbort\-qt
+is a cross\-platform reimplementation of Trizbort, a mapper for interactive
+fiction. It edits the \fB.trizbort\fR map format: rooms, the connections between
+them, regions, colours and per\-map settings. With no arguments, or with a map
+file, it opens the graphical editor. The command\-line options below run a task
+without opening a window and then exit.
+.SH OPTIONS
+.TP
+.BI \-\-save " file"
+Load the map and write it back out (round\-trip / format upgrade).
+.TP
+.BI \-\-quicksave ", " \-q
+Re\-save the map in place to its own file.
+.TP
+.BI \-\-smartsave ", " \-s
+Re\-save the map and write a PDF and/or image beside it, per the Smart Save
+preferences.
+.TP
+.BR \-\-zil ", " \-\-inform6 ", " \-\-inform7 ", " \-\-tads ", " \-\-hugo ", " \-\-alan ", " \-\-quest ", " \-\-questrooms ", " \-\-adventuron " " \fIfile\fR
+Export the map as source code for the named interactive\-fiction system.
+.TP
+.BI \-\-render " file"
+Render the map to a raster image (PNG, JPEG or BMP, by extension).
+.TP
+.BI \-\-pdf " file"
+Render the map to a PDF document.
+.TP
+.B \-\-stats
+Print map statistics to standard output.
+.TP
+.BI \-\-import\-transcript " in out"
+Build a map from a play\-session transcript and write it to \fIout\fR.
+.TP
+.BR \-\-loadlastproject ", " \-a
+Open the most recently used map on start\-up.
+.TP
+.BR \-\-exit ", " \-x
+After any batch task, do not open the editor window.
+.SH FILES
+.TP
+.I ~/.config/Trizbort/Trizbort (Qt).conf
+Per\-user preferences (recent files, tooltips, export options).
+.SH SEE ALSO
+Project home page:
+.UR https://www.trizbort.com/
+.UE
+.SH AUTHOR
+Qt/C++ port by Jason Self. Based on the original C# Trizbort by Genstein and
+Jason Lautzenheiser.

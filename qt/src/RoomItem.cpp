@@ -50,6 +50,8 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
+#include <QLinearGradient>
 #include <QMenu>
 #include <QHash>
 #include <QPainter>
@@ -278,6 +280,8 @@ void drawRoomText(QPainter *painter, const Map &map, const Room &room, const QRe
         nameText = QObject::tr("To");
         subtitleText = ref ? ref->name : QString();
     }
+    nameText = applyDashWrapping(nameText, map.settings.wrapTextAtDashes);
+    subtitleText = applyDashWrapping(subtitleText, map.settings.wrapTextAtDashes);
 
     if (textBounds.width() > 0 && textBounds.height() > 0 && !nameText.isEmpty()) {
         QColor nameColor = room.largeText.isValid() ? room.largeText
@@ -317,13 +321,14 @@ void drawRoomText(QPainter *painter, const Map &map, const Room &room, const QRe
     objs = objs.trimmed();
     if (objs.isEmpty())
         return;
+    objs = applyDashWrapping(objs, map.settings.wrapTextAtDashes);
 
     const double off = map.settings.objectListOffset;
     QColor objColor = room.smallText.isValid() ? room.smallText
                                                : map.settings.colors[ColorSmallText];
     if (!objColor.isValid())
         objColor = QColor(60, 60, 60);
-    const QFont objFont = qfontFromSpec(map.settings.objectFont, 9.0);
+    const QFont objFont = qfontFromSpec(map.settings.objectFont, 11.0);
     painter->setFont(objFont);
     painter->setPen(objColor);
     const QFontMetricsF ofm(objFont);
@@ -550,10 +555,28 @@ void RoomItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
 
         const double hs = handleSize();
         painter->setPen(QPen(QColor(80, 80, 80), 1.0));
-        painter->setBrush(QColor(255, 255, 255));
         for (int i = 0; i < 8; ++i) {
             const QPointF c = handlePoint(i, m_w, m_h);
-            painter->drawRect(QRectF(c.x() - hs / 2.0, c.y() - hs / 2.0, hs, hs));
+            const QRectF hr(c.x() - hs / 2.0, c.y() - hs / 2.0, hs, hs);
+            // Light-cyan-to-steel-blue gradient, matching the C# resize handles.
+            QLinearGradient g(hr.topLeft(), hr.bottomRight());
+            g.setColorAt(0.0, QColor(224, 255, 255));
+            g.setColorAt(1.0, QColor(70, 130, 180));
+            painter->setBrush(g);
+            painter->drawRect(hr);
+        }
+    }
+
+    // In connect mode, show the compass docking ports on the hovered room so the
+    // user can see (and pick) where a connection will attach — the C# drawPorts.
+    if (m_hovered && m_scene->connectMode()) {
+        const QStringList ports =
+            MapScene::portTokensForDetail(AppSettings::instance().portAdjustDetail);
+        painter->setPen(QPen(QColor(30, 120, 220), 1.0));
+        painter->setBrush(QColor(200, 225, 255));
+        for (const QString &t : ports) {
+            const QPointF wp = MapScene::portPoint(*room, t);
+            painter->drawEllipse(QPointF(wp.x() - room->x, wp.y() - room->y), 3.5, 3.5);
         }
     }
 }
@@ -615,6 +638,14 @@ int RoomItem::handleAt(const QPointF &localPos) const
     return -1;
 }
 
+void RoomItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    m_hovered = true;
+    if (m_scene->connectMode())
+        update();
+    QGraphicsItem::hoverEnterEvent(event);
+}
+
 void RoomItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
     const int h = handleAt(event->pos());
@@ -634,11 +665,30 @@ void RoomItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 void RoomItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     unsetCursor();
+    if (m_hovered && m_scene->connectMode())
+        update();
+    m_hovered = false;
     QGraphicsItem::hoverLeaveEvent(event);
 }
 
 void RoomItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    // Ctrl+click on a reference room jumps to (selects and reveals) the room it
+    // references, matching the C# Canvas.OnMouseClick behaviour.
+    if (event->button() == Qt::LeftButton && (event->modifiers() & Qt::ControlModifier)) {
+        const Room *r = m_scene->document() ? m_scene->document()->roomById(m_roomId) : nullptr;
+        if (r && r->referenceRoom >= 0) {
+            const int target = r->referenceRoom;
+            m_scene->selectRoomItem(target);
+            if (const Room *tr = m_scene->document()->roomById(target)) {
+                const QList<QGraphicsView *> views = m_scene->views();
+                if (!views.isEmpty())
+                    views.first()->ensureVisible(QRectF(tr->x, tr->y, tr->w, tr->h));
+            }
+            event->accept();
+            return;
+        }
+    }
     if (event->button() == Qt::LeftButton) {
         const int h = handleAt(event->pos());
         if (h >= 0) {

@@ -52,12 +52,20 @@ private:
     QPlainTextEdit *m_description = nullptr;
     QPlainTextEdit *m_objects = nullptr;
     QComboBox *m_objectsPosition = nullptr;
+    QCheckBox *m_objectsCustom = nullptr;
+    QSpinBox *m_objectsRight = nullptr;
+    QSpinBox *m_objectsDown = nullptr;
     QCheckBox *m_dark = nullptr;
     QCheckBox *m_start = nullptr;
     QCheckBox *m_end = nullptr;
     QComboBox *m_shape = nullptr;
+    QCheckBox *m_handDrawn = nullptr;
     QComboBox *m_border = nullptr;
-    QSpinBox *m_cornerRadius = nullptr;
+    QCheckBox *m_cornersEqual = nullptr;
+    QSpinBox *m_cornerTL = nullptr;
+    QSpinBox *m_cornerTR = nullptr;
+    QSpinBox *m_cornerBL = nullptr;
+    QSpinBox *m_cornerBR = nullptr;
     QComboBox *m_secondFillLocation = nullptr;
 
     ColorButton *m_fillButton = nullptr;

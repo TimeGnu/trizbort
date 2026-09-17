@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2026 Jason Self <j@jxself.org> -->
+<component type="desktop-application">
+  <id>org.jxself.trizbort-qt</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>Trizbort (Qt)</name>
+  <summary>Map maker for interactive fiction and text adventures</summary>
+  <description>
+    <p>
+      Trizbort (Qt) is a cross-platform mapper for interactive fiction. Draw
+      rooms and the connections between them, annotate them with descriptions
+      and objects, and export the map as source code for many interactive-fiction
+      systems (ZIL, Inform 6, Inform 7, TADS 3, Hugo, Alan, Quest and Adventuron)
+      or as a PDF or image.
+    </p>
+    <p>
+      It can also build a map automatically from a play-session transcript,
+      following the player's movements. It reads and writes the .trizbort file
+      format used by the original Trizbort.
+    </p>
+  </description>
+  <launchable type="desktop-id">trizbort-qt.desktop</launchable>
+  <provides>
+    <binary>trizbort-qt</binary>
+    <mediatype>application/x-trizbort</mediatype>
+  </provides>
+  <categories>
+    <category>Graphics</category>
+  </categories>
+  <releases>
+    <release version="0.1" date="2026-09-16">
+      <description>
+        <p>Initial packaged release of the Qt/C++ reimplementation.</p>
+      </description>
+    </release>
+  </releases>
+  <url type="homepage">https://www.trizbort.com/</url>
+  <developer id="org.jxself">
+    <name>Jason Self</name>
+  </developer>
+  <content_rating type="oars-1.1"/>
+</component>

@@ -46,6 +46,7 @@
 #include <QLineF>
 #include <QPair>
 #include <QPointF>
+#include <QStringList>
 #include <QVector>
 
 #include "MapDocument.h"
@@ -106,6 +107,12 @@ public:
                                 const QString &port);
     // The 8-way compass port on a room that best faces a scene point.
     static QString portTowards(const Room &room, const QPointF &target);
+
+    // The compass port tokens offered at a given granularity (the app's
+    // PortAdjustDetail): 4 (NSEW), 8 (+ diagonals) or 16 (+ half-winds).
+    static QStringList portTokensForDetail(int detail);
+    // The port token (at that granularity) whose point is nearest a scene point.
+    static QString nearestPort(const Room &room, const QPointF &scenePoint, int detail);
 
     // The id of the room whose outline contains a scene point, or -1.
     int roomIdAt(const QPointF &scenePos) const;
@@ -195,6 +202,7 @@ private:
     ConnectionFlow m_newConnFlow = ConnectionFlow::TwoWay;
     ValidationFlags m_validation;
     int m_connectFromRoom = -1;
+    QString m_connectFromPort;              // port picked when the drag started
     QGraphicsLineItem *m_rubberLine = nullptr;
 
     QUndoStack *m_undo = nullptr;

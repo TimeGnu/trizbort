@@ -43,7 +43,10 @@
 #include <QApplication>
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QImage>
+#include <QKeyEvent>
+#include <QSettings>
 #include <QUndoStack>
 #include <QPainter>
 #include <QRectF>
@@ -64,6 +67,7 @@
 #include "TranscriptAutomapper.h"
 #include "TrizbortReader.h"
 #include "TrizbortWriter.h"
+#include "Version.h"
 #include "export/CodeExporter.h"
 #include "export/ExporterFactory.h"
 
@@ -168,6 +172,61 @@ static int runSave(const QString &mapPath, const QString &outPath)
         return 3;
     }
     return 0;
+}
+
+// Quick-save (C# -q/--quicksave): re-save the map back to its own file,
+// upgrading/normalising it in place.
+static int runQuickSave(const QString &mapPath)
+{
+    return runSave(mapPath, mapPath);
+}
+
+// Smart-save (C# -s/--smartsave): re-save the project and, per the persisted
+// Smart Save preferences, write a PDF and/or an image alongside it. Headless,
+// so images render at 100%.
+static int runSmartSave(const QString &mapPath)
+{
+    QTextStream err(stderr);
+    trizbort::Map map;
+    QString error;
+    if (!trizbort::TrizbortReader::load(mapPath, map, &error)) {
+        err << "load failed: " << error << Qt::endl;
+        return 1;
+    }
+    if (!trizbort::TrizbortWriter::save(mapPath, map, &error)) {
+        err << "save failed: " << error << Qt::endl;
+        return 3;
+    }
+    QSettings s;
+    const bool wantPdf = s.value(QStringLiteral("smartSave/pdf"), true).toBool();
+    const bool wantImage = s.value(QStringLiteral("smartSave/image"), true).toBool();
+    const QString fmt =
+        s.value(QStringLiteral("smartSave/imageFormat"), QStringLiteral("png")).toString().toLower();
+    const QFileInfo fi(mapPath);
+    const QString base = fi.path() + QLatin1Char('/') + fi.completeBaseName();
+    int rc = 0;
+    if (wantPdf && !trizbort::renderMapToPdf(map, base + QStringLiteral(".pdf"), &error)) {
+        err << "pdf failed: " << error << Qt::endl;
+        rc = 3;
+    }
+    if (wantImage &&
+        !trizbort::renderMapToImage(map, base + QLatin1Char('.') + fmt, &error)) {
+        err << "image failed: " << error << Qt::endl;
+        rc = 3;
+    }
+    return rc;
+}
+
+// The most recent map on the recent-files list that still exists (C#
+// -a/--loadlastproject), or empty if there is none.
+static QString lastProjectPath()
+{
+    const QStringList recent = QSettings().value(QStringLiteral("recentFiles")).toStringList();
+    for (const QString &p : recent) {
+        if (!p.isEmpty() && QFile::exists(p))
+            return p;
+    }
+    return QString();
 }
 
 static int runStats(const QString &mapPath)
@@ -309,17 +368,6 @@ static int runEditSelftest()
         check(sc.roomNearestWithin(QPointF(-100, 20), 16.0) == -1, "snap: no room when far");
     }
 
-    // Update-check version comparison (handles a leading "v", extra components,
-    // and pre-release suffixes).
-    check(MainWindow::compareVersionStrings(QStringLiteral("v1.9.0"), QStringLiteral("1.8.0.0")) > 0,
-          "version newer");
-    check(MainWindow::compareVersionStrings(QStringLiteral("1.8.0"), QStringLiteral("1.8.0.0")) == 0,
-          "version equal with trailing zeros");
-    check(MainWindow::compareVersionStrings(QStringLiteral("v1.7.5"), QStringLiteral("1.8.0.0")) < 0,
-          "version older");
-    check(MainWindow::compareVersionStrings(QStringLiteral("v2.0.0-beta"), QStringLiteral("1.8.0.0")) > 0,
-          "version newer ignoring pre-release suffix");
-
     // Port-adjust detail: the same direction snaps to 4, 8, or 16 compass points.
     {
         Room room;
@@ -448,6 +496,75 @@ static int runGuiSelftest(const QString &samplePath)
     out << (failures == 0 ? "gui-selftest: PASS" : "gui-selftest: FAIL") << Qt::endl;
     return failures == 0 ? 0 : 1;
 }
+
+// Headless test for the canvas keyboard editing/navigation model and the port
+// helpers behind connect-mode docking ports. Drives the real key handlers.
+namespace trizbort {
+int runKeyboardSelftest()
+{
+    QTextStream out(stdout);
+    int failures = 0;
+    auto check = [&](bool ok, const char *what) {
+        if (!ok) {
+            out << "  FAIL: " << what << Qt::endl;
+            ++failures;
+        }
+    };
+
+    MainWindow win;
+    Map &map = win.m_map;
+    MapScene *scene = win.m_scene;
+    map.clear();
+    const int a = map.addRoom(0, 0);      // room A at the origin
+    const int b = map.addRoom(0, -128);   // room B one step north (y grows down)
+    map.addConnection(a, QStringLiteral("n"), b, QStringLiteral("s"));
+    scene->setDocument(&map);
+    win.m_undo.clear();
+
+    auto sendKey = [&](int key, Qt::KeyboardModifiers mods) {
+        QKeyEvent ev(QEvent::KeyPress, key, mods);
+        win.handleCanvasKey(&ev);
+    };
+
+    // Arrow key nudges the selected room by one grid step.
+    scene->selectRoomItem(a);
+    const double x0 = map.roomById(a)->x;
+    sendKey(Qt::Key_Right, Qt::NoModifier);
+    check(map.roomById(a) && map.roomById(a)->x == x0 + map.settings.gridSize,
+          "arrow nudges the selected room by a grid step");
+
+    // Ctrl+Alt+arrow resizes the room.
+    scene->selectRoomItem(a);
+    const double w0 = map.roomById(a)->w;
+    sendKey(Qt::Key_Right, Qt::ControlModifier | Qt::AltModifier);
+    check(map.roomById(a)->w == w0 + map.settings.gridSize, "Ctrl+Alt+arrow resizes the room");
+
+    // Ctrl+arrow follows the connection to the room in that direction.
+    scene->selectRoomItem(a);
+    sendKey(Qt::Key_Up, Qt::ControlModifier);
+    check(scene->selectedRoomId() == b, "Ctrl+arrow follows a connection to the next room");
+
+    // Ctrl+arrow with no connection that way adds a new connected room.
+    const int roomsBefore = map.rooms.size();
+    scene->selectRoomItem(b);
+    sendKey(Qt::Key_Up, Qt::ControlModifier);
+    check(map.rooms.size() == roomsBefore + 1, "Ctrl+arrow adds a connected room when none exists");
+
+    // Port helpers behind connect-mode docking ports.
+    check(MapScene::portTokensForDetail(4).size() == 4 &&
+              MapScene::portTokensForDetail(8).size() == 8 &&
+              MapScene::portTokensForDetail(16).size() == 16,
+          "portTokensForDetail returns 4/8/16 ports");
+    if (const Room *ra = map.roomById(a)) {
+        const QPointF north(ra->x + ra->w / 2.0, ra->y - 20);
+        check(MapScene::nearestPort(*ra, north, 8) == QLatin1String("n"),
+              "nearestPort picks the north port above the room");
+    }
+
+    out << (failures == 0 ? "keyboard-selftest: PASS" : "keyboard-selftest: FAIL") << Qt::endl;
+    return failures == 0 ? 0 : 1;
+}
+} // namespace trizbort
 
 // Headless test for the undo/redo command classes.
 static int runUndoSelftest()
@@ -745,7 +862,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     QApplication::setApplicationName(QStringLiteral("Trizbort (Qt)"));
     QApplication::setOrganizationName(QStringLiteral("Trizbort"));
-    QApplication::setApplicationVersion(QStringLiteral("1.8.0.0"));
+    QApplication::setApplicationVersion(QStringLiteral(TRIZBORT_VERSION));
 
     if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--edit-selftest"))
         return runEditSelftest();
@@ -755,6 +872,8 @@ int main(int argc, char *argv[])
         return runAutomapSelftest();
     if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--undo-selftest"))
         return runUndoSelftest();
+    if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--keyboard-selftest"))
+        return trizbort::runKeyboardSelftest();
     if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--gui-selftest"))
         return runGuiSelftest(argc >= 3 ? QString::fromLocal8Bit(argv[2]) : QString());
 
@@ -767,6 +886,10 @@ int main(int argc, char *argv[])
     QString exportFmt;
     QString exportOut;
     bool statsRequested = false;
+    bool loadLastRequested = false;
+    bool smartSaveRequested = false;
+    bool quickSaveRequested = false;
+    bool exitRequested = false;
     static const struct {
         const char *flag;
         const char *fmt;
@@ -795,6 +918,23 @@ int main(int argc, char *argv[])
             statsRequested = true;
             continue;
         }
+        if (args.at(i) == QLatin1String("--loadlastproject") ||
+            args.at(i) == QLatin1String("-a")) {
+            loadLastRequested = true;
+            continue;
+        }
+        if (args.at(i) == QLatin1String("--smartsave") || args.at(i) == QLatin1String("-s")) {
+            smartSaveRequested = true;
+            continue;
+        }
+        if (args.at(i) == QLatin1String("--quicksave") || args.at(i) == QLatin1String("-q")) {
+            quickSaveRequested = true;
+            continue;
+        }
+        if (args.at(i) == QLatin1String("--exit") || args.at(i) == QLatin1String("-x")) {
+            exitRequested = true;
+            continue;
+        }
         if (args.at(i) == QLatin1String("--import-transcript") && i + 2 < args.size()) {
             transcriptPath = args.at(++i);
             transcriptOut = args.at(++i);
@@ -811,6 +951,26 @@ int main(int argc, char *argv[])
         }
         if (!matched)
             mapPath = args.at(i);
+    }
+
+    // --loadlastproject supplies the map when none was named on the command line.
+    if (loadLastRequested && mapPath.isEmpty())
+        mapPath = lastProjectPath();
+
+    if (smartSaveRequested) {
+        if (mapPath.isEmpty()) {
+            QTextStream(stderr) << "usage: trizbort-qt <map.trizbort> --smartsave" << Qt::endl;
+            return 2;
+        }
+        return runSmartSave(mapPath);
+    }
+
+    if (quickSaveRequested) {
+        if (mapPath.isEmpty()) {
+            QTextStream(stderr) << "usage: trizbort-qt <map.trizbort> --quicksave" << Qt::endl;
+            return 2;
+        }
+        return runQuickSave(mapPath);
     }
 
     if (!exportFmt.isEmpty()) {
@@ -858,6 +1018,10 @@ int main(int argc, char *argv[])
         }
         return renderToFile(mapPath, renderPath, /*pdf=*/false);
     }
+
+    // --exit (C# -x): after any batch work, don't open the editor window.
+    if (exitRequested)
+        return 0;
 
     trizbort::MainWindow window;
     window.resize(1000, 700);

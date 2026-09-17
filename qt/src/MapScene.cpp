@@ -199,6 +199,34 @@ QString MapScene::portTowards(const Room &room, const QPointF &target)
     return QString::fromLatin1(kPorts[(bucket * (16 / divisions)) % 16]);
 }
 
+QStringList MapScene::portTokensForDetail(int detail)
+{
+    static const char *const k16[16] = {"n",  "nne", "ne", "ene", "e",  "ese", "se", "sse",
+                                        "s",  "ssw", "sw", "wsw", "w",  "wnw", "nw", "nnw"};
+    if (detail != 4 && detail != 8 && detail != 16)
+        detail = 16;
+    QStringList out;
+    for (int i = 0; i < 16; i += 16 / detail)
+        out << QString::fromLatin1(k16[i]);
+    return out;
+}
+
+QString MapScene::nearestPort(const Room &room, const QPointF &scenePoint, int detail)
+{
+    const QStringList tokens = portTokensForDetail(detail);
+    QString best = tokens.isEmpty() ? QStringLiteral("n") : tokens.first();
+    double bestD = 1e18;
+    for (const QString &t : tokens) {
+        const QPointF p = portPoint(room, t);
+        const double d = std::hypot(p.x() - scenePoint.x(), p.y() - scenePoint.y());
+        if (d < bestD) {
+            bestD = d;
+            best = t;
+        }
+    }
+    return best;
+}
+
 int MapScene::roomIdAt(const QPointF &scenePos) const
 {
     if (RoomItem *item = roomItemAt(scenePos))
@@ -547,6 +575,14 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (m_connectMode && event->button() == Qt::LeftButton) {
         if (RoomItem *from = roomItemAt(event->scenePos())) {
             m_connectFromRoom = from->roomId();
+            // Remember which compass port the drag started nearest to, so the
+            // connection docks there rather than at an auto-computed port.
+            m_connectFromPort.clear();
+            if (m_map) {
+                if (const Room *fr = m_map->roomById(from->roomId()))
+                    m_connectFromPort = nearestPort(*fr, event->scenePos(),
+                                                    AppSettings::instance().portAdjustDetail);
+            }
             m_rubberLine = new QGraphicsLineItem(QLineF(event->scenePos(), event->scenePos()));
             QPen pen(QColor(30, 120, 220));
             pen.setWidthF(2.0);
@@ -603,8 +639,13 @@ void MapScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                     portA = QStringLiteral("nw");
                     portB = QStringLiteral("ne");
                 } else {
-                    portA = Map::portFacing(*from, *to);
-                    portB = Map::portFacing(*to, *from);
+                    // Dock the source at the port the drag began from and the
+                    // target at the port nearest where it was released, so the
+                    // user chooses both ends; fall back to the facing port.
+                    const int detail = AppSettings::instance().portAdjustDetail;
+                    portA = m_connectFromPort.isEmpty() ? Map::portFacing(*from, *to)
+                                                        : m_connectFromPort;
+                    portB = nearestPort(*to, event->scenePos(), detail);
                 }
                 if (m_undo) {
                     m_undo->push(
@@ -664,11 +705,22 @@ void MapScene::drawBackground(QPainter *painter, const QRectF &rect)
         painter->drawLine(QPointF(rect.left(), y), QPointF(rect.right(), y));
 
     if (m_map->settings.showOrigin) {
-        QPen originPen(QColor(200, 160, 160));
+        // A small "+" spanning one grid step each way from the origin (as the C#
+        // Canvas draws it), tinted canvas:smallText 3:1, not a full crosshair.
+        QColor canvas = m_map->canvasColor();
+        if (!canvas.isValid())
+            canvas = QColor(Qt::white);
+        QColor small = m_map->settings.colors[ColorSmallText];
+        if (!small.isValid())
+            small = QColor(60, 60, 60);
+        const QColor originColor((3 * canvas.red() + small.red()) / 4,
+                                 (3 * canvas.green() + small.green()) / 4,
+                                 (3 * canvas.blue() + small.blue()) / 4);
+        QPen originPen(originColor);
         originPen.setWidthF(0.0);
         painter->setPen(originPen);
-        painter->drawLine(QPointF(0, rect.top()), QPointF(0, rect.bottom()));
-        painter->drawLine(QPointF(rect.left(), 0), QPointF(rect.right(), 0));
+        painter->drawLine(QPointF(-g, 0), QPointF(g, 0));
+        painter->drawLine(QPointF(0, -g), QPointF(0, g));
     }
 }
 

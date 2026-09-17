@@ -50,9 +50,7 @@
 #include <QCloseEvent>
 #include <QDateTime>
 #include <QDesktopServices>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QRegularExpression>
+#include <QDialog>
 #include <QDialogButtonBox>
 #include <QDockWidget>
 #include <QFileDialog>
@@ -60,6 +58,7 @@
 #include <QFileSystemWatcher>
 #include <QFormLayout>
 #include <QInputDialog>
+#include <QKeyEvent>
 #include <QKeySequence>
 #include <QDoubleSpinBox>
 #include <QFontComboBox>
@@ -80,6 +79,7 @@
 #include <QSettings>
 #include <QTimer>
 #include <QUrl>
+#include <QVBoxLayout>
 #include <QPlainTextEdit>
 #include <QStatusBar>
 #include <QToolBar>
@@ -110,6 +110,9 @@ MainWindow::MainWindow(QWidget *parent)
     m_scene = new MapScene(this);
     m_view = new MapView(this);
     m_view->setScene(m_scene);
+    // Intercept canvas key presses (arrows, keypad) for the C# keyboard-editing
+    // and navigation model before the view scrolls.
+    m_view->installEventFilter(this);
     setCentralWidget(m_view);
 
     // Minimap overview in a dockable panel (hidden until the user shows it).
@@ -252,15 +255,14 @@ void MainWindow::createActions()
         const char *dir;
         QKeySequence shortcut;
     };
+    // These items add a room in a direction (click). The arrow chords are
+    // reserved for the keyboard-navigation model in eventFilter: Ctrl+arrow
+    // navigates-or-adds and Ctrl+Alt+arrow resizes, matching the C# canvas.
     const Dir dirs[] = {
-        {"North", "n", QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_Up)},
-        {"South", "s", QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_Down)},
-        {"East", "e", QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_Right)},
-        {"West", "w", QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_Left)},
-        {"North-East", "ne", QKeySequence()},
-        {"North-West", "nw", QKeySequence()},
-        {"South-East", "se", QKeySequence()},
-        {"South-West", "sw", QKeySequence()},
+        {"North", "n", QKeySequence()},      {"South", "s", QKeySequence()},
+        {"East", "e", QKeySequence()},       {"West", "w", QKeySequence()},
+        {"North-East", "ne", QKeySequence()}, {"North-West", "nw", QKeySequence()},
+        {"South-East", "se", QKeySequence()}, {"South-West", "sw", QKeySequence()},
     };
     for (const Dir &d : dirs) {
         const QString dir = QString::fromLatin1(d.dir);
@@ -514,18 +516,42 @@ void MainWindow::createActions()
     helpMenu->addAction(tr("Online &Help"), QKeySequence::HelpContents, this, [this] {
         QDesktopServices::openUrl(QUrl(QStringLiteral("https://www.trizbort.com/")));
     });
-    helpMenu->addAction(tr("Check for &Updates"), this, &MainWindow::checkForUpdates);
     helpMenu->addSeparator();
     helpMenu->addAction(tr("&About Trizbort (Qt)…"), this, [this] {
-        QMessageBox::about(
-            this, tr("About Trizbort (Qt)"),
-            tr("<h3>Trizbort (Qt) %1</h3>"
-               "<p>A from-scratch C++/Qt reimplementation of Trizbort, the "
-               "interactive-fiction mapper.</p>"
+        // A structured About dialog (rather than a bare message box), mirroring
+        // the C# AboutDialog: title, version, description, credits and a link.
+        QDialog dialog(this);
+        dialog.setWindowTitle(tr("About Trizbort (Qt)"));
+        auto *layout = new QVBoxLayout(&dialog);
+
+        auto *heading = new QLabel(tr("<h2>Trizbort (Qt)</h2>"), &dialog);
+        heading->setTextFormat(Qt::RichText);
+        layout->addWidget(heading);
+
+        auto *version =
+            new QLabel(tr("Version %1").arg(QApplication::applicationVersion()), &dialog);
+        layout->addWidget(version);
+
+        auto *body = new QLabel(
+            tr("<p>A from-scratch C++/Qt reimplementation of Trizbort, the "
+               "interactive-fiction mapper, putting GNU/Linux first.</p>"
                "<p>GNU GPL v3 or later. Based on the MIT-licensed C# Trizbort by "
-               "Genstein and Jason Lautzenheiser.</p>"
-               "<p><a href=\"https://www.trizbort.com/\">trizbort.com</a></p>")
-                .arg(QApplication::applicationVersion()));
+               "Genstein and Jason Lautzenheiser.</p>"),
+            &dialog);
+        body->setTextFormat(Qt::RichText);
+        body->setWordWrap(true);
+        layout->addWidget(body);
+
+        auto *link = new QLabel(
+            tr("<a href=\"https://www.trizbort.com/\">trizbort.com</a>"), &dialog);
+        link->setTextFormat(Qt::RichText);
+        link->setOpenExternalLinks(true);
+        layout->addWidget(link);
+
+        auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok, &dialog);
+        connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+        layout->addWidget(buttons);
+        dialog.exec();
     });
 
     toolBar->addAction(newAct);
@@ -612,112 +638,6 @@ void MainWindow::openFromUrl()
     updateTitle();
     m_view->zoomToFit();
     statusBar()->showMessage(tr("Opened map from %1").arg(url));
-}
-
-namespace {
-// The leading dotted-number run of a version/tag, minus any "v" prefix or
-// "-beta"-style suffix, split into integer components.
-QList<int> versionParts(const QString &v)
-{
-    QString s = v.trimmed();
-    if (s.startsWith(QLatin1Char('v'), Qt::CaseInsensitive))
-        s = s.mid(1);
-    static const QRegularExpression re(QStringLiteral("^[0-9]+(?:\\.[0-9]+)*"));
-    const QRegularExpressionMatch m = re.match(s);
-    if (m.hasMatch())
-        s = m.captured(0);
-    QList<int> parts;
-    const QStringList pieces = s.split(QLatin1Char('.'), Qt::SkipEmptyParts);
-    for (const QString &p : pieces)
-        parts << p.toInt();
-    return parts;
-}
-
-QString cleanVersion(const QString &v)
-{
-    QString s = v.trimmed();
-    if (s.startsWith(QLatin1Char('v'), Qt::CaseInsensitive))
-        s = s.mid(1);
-    return s;
-}
-} // namespace
-
-int MainWindow::compareVersionStrings(const QString &a, const QString &b)
-{
-    const QList<int> pa = versionParts(a);
-    const QList<int> pb = versionParts(b);
-    const int n = std::max(pa.size(), pb.size());
-    for (int i = 0; i < n; ++i) {
-        const int x = i < pa.size() ? pa.at(i) : 0;
-        const int y = i < pb.size() ? pb.at(i) : 0;
-        if (x != y)
-            return x < y ? -1 : 1;
-    }
-    return 0;
-}
-
-void MainWindow::checkForUpdates()
-{
-    const QString releasesUrl = QStringLiteral("https://github.com/TimeGnu/trizbort/releases");
-
-    QNetworkAccessManager manager;
-    QNetworkRequest request{QUrl(
-        QStringLiteral("https://api.github.com/repos/TimeGnu/trizbort/releases/latest"))};
-    request.setRawHeader("Accept", "application/vnd.github+json");
-    request.setHeader(QNetworkRequest::UserAgentHeader, QStringLiteral("Trizbort-Qt"));
-    request.setAttribute(QNetworkRequest::RedirectPolicyAttribute,
-                         QNetworkRequest::NoLessSafeRedirectPolicy);
-    QNetworkReply *reply = manager.get(request);
-    QEventLoop loop;
-    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    statusBar()->showMessage(tr("Checking for updates…"));
-    loop.exec();
-    QApplication::restoreOverrideCursor();
-
-    if (reply->error() != QNetworkReply::NoError) {
-        const QString err = reply->errorString();
-        reply->deleteLater();
-        statusBar()->clearMessage();
-        const auto choice = QMessageBox::warning(
-            this, tr("Check for Updates"),
-            tr("Couldn't reach the update server:\n%1\n\nOpen the releases page in your browser?")
-                .arg(err),
-            QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-        if (choice == QMessageBox::Yes)
-            QDesktopServices::openUrl(QUrl(releasesUrl));
-        return;
-    }
-
-    const QByteArray body = reply->readAll();
-    reply->deleteLater();
-    statusBar()->clearMessage();
-
-    const QJsonObject obj = QJsonDocument::fromJson(body).object();
-    const QString tag = obj.value(QStringLiteral("tag_name")).toString();
-    const QString htmlUrl = obj.value(QStringLiteral("html_url")).toString();
-    const QString current = QApplication::applicationVersion();
-
-    if (tag.isEmpty()) {
-        QMessageBox::information(
-            this, tr("Check for Updates"),
-            tr("No published release was found. You are running version %1.").arg(current));
-        return;
-    }
-
-    if (compareVersionStrings(tag, current) > 0) {
-        const auto choice = QMessageBox::question(
-            this, tr("Update Available"),
-            tr("Trizbort %1 is available. You are running %2.\n\nOpen the download page?")
-                .arg(cleanVersion(tag), current),
-            QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-        if (choice == QMessageBox::Yes)
-            QDesktopServices::openUrl(QUrl(htmlUrl.isEmpty() ? releasesUrl : htmlUrl));
-    } else {
-        QMessageBox::information(
-            this, tr("Check for Updates"),
-            tr("You are running the latest version (%1).").arg(current));
-    }
 }
 
 bool MainWindow::loadFile(const QString &path)
@@ -854,7 +774,8 @@ void MainWindow::exportImage()
         suffix != QLatin1String("jpeg") && suffix != QLatin1String("bmp"))
         path += QStringLiteral(".png");
     QString error;
-    if (!renderMapToImage(m_map, path, &error))
+    const double scale = m_saveAt100 ? 1.0 : m_view->transform().m11();
+    if (!renderMapToImage(m_map, path, &error, scale))
         QMessageBox::warning(this, tr("Export Failed"), error);
     else
         statusBar()->showMessage(tr("Exported %1").arg(QFileInfo(path).fileName()));
@@ -925,6 +846,8 @@ void MainWindow::startLiveAutomap()
     AutomapSettings settings;
     settings.assumeTwoWayConnections = s.value(QStringLiteral("automap/twoWay"), true).toBool();
     settings.assumeSameNameSameRoom = s.value(QStringLiteral("automap/sameName"), true).toBool();
+    settings.verboseTranscript = s.value(QStringLiteral("automap/verbose"), true).toBool();
+    settings.continueTranscript = s.value(QStringLiteral("automap/continue"), false).toBool();
     settings.guessExits = s.value(QStringLiteral("automap/guessExits"), false).toBool();
     settings.objectCommand =
         s.value(QStringLiteral("automap/objectCommand"), QStringLiteral("tb see")).toString();
@@ -944,6 +867,8 @@ void MainWindow::startLiveAutomap()
     settings = dialog.settings();
     s.setValue(QStringLiteral("automap/twoWay"), settings.assumeTwoWayConnections);
     s.setValue(QStringLiteral("automap/sameName"), settings.assumeSameNameSameRoom);
+    s.setValue(QStringLiteral("automap/verbose"), settings.verboseTranscript);
+    s.setValue(QStringLiteral("automap/continue"), settings.continueTranscript);
     s.setValue(QStringLiteral("automap/guessExits"), settings.guessExits);
     s.setValue(QStringLiteral("automap/objectCommand"), settings.objectCommand);
     s.setValue(QStringLiteral("automap/regionCommand"), settings.regionCommand);
@@ -953,6 +878,19 @@ void MainWindow::startLiveAutomap()
     m_automapPath = path;
     m_automapSize = -1;
     m_automapFedLines = 0;
+    // "Start from the end": treat whatever is already in the transcript as
+    // already seen, so only moves played after this point are mapped (the C#
+    // ContinueTranscript option).
+    if (settings.continueTranscript) {
+        QFile existing(path);
+        if (existing.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QString text = QString::fromUtf8(existing.readAll());
+            text.replace(QLatin1String("\r\n"), QLatin1String("\n"));
+            text.replace(QLatin1Char('\r'), QLatin1Char('\n'));
+            m_automapFedLines = text.split(QLatin1Char('\n')).size();
+            m_automapSize = existing.size();
+        }
+    }
     m_automapping = true;
 
     m_automapController = new GuiAutomapController(this);
@@ -1127,6 +1065,263 @@ void MainWindow::addConnectedRoomLabeled(const QString &placementDir, const QStr
     const int newId = cmd->newRoomId();
     m_undo.push(cmd);
     statusBar()->showMessage(tr("Added room %1 (%2)").arg(newId).arg(displayName));
+}
+
+namespace {
+
+// The eight compass directions in clockwise order, for ±45° rotation.
+const char *const kCompassRing[8] = {"n", "ne", "e", "se", "s", "sw", "w", "nw"};
+
+int compassIndex(const QString &dir)
+{
+    for (int i = 0; i < 8; ++i)
+        if (dir == QLatin1String(kCompassRing[i]))
+            return i;
+    return -1;
+}
+
+QString rotateCompass(const QString &dir, int steps)
+{
+    const int i = compassIndex(dir);
+    if (i < 0)
+        return dir;
+    return QLatin1String(kCompassRing[((i + steps) % 8 + 8) % 8]);
+}
+
+// A unit step in map coordinates for a compass token (y grows downward).
+QPointF dirStep(const QString &dir)
+{
+    double dx = 0, dy = 0;
+    if (dir.contains(QLatin1Char('n'))) dy = -1;
+    if (dir.contains(QLatin1Char('s'))) dy = 1;
+    if (dir.contains(QLatin1Char('e'))) dx = 1;
+    if (dir.contains(QLatin1Char('w'))) dx = -1;
+    return QPointF(dx, dy);
+}
+
+// Compass token for a key press: arrows give cardinals; keypad keys add the
+// diagonals (and cover both NumLock states, e.g. Key_8 or Key_Up == north).
+QString compassFromKey(int key, bool keypad)
+{
+    switch (key) {
+    case Qt::Key_Up:    return QStringLiteral("n");
+    case Qt::Key_Down:  return QStringLiteral("s");
+    case Qt::Key_Left:  return QStringLiteral("w");
+    case Qt::Key_Right: return QStringLiteral("e");
+    default: break;
+    }
+    if (keypad) {
+        switch (key) {
+        case Qt::Key_8: return QStringLiteral("n");
+        case Qt::Key_2: return QStringLiteral("s");
+        case Qt::Key_4: return QStringLiteral("w");
+        case Qt::Key_6: return QStringLiteral("e");
+        case Qt::Key_7: case Qt::Key_Home:     return QStringLiteral("nw");
+        case Qt::Key_9: case Qt::Key_PageUp:   return QStringLiteral("ne");
+        case Qt::Key_1: case Qt::Key_End:      return QStringLiteral("sw");
+        case Qt::Key_3: case Qt::Key_PageDown: return QStringLiteral("se");
+        default: break;
+        }
+    }
+    return QString();
+}
+
+Qt::KeyboardModifier parseKeypadModifier(const QString &name)
+{
+    const QString n = name.toLower();
+    if (n == QLatin1String("control")) return Qt::ControlModifier;
+    if (n == QLatin1String("alt")) return Qt::AltModifier;
+    if (n == QLatin1String("shift")) return Qt::ShiftModifier;
+    return Qt::NoModifier;
+}
+
+} // namespace
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj == m_view && event->type() == QEvent::KeyPress) {
+        if (handleCanvasKey(static_cast<QKeyEvent *>(event)))
+            return true;
+    }
+    return QMainWindow::eventFilter(obj, event);
+}
+
+bool MainWindow::handleCanvasKey(QKeyEvent *event)
+{
+    const bool keypad = event->modifiers() & Qt::KeypadModifier;
+    const QString dir = compassFromKey(event->key(), keypad);
+    if (dir.isEmpty())
+        return false;
+
+    const Qt::KeyboardModifiers mods =
+        event->modifiers() & (Qt::ControlModifier | Qt::AltModifier | Qt::ShiftModifier);
+    const bool ctrl = mods & Qt::ControlModifier;
+    const bool alt = mods & Qt::AltModifier;
+    const bool shift = mods & Qt::ShiftModifier;
+
+    auto followTo = [this](const QString &d) {
+        const int r = roomThroughConnection(m_scene->selectedRoomId(), d);
+        if (r >= 0) {
+            m_scene->selectRoomItem(r);
+            if (const Room *rr = m_map.roomById(r))
+                m_view->ensureVisible(QRectF(rr->x, rr->y, rr->w, rr->h));
+        }
+    };
+
+    if (keypad) {
+        // Numeric-keypad navigation (diagonals included). Shift follows a
+        // connection; otherwise navigate, creating/stubbing per the map's
+        // keypad modifiers.
+        if (shift) {
+            followTo(dir);
+            return true;
+        }
+        const Qt::KeyboardModifier createMod =
+            parseKeypadModifier(m_map.settings.keypadCreationModifier);
+        const Qt::KeyboardModifier unexpMod =
+            parseKeypadModifier(m_map.settings.keypadUnexploredModifier);
+        const bool create = createMod != Qt::NoModifier && (mods & createMod);
+        const bool unexplored = unexpMod != Qt::NoModifier && (mods & unexpMod);
+        navigateOrAdd(dir, create, unexplored);
+        return true;
+    }
+
+    // Plain arrow keys (cardinals only).
+    if (ctrl && alt) {
+        keyboardResizeRooms(dir);
+        return true;
+    }
+    if (ctrl) {
+        navigateOrAdd(dir, /*allowCreate=*/true, /*unexploredStub=*/false);
+        return true;
+    }
+    if (shift) {
+        followTo(dir);
+        return true;
+    }
+
+    // No modifier: nudge the selection, or scroll the view when nothing is
+    // selected.
+    if (m_scene->selectedRoomIds().isEmpty()) {
+        const QPointF s = dirStep(dir);
+        auto *hb = m_view->horizontalScrollBar();
+        auto *vb = m_view->verticalScrollBar();
+        hb->setValue(hb->value() + int(s.x()) * (m_view->viewport()->width() / 10));
+        vb->setValue(vb->value() + int(s.y()) * (m_view->viewport()->height() / 10));
+        return true;
+    }
+    const double delta = m_map.settings.snapToGrid ? m_map.settings.gridSize : 2.0;
+    const QPointF s = dirStep(dir);
+    nudgeSelection(s.x() * delta, s.y() * delta);
+    return true;
+}
+
+int MainWindow::roomThroughConnection(int roomId, const QString &dir) const
+{
+    if (roomId < 0)
+        return -1;
+    // Try the exact direction, then 45° either side (the C# approximate match).
+    const QString tries[3] = {dir, rotateCompass(dir, -1), rotateCompass(dir, 1)};
+    for (const QString &d : tries) {
+        for (const Connection &c : m_map.connections) {
+            bool fromHere = false;
+            for (const Vertex &v : c.vertices) {
+                if (v.docked && v.roomId == roomId && v.port.toLower() == d) {
+                    fromHere = true;
+                    break;
+                }
+            }
+            if (!fromHere)
+                continue;
+            for (const Vertex &v : c.vertices)
+                if (v.docked && v.roomId != roomId)
+                    return v.roomId;
+        }
+    }
+    return -1;
+}
+
+void MainWindow::nudgeSelection(double dx, double dy)
+{
+    const QList<int> rooms = m_scene->selectedRoomIds();
+    QList<RoomMove> moves;
+    for (int id : rooms) {
+        const Room *r = m_map.roomById(id);
+        if (!r)
+            continue;
+        moves.append({id, QPointF(r->x, r->y), QPointF(r->x + dx, r->y + dy)});
+    }
+    if (!moves.isEmpty())
+        m_undo.push(new MoveRoomsCommand(m_scene, moves));
+}
+
+void MainWindow::keyboardResizeRooms(const QString &dir)
+{
+    const double delta = m_map.settings.snapToGrid ? m_map.settings.gridSize : 2.0;
+    const double grid = m_map.settings.gridSize;
+    applyToSelectedRooms(tr("Resize Room"), [dir, delta, grid](Room &r) {
+        if (dir == QLatin1String("w")) {
+            if (r.w - delta >= grid)
+                r.w -= delta;
+        } else if (dir == QLatin1String("e")) {
+            r.w += delta;
+        } else if (dir == QLatin1String("n")) {
+            if (r.h - delta >= grid)
+                r.h -= delta;
+        } else if (dir == QLatin1String("s")) {
+            r.h += delta;
+        }
+    });
+}
+
+void MainWindow::navigateOrAdd(const QString &dir, bool allowCreate, bool unexploredStub)
+{
+    const int sel = m_scene->selectedRoomId();
+    if (sel < 0) {
+        statusBar()->showMessage(tr("Select a room first."));
+        return;
+    }
+    const int target = roomThroughConnection(sel, dir);
+    if (target >= 0) {
+        m_scene->selectRoomItem(target);
+        if (const Room *rr = m_map.roomById(target))
+            m_view->ensureVisible(QRectF(rr->x, rr->y, rr->w, rr->h));
+        return;
+    }
+    if (allowCreate)
+        addConnectedRoom(dir);
+    else if (unexploredStub)
+        addUnexploredExit(sel, dir);
+}
+
+void MainWindow::addUnexploredExit(int roomId, const QString &dir)
+{
+    const Room *r = m_map.roomById(roomId);
+    if (!r)
+        return;
+    Connection c;
+    c.id = m_map.nextConnectionId();
+    c.seq = m_map.nextSeq();
+    c.style = m_scene->newConnectionStyle();
+    c.flow = m_scene->newConnectionFlow();
+    Vertex a;
+    a.index = 0;
+    a.docked = true;
+    a.roomId = roomId;
+    a.port = dir;
+    const QPointF start = MapScene::portPoint(*r, dir);
+    const QPointF step = dirStep(dir);
+    const double dist = m_map.settings.preferredDistanceBetweenRooms;
+    Vertex b;
+    b.index = 1;
+    b.docked = false;
+    b.point = QPointF(start.x() + step.x() * dist, start.y() + step.y() * dist);
+    c.vertices << a << b;
+
+    ReplaceContentCommand::Content before{m_map.rooms, m_map.connections, m_map.regions};
+    ReplaceContentCommand::Content after = before;
+    after.connections.append(c);
+    m_undo.push(new ReplaceContentCommand(m_scene, before, after, tr("Add Unexplored Exit")));
 }
 
 void MainWindow::deleteSelection()
@@ -1875,7 +2070,8 @@ void MainWindow::smartSave()
     if (m_smartSaveImage) {
         const QString fmt = m_smartSaveImageFormat.isEmpty() ? QStringLiteral("png")
                                                              : m_smartSaveImageFormat.toLower();
-        if (renderMapToImage(m_map, base + QLatin1Char('.') + fmt, &error))
+        const double scale = m_saveAt100 ? 1.0 : m_view->transform().m11();
+        if (renderMapToImage(m_map, base + QLatin1Char('.') + fmt, &error, scale))
             saved << fmt.toUpper();
         else
             ok = false;
@@ -1913,9 +2109,19 @@ void MainWindow::reloadFromDisk()
 {
     if (m_filePath.isEmpty() || !QFile::exists(m_filePath))
         return;
-    if (!m_undo.isClean()) {
-        statusBar()->showMessage(
-            tr("The file changed on disk; unsaved changes were kept (not reloaded)."));
+    // Prompt like the C# TrizbortFileWatcher, warning first when a reload would
+    // throw away unsaved edits, and letting the user discard-and-reload or keep
+    // their version.
+    const bool dirty = !m_undo.isClean();
+    const QString msg =
+        dirty ? tr("This map has been modified by another program.\n\nReloading will discard "
+                   "your unsaved changes. Do you want to reload it?")
+              : tr("This map has been modified by another program. Do you want to reload it?");
+    const auto answer =
+        QMessageBox::question(this, tr("Reload Map?"), msg, QMessageBox::Yes | QMessageBox::No,
+                              dirty ? QMessageBox::No : QMessageBox::Yes);
+    if (answer != QMessageBox::Yes) {
+        statusBar()->showMessage(tr("The file changed on disk; kept your version."));
         return;
     }
     const QString path = m_filePath;
@@ -1935,6 +2141,7 @@ void MainWindow::loadPreferences()
     m_smartSaveImage = s.value(QStringLiteral("smartSave/image"), true).toBool();
     m_smartSaveImageFormat =
         s.value(QStringLiteral("smartSave/imageFormat"), QStringLiteral("png")).toString();
+    m_saveAt100 = s.value(QStringLiteral("saveImagesAt100"), true).toBool();
 
     // Application-wide settings read by rendering code (tooltips, hand-drawn
     // default, port granularity, general margins, default font).
@@ -1973,6 +2180,7 @@ void MainWindow::savePreferences()
     s.setValue(QStringLiteral("smartSave/pdf"), m_smartSavePdf);
     s.setValue(QStringLiteral("smartSave/image"), m_smartSaveImage);
     s.setValue(QStringLiteral("smartSave/imageFormat"), m_smartSaveImageFormat);
+    s.setValue(QStringLiteral("saveImagesAt100"), m_saveAt100);
 
     const AppSettings &app = AppSettings::instance();
     s.setValue(QStringLiteral("tooltips/showObjects"), app.showObjectsInTooltips);
@@ -2066,6 +2274,12 @@ void MainWindow::showAppSettings()
     connect(ssImage, &QCheckBox::toggled, ssFormat, &QComboBox::setEnabled);
     form->addRow(tr("Smart Save image &format:"), ssFormat);
 
+    auto *saveAt100 = new QCheckBox(tr("Save images at 100%"), &dialog);
+    saveAt100->setChecked(m_saveAt100);
+    saveAt100->setToolTip(
+        tr("When off, exported images use the current view zoom instead of 100%."));
+    form->addRow(saveAt100);
+
     AppSettings &app = AppSettings::instance();
     auto sectionLabel = [&](const QString &text) {
         auto *label = new QLabel(QStringLiteral("<b>%1</b>").arg(text), &dialog);
@@ -2155,6 +2369,7 @@ void MainWindow::showAppSettings()
     m_smartSavePdf = ssPdf->isChecked();
     m_smartSaveImage = ssImage->isChecked();
     m_smartSaveImageFormat = ssFormat->currentText();
+    m_saveAt100 = saveAt100->isChecked();
 
     app.showObjectsInTooltips = ttObjects->isChecked();
     app.showDescriptionsInTooltips = ttDesc->isChecked();

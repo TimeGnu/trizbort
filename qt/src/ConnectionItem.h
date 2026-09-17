@@ -74,6 +74,8 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
 private:
     // Scene-space points of the connection's vertices (endpoints + waypoints),
@@ -86,6 +88,7 @@ private:
     QVector<QPointF> m_points;
     int m_dragVertex = -1;      // index of the vertex being dragged, or -1
     Connection m_dragBefore;    // snapshot for the undo command
+    bool m_hover = false;       // mouse hovering this connection
 };
 
 } // namespace trizbort

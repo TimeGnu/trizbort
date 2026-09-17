@@ -182,9 +182,16 @@ public:
         m_sameName = new QCheckBox(tr("Rooms with the same name are the same room"), this);
         m_sameName->setChecked(settings.assumeSameNameSameRoom);
         form->addRow(QString(), m_sameName);
+        m_verbose = new QCheckBox(tr("Transcript is verbose; expect room descriptions"), this);
+        m_verbose->setChecked(settings.verboseTranscript);
+        form->addRow(QString(), m_verbose);
         m_guessExits = new QCheckBox(tr("Guess exits from room descriptions"), this);
         m_guessExits->setChecked(settings.guessExits);
         form->addRow(QString(), m_guessExits);
+        m_startFromEnd =
+            new QCheckBox(tr("Start from the end of the transcript (map only new moves)"), this);
+        m_startFromEnd->setChecked(settings.continueTranscript);
+        form->addRow(QString(), m_startFromEnd);
         m_step = new QCheckBox(tr("Single-step with F11"), this);
         form->addRow(QString(), m_step);
 
@@ -206,6 +213,8 @@ public:
         AutomapSettings s = m_settings;
         s.assumeTwoWayConnections = m_twoWay->isChecked();
         s.assumeSameNameSameRoom = m_sameName->isChecked();
+        s.verboseTranscript = m_verbose->isChecked();
+        s.continueTranscript = m_startFromEnd->isChecked();
         s.guessExits = m_guessExits->isChecked();
         s.objectCommand = m_objectCmd->text().trimmed().isEmpty() ? QStringLiteral("tb see")
                                                                   : m_objectCmd->text().trimmed();
@@ -219,6 +228,8 @@ private:
     QLineEdit *m_file = nullptr;
     QCheckBox *m_twoWay = nullptr;
     QCheckBox *m_sameName = nullptr;
+    QCheckBox *m_verbose = nullptr;
+    QCheckBox *m_startFromEnd = nullptr;
     QCheckBox *m_guessExits = nullptr;
     QCheckBox *m_step = nullptr;
     QLineEdit *m_objectCmd = nullptr;

@@ -58,6 +58,15 @@ struct AutomapSettings {
     // When true (the non-interactive default), rooms sharing a name are taken to
     // be the same room; when false the controller is asked to disambiguate.
     bool assumeSameNameSameRoom = true;
+    // When false the transcript is treated as terse (no room descriptions), so
+    // rooms sharing a name are always taken to be the same room without asking
+    // (Automap.cs: "must assume room with same name is same room" when not
+    // verbose). When true, disambiguation applies as normal.
+    bool verboseTranscript = true;
+    // Live automap only: skip everything already in the transcript file and
+    // start from its end, so only newly-played moves are mapped (C#
+    // ContinueTranscript).
+    bool continueTranscript = false;
     // Add dangling exit stubs for direction words found in a room's description.
     bool guessExits = false;
     double preferredDistanceBetweenRooms = 64.0;

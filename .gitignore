@@ -118,3 +118,12 @@ UpgradeLog*.XML
 # .NET Upgrade Assistant log (accidentally committed on 1.7.5)
 *.clef
 upgrade-assistant.clef
+
+# Debian packaging build artifacts
+/obj-*/
+/debian/.debhelper/
+/debian/trizbort-qt/
+/debian/files
+/debian/debhelper-build-stamp
+/debian/*.substvars
+/debian/*.debhelper.log

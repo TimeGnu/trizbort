@@ -65,17 +65,21 @@ class GuiAutomapController;
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
+    // Headless self-test seam (main.cpp): drives the keyboard handlers against a
+    // real window and inspects the model. Keeps the handlers out of the public API.
+    friend int runKeyboardSelftest();
+
 public:
     explicit MainWindow(QWidget *parent = nullptr);
 
     bool loadFile(const QString &path);
 
-    // Compare two dotted version strings ("v1.9", "1.8.0.0"): -1/0/1. Public and
-    // static so the update check's comparison can be unit-tested.
-    static int compareVersionStrings(const QString &a, const QString &b);
-
 protected:
     void closeEvent(QCloseEvent *event) override;
+    // Keyboard editing/navigation on the canvas (the C# Canvas key handlers):
+    // arrow-key nudge/scroll, Ctrl+arrow select-or-add, Shift+arrow follow a
+    // connection, Ctrl+Alt+arrow resize, and numeric-keypad navigation.
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private slots:
     void newFile();
@@ -93,6 +97,19 @@ private slots:
     void automapTick();
     void addRoom();
     void addConnectedRoom(const QString &direction);
+
+    // Keyboard-editing helpers (see eventFilter). Directions are compass tokens
+    // ("n","s","e","w","ne","nw","se","sw").
+    bool handleCanvasKey(QKeyEvent *event);
+    // Follow a connection docked at the selected room toward the given compass
+    // direction (exact, then ±45°) and return the room at the far end, or -1.
+    int roomThroughConnection(int roomId, const QString &dir) const;
+    void nudgeSelection(double dx, double dy);              // move selected elements
+    void keyboardResizeRooms(const QString &dir);           // Ctrl+Alt+arrow
+    // Select the room reached through a connection in `dir`; when none exists,
+    // optionally add a connected room, or add an unexplored dangling exit.
+    void navigateOrAdd(const QString &dir, bool allowCreate, bool unexploredStub);
+    void addUnexploredExit(int roomId, const QString &dir);
     void addConnectedRoomLabeled(const QString &placementDir, const QString &startLabel,
                                  const QString &endLabel, const QString &displayName);
     void deleteSelection();
@@ -122,10 +139,6 @@ private:
     void paste();
     void copyColor();
     void pasteColor();
-
-    // Query the fork's GitHub releases feed and report whether a newer version
-    // is available (the C# Check-for-Updates).
-    void checkForUpdates();
 
     // Export / file helpers.
     void exportToClipboard(const QString &format);
@@ -190,6 +203,9 @@ private:
     bool m_smartSavePdf = true;
     bool m_smartSaveImage = true;
     QString m_smartSaveImageFormat = QStringLiteral("png");
+    // When true, image/PDF exports render at 100% (1 unit per pixel); when false
+    // they render at the current view zoom (the C# SaveAt100 app setting).
+    bool m_saveAt100 = true;
 };
 
 } // namespace trizbort

@@ -25,24 +25,42 @@
 
 namespace trizbort {
 
-// Build a QFont from a stored FontSpec, applying the family, point size and
-// style flags. When the spec carries no family or a non-positive size (an
-// unspecified font), the given fallback point size and the default UI family
-// are used instead. Sizes are treated as points, matching the C# GDI fonts the
-// .trizbort format stores.
-inline QFont qfontFromSpec(const FontSpec &spec, double fallbackPointSize)
+// Build a QFont from a stored FontSpec, applying the family, size and style
+// flags. When the spec carries no family or a non-positive size (an unspecified
+// font), the given fallback size and the default UI family are used instead.
+// The .trizbort format stores C# GDI font sizes in GraphicsUnit.World, i.e. map
+// units (== pixels at 1:1), so the size is applied with setPixelSize; using
+// point sizes would render text ~33% larger and overflow small rooms.
+inline QFont qfontFromSpec(const FontSpec &spec, double fallbackSize)
 {
     QFont font;
     if (!spec.family.isEmpty())
         font.setFamily(spec.family);
     else if (!AppSettings::instance().defaultFontName.isEmpty())
         font.setFamily(AppSettings::instance().defaultFontName); // the app-wide default family
-    font.setPointSizeF(spec.size > 0.0 ? spec.size : fallbackPointSize);
+    font.setPixelSize(qRound(spec.size > 0.0 ? spec.size : fallbackSize));
     font.setBold(spec.bold);
     font.setItalic(spec.italic);
     font.setUnderline(spec.underline);
     font.setStrikeOut(spec.strikeout);
     return font;
+}
+
+// Honour the map's "wrap text at dashes" setting when laying out canvas text,
+// mirroring TextBlock.cs. Qt's word wrap only guarantees breaks at whitespace,
+// so this rewrites the break behaviour around hyphen-minus while keeping the
+// exact glyph: with wrapping on, a zero-width space (U+200B) after each hyphen
+// adds a break opportunity there; with it off, a word joiner (U+2060) removes
+// one. Like the C# original, this only applies to single-line text (text with
+// explicit newlines is drawn as authored).
+inline QString applyDashWrapping(const QString &text, bool wrapAtDashes)
+{
+    if (!text.contains(QLatin1Char('-')) || text.contains(QLatin1Char('\n')))
+        return text;
+    QString out = text;
+    out.replace(QLatin1Char('-'),
+                wrapAtDashes ? QStringLiteral("-​") : QStringLiteral("-⁠"));
+    return out;
 }
 
 } // namespace trizbort

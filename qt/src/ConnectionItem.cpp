@@ -81,6 +81,68 @@ QPointF midpointAlongPath(const QList<QPointF> &pts)
     return pts.last();
 }
 
+// The midpoint of a poly-line together with the unit direction of the segment
+// it falls on, so mid-line labels can be oriented like Connection.annotate.
+struct MidInfo {
+    QPointF point;
+    QPointF unit{0, 1}; // segment direction (start -> end)
+};
+MidInfo midSegmentInfo(const QList<QPointF> &pts)
+{
+    MidInfo info;
+    if (pts.size() < 2) {
+        info.point = pts.isEmpty() ? QPointF() : pts.first();
+        return info;
+    }
+    double total = 0.0;
+    for (int i = 1; i < pts.size(); ++i)
+        total += std::hypot(pts[i].x() - pts[i - 1].x(), pts[i].y() - pts[i - 1].y());
+    double half = total / 2.0;
+    for (int i = 1; i < pts.size(); ++i) {
+        const QPointF d = pts[i] - pts[i - 1];
+        const double len = std::hypot(d.x(), d.y());
+        if (len > 0.0 && half <= len) {
+            info.point = pts[i - 1] + d * (half / len);
+            info.unit = d / len;
+            return info;
+        }
+        half -= len;
+    }
+    info.point = pts.last();
+    return info;
+}
+
+// Ellipse/octagonal rooms pull their end labels a few pixels off the outline,
+// per-port, matching Connection.roomTypeAdjustments. Zero for other shapes.
+QPointF roomTypeLabelAdjust(const Map *map, const Connection &c, bool start)
+{
+    if (!map || c.vertices.isEmpty())
+        return QPointF();
+    QList<Vertex> sorted = c.vertices;
+    std::sort(sorted.begin(), sorted.end(),
+              [](const Vertex &a, const Vertex &b) { return a.index < b.index; });
+    const Vertex &v = start ? sorted.first() : sorted.last();
+    if (!v.docked)
+        return QPointF();
+    const Room *r = map->roomById(v.roomId);
+    if (!r || !(r->ellipse || r->octagonal))
+        return QPointF();
+    const QString p = v.port.toLower();
+    if (p == QLatin1String("se"))
+        return QPointF(8, 6);
+    if (p == QLatin1String("ne"))
+        return QPointF(10, -6);
+    if (p == QLatin1String("ene") || p == QLatin1String("ese"))
+        return QPointF(4, 0);
+    if (p == QLatin1String("nw") || p == QLatin1String("wnw"))
+        return QPointF(-10, -4);
+    if (p == QLatin1String("sw"))
+        return QPointF(-10, 4);
+    if (p == QLatin1String("wsw"))
+        return QPointF(-10, 0);
+    return QPointF();
+}
+
 // Draw one connection annotation (start/mid/end text) offset from an anchor on
 // the line, on the side the line points away to. Mirrors Connection.annotate:
 // the label sits clear of the line, growing away from the anchor.
@@ -154,6 +216,7 @@ ConnectionItem::ConnectionItem(MapScene *scene, int connId)
     , m_connId(connId)
 {
     setFlags(ItemIsSelectable);
+    setAcceptHoverEvents(true);
     setZValue(-1);
     updateRoute();
 }
@@ -257,10 +320,18 @@ void ConnectionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, 
 
     QPen pen(color);
     pen.setWidthF(2.0);
+    // C# renders a "dashed" connection with a dotted pen (Palette.DashedLinePen
+    // uses DashStyle.Dot), so match that rather than drawing long dashes.
     if (c.style == ConnectionStyle::Dashed)
-        pen.setStyle(Qt::DashLine);
+        pen.setStyle(Qt::DotLine);
     if (isSelected()) {
-        pen.setColor(QColor(30, 120, 220));
+        QColor sel = map->settings.colors[ColorSelectedLine];
+        pen.setColor(sel.isValid() ? sel : QColor(30, 120, 220));
+        pen.setWidthF(3.0);
+    } else if (m_hover) {
+        // Hover highlight in the palette's hover-line colour (C# HoverLine pen).
+        QColor hov = map->settings.colors[ColorHoverLine];
+        pen.setColor(hov.isValid() ? hov : QColor(0, 150, 0));
         pen.setWidthF(3.0);
     }
 
@@ -356,25 +427,42 @@ void ConnectionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, 
             textColor = QColor(Qt::black);
         const double off = map->settings.textOffset > 0.0 ? map->settings.textOffset : 4.0;
 
+        const bool wrap = map->settings.wrapTextAtDashes;
         if (!c.startText.isEmpty()) {
-            const QPointF a = m_points.first();
+            const QPointF a = m_points.first() + roomTypeLabelAdjust(map, c, true);
             const QPointF b = m_points.at(1);
             QPointF out = a - b;
             const double l = std::hypot(out.x(), out.y());
             out = (l > 1e-6) ? out / l : QPointF(0, -1);
-            drawConnectionLabel(painter, a, out, c.startText, lineFont, textColor, off);
+            drawConnectionLabel(painter, a, out, applyDashWrapping(c.startText, wrap), lineFont,
+                                textColor, off);
         }
         if (!c.endText.isEmpty()) {
-            const QPointF a = m_points.last();
+            const QPointF a = m_points.last() + roomTypeLabelAdjust(map, c, false);
             const QPointF b = m_points.at(m_points.size() - 2);
             QPointF out = a - b;
             const double l = std::hypot(out.x(), out.y());
             out = (l > 1e-6) ? out / l : QPointF(0, -1);
-            drawConnectionLabel(painter, a, out, c.endText, lineFont, textColor, off);
+            drawConnectionLabel(painter, a, out, applyDashWrapping(c.endText, wrap), lineFont,
+                                textColor, off);
         }
         if (!c.midText.isEmpty()) {
-            const QPointF mid = midpointAlongPath(m_points);
-            drawConnectionLabel(painter, mid, QPointF(0, 1), c.midText, lineFont, textColor, off);
+            // Mirror Connection.annotate's mid-line special-casing: vertical
+            // lines push the label to the right (centred vertically), near-
+            // horizontal lines drop it below (centred horizontally), and other
+            // angles grow it along the segment direction.
+            const MidInfo mid = midSegmentInfo(m_points);
+            constexpr double kRadToDeg = 57.29577951308232; // 180/pi (portable; no M_PI)
+            const double angle = std::atan2(mid.unit.y(), mid.unit.x()) * kRadToDeg;
+            QPointF out;
+            if (std::abs(std::abs(angle) - 90.0) < 1.0)
+                out = QPointF(1, 0);            // vertical line: to the right
+            else if (std::abs(angle) <= 10.0)
+                out = QPointF(0, 1);            // near-horizontal: below the line
+            else
+                out = mid.unit;                 // diagonal: along the segment
+            drawConnectionLabel(painter, mid.point, out, applyDashWrapping(c.midText, wrap),
+                                lineFont, textColor, off);
         }
     }
 
@@ -561,6 +649,20 @@ void ConnectionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     m_scene->activateConnection(m_connId);
     event->accept();
+}
+
+void ConnectionItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    m_hover = true;
+    update();
+    QGraphicsItem::hoverEnterEvent(event);
+}
+
+void ConnectionItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    m_hover = false;
+    update();
+    QGraphicsItem::hoverLeaveEvent(event);
 }
 
 void ConnectionItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)

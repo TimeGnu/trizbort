@@ -71,6 +71,7 @@ protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -88,6 +89,7 @@ private:
     double m_h = 64.0;
     bool m_applyingModel = false; // guard against feedback while syncing
 
+    bool m_hovered = false;       // mouse over this room (for connect-mode ports)
     int m_resizeHandle = -1;      // active resize handle, or -1
     QPointF m_resizeStartScene;   // scene pos where the resize drag began
     double m_startX = 0, m_startY = 0, m_startW = 0, m_startH = 0;
