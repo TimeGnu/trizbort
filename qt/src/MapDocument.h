@@ -58,6 +58,20 @@ namespace trizbort {
 // The default region name; rooms and the region list use it for "no region".
 inline const QString kNoRegion = QStringLiteral("NoRegion");
 
+// The .trizbort FILE FORMAT version stamped into the <trizbort version="..."/>
+// attribute of newly-created maps (loaded maps keep whatever version they had,
+// so they round-trip unchanged). This is a property of the on-disk format, NOT
+// of the application: the reader keys format-compatibility behaviour off it
+// (e.g. the pre-1.5.8.3 colour quirk) and other tools, including the C# app,
+// parse it as a dotted number. It must therefore stay a plain dotted version
+// and change ONLY when the format itself changes.
+//
+// Do NOT set this to the application version (TRIZBORT_VERSION). The app version
+// is dynamic (it can be "dev-151-gabc1234") and moves with every release; using
+// it here would put unparseable text into saved files and bump the "format
+// version" on releases that never touched the format.
+inline const QString kTrizbortFileFormatVersion = QStringLiteral("1.8.0.0");
+
 // A room's shape, matching the C# RoomShape enum (persisted as an int in
 // <settings><rooms><defaultRoomShape>).
 enum class RoomShape { SquareCorners, RoundedCorners, Ellipse, Octagonal, NotARoom };

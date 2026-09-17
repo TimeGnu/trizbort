@@ -430,7 +430,11 @@ QString TrizbortWriter::toString(const Map &map)
     QString out;
     out += QLatin1String("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 
-    const QString version = map.version.isEmpty() ? QStringLiteral("1.8.0.0") : map.version;
+    // Preserve a loaded map's own format version (so it round-trips unchanged);
+    // stamp new maps with the current file-format version. This is deliberately
+    // the format version, never the application version -- see
+    // kTrizbortFileFormatVersion.
+    const QString version = map.version.isEmpty() ? kTrizbortFileFormatVersion : map.version;
     out += QLatin1String("<trizbort");
     addAttr(out, QStringLiteral("version"), version);
     out += QLatin1String(">\n");
