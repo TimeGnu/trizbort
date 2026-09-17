@@ -67,6 +67,7 @@
 #include "TranscriptAutomapper.h"
 #include "TrizbortReader.h"
 #include "TrizbortWriter.h"
+#include "Version.h"
 #include "export/CodeExporter.h"
 #include "export/ExporterFactory.h"
 
@@ -861,7 +862,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     QApplication::setApplicationName(QStringLiteral("Trizbort (Qt)"));
     QApplication::setOrganizationName(QStringLiteral("Trizbort"));
-    QApplication::setApplicationVersion(QStringLiteral("1.8.0.0"));
+    QApplication::setApplicationVersion(QStringLiteral(TRIZBORT_VERSION));
 
     if (argc >= 2 && QString::fromLocal8Bit(argv[1]) == QLatin1String("--edit-selftest"))
         return runEditSelftest();

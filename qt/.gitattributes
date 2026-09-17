@@ -1,0 +1,4 @@
+# Copyright (c) 2026 Jason Self <j@jxself.org>. GPLv3-or-later; see qt/COPYING.
+# Keep shell scripts LF so they run under sh on every platform, including
+# Git for Windows (whose sh can choke on CRLF).
+*.sh text eol=lf

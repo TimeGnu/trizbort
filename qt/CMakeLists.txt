@@ -14,6 +14,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
+# Resolve the program version (see cmake/GetVersion.cmake) and bake it into a
+# generated Version.h that the About box reads.
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(GetVersion)
+trizbort_determine_version(TRIZBORT_VERSION_STRING)
+message(STATUS "Trizbort version: ${TRIZBORT_VERSION_STRING}")
+configure_file(src/Version.h.in "${CMAKE_CURRENT_BINARY_DIR}/generated/Version.h" @ONLY)
+
 find_package(Qt6 REQUIRED COMPONENTS Widgets Network)
 
 add_executable(trizbort-qt
@@ -46,6 +54,7 @@ add_executable(trizbort-qt
     src/export/QuestExporter.cpp
 )
 
+target_include_directories(trizbort-qt PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
 target_link_libraries(trizbort-qt PRIVATE Qt6::Widgets Qt6::Network)
 
 # Installation (FHS layout via GNUInstallDirs; used by `cmake --install` and by
